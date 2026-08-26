@@ -1,0 +1,982 @@
+{
+  "checkedAt": "2026-08-26T23:23:40.931Z",
+  "scope": "Links oficiais Roblox Creator Hub e Luau encontrados nos HTMLs",
+  "totals": {
+    "checked": 194,
+    "reachable": 194,
+    "broken": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "url": "https://create.roblox.com/docs",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/experiences",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/publishing/publish-experiences-and-places",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/client-server",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/creation",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio/setup",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/dashboard/creations",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio/testing-modes",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/place-files",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio/explorer",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio/properties",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio/output",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/data-model",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/workspace",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/services",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/Instance",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/parts",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/tutorials/curriculums/building/work-with-parts",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/parts/models",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio/pivot-tools",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/physics/units",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/game-design/prototyping",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/assets",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/assets/manager",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/assets/toolbox",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/security/third-party-vulnerabilities",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio/terrain-editor",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/environment/lighting",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/locations",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio/script-editor",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/variables",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/nil",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/operators",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/strings",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/type-coercion",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/control-structures",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/scheduler",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/functions",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/tuples",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/tables",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/scope",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio/debugging",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/type-checking",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://luau.org/types/",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://luau.org/types/type-refinements/",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/events",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/BasePart",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/datatypes/RBXScriptConnection",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/attributes",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/CollectionService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/datatypes/Vector3",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/workspace/cframes",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/PVInstance",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/workspace/raycasting",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/datatypes/RaycastParams",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/datatypes/RaycastResult",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/WorldRoot",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/datatypes/OverlapParams",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/TweenService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/Tween",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/players",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/characters",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/Player",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/Players",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/Humanoid",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/module",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/RunService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/players/tools",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/Tool",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/StarterPack",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/Backpack",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/input/input-action-system",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/InputAction",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/InputBinding",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/ui",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/ui/frames",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/ui/labels",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/ui/position-and-size",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/ui/buttons",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/GuiButton",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/ScreenGui",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/publishing/adaptive-design",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/publishing/accessibility",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/GuiObject",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/localization",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/localization/automatic-translations",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/input/mouse-and-keyboard",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/input/gamepad",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/security/security-tactics",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/events/remote",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/RemoteEvent",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/RemoteFunction",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/UnreliableRemoteEvent",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/security/client-server-boundary",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://luau.org/library",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/data-stores",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/ui/proximity-prompts",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/ProximityPromptService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/players/leaderboards",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/security/defensive-design",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/ServerStorage",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/HttpService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/ModuleScript",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://luau.org/typecheck",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/luau/metatables",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/ProximityPrompt",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/education/battle-royale-series/managing-players",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/collaboration",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/version-history",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/assets/packages",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/sync",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/data-stores/best-practices",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/GlobalDataStore",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/DataStoreService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/data-stores/player-data-purchasing",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/DataModel",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/data-stores/versioning-listing-and-caching",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/data-stores/observability",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/game-design/balance-virtual-economies",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/game-design/introduction-to-quest-design",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/analytics/economy-events",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/PolicyService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/game-design/core-loops",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/security/server-side-detection",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/performance-optimization/microprofiler/task-scheduler",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/multithreading",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/physics/assemblies",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/HingeConstraint",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/physics/network-ownership",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/scripting/security/network-ownership",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/workspace/streaming",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/server-authority",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/animation/using",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/Animator",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/animation/events",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/workspace/camera",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/audio/objects",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/effects",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/characters/pathfinding",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/PathfindingService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/Path",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/ui/text-filtering",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/chat/in-experience-text-chat",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/bans",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/promotion/content-maturity",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/performance-optimization",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/performance-optimization/identify",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/performance-optimization/microprofiler/use-microprofiler",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/performance-optimization/improve",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio/rig-builder",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/avatar",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/configure-games",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/publishing/experience-icons",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/publishing/thumbnails",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud/guides/usage-place-publishing",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/MarketplaceService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/monetization/developer-products",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/monetization",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/analytics/event-types",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/AnalyticsService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/experiments",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/game-design/liveops-essentials",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/safety",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/analytics",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/teleport",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/TeleportOptions",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/TeleportService/TeleportInitFailed",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/TeleportService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/data-stores-vs-memory-stores",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/memory-stores",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/memory-stores/best-practices",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/MemoryStoreQueue",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/cross-server-messaging",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/reference/engine/classes/MessagingService",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/matchmaking",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/http-service",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud-services/secrets",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud/reference/features/universes",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud/auth/api-keys",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud/reference/scopes",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud/auth/oauth2-overview",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud/reference/rate-limits",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/cloud/reference/patterns",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/game-design/design-for-roblox",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/localization/manual-translations",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/studio/microprofiler",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/performance-optimization/design",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/projects/configure-experiences",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/analytics/analytics-dashboard",
+      "status": 200,
+      "result": "reachable"
+    },
+    {
+      "url": "https://create.roblox.com/docs/production/game-design",
+      "status": 200,
+      "result": "reachable"
+    }
+  ]
+}

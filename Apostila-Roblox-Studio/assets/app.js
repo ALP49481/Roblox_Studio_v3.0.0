@@ -4,7 +4,10 @@
   const STORAGE_KEYS = {
     theme: "apostila-roblox-theme",
     progress: "apostila-roblox-progress-v1",
-    cloudAccount: "apostila-roblox-cloud-account-v1"
+    cloudAccount: "apostila-roblox-cloud-account-v1",
+    favorites: "apostila-roblox-favorites-v1",
+    recent: "apostila-roblox-recent-v1",
+    lastChapter: "apostila-roblox-last-chapter-v1"
   };
   const lessonGroups = {
     "0": ["modulo-00-capitulo-01", "modulo-00-capitulo-02"],
@@ -85,6 +88,14 @@
   const root = document.documentElement;
   let activeUser = null;
   let cloudRequestInProgress = false;
+  let searchIndexPromise = null;
+
+  const appScript = document.querySelector('script[src*="assets/app.js"]');
+  const siteRootUrl = appScript ? new URL("../", appScript.src) : new URL("./", window.location.href);
+
+  function siteUrl(relativePath) {
+    return new URL(relativePath, siteRootUrl).href;
+  }
 
   function readStorage(key, fallback) {
     try {
@@ -104,6 +115,283 @@
       console.warn(`Não foi possível salvar ${key}.`, error);
       return false;
     }
+  }
+
+  function normalizeSearch(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("pt-BR");
+  }
+
+  function currentFavorites() {
+    const stored = readStorage(STORAGE_KEYS.favorites, []);
+    return Array.isArray(stored) ? stored.filter((id) => availableLessons.includes(id)) : [];
+  }
+
+  function currentRecent() {
+    const stored = readStorage(STORAGE_KEYS.recent, []);
+    return Array.isArray(stored)
+      ? stored.filter((item) => item && availableLessons.includes(item.id)).slice(0, 8)
+      : [];
+  }
+
+  function updateFavoriteButtons() {
+    const favorites = new Set(currentFavorites());
+    document.querySelectorAll("[data-favorite-id]").forEach((button) => {
+      const favorite = favorites.has(button.dataset.favoriteId);
+      button.setAttribute("aria-pressed", String(favorite));
+      button.setAttribute("aria-label", favorite ? "Remover capítulo dos favoritos" : "Adicionar capítulo aos favoritos");
+      button.textContent = favorite ? "★ Favorito" : "☆ Favoritar";
+    });
+  }
+
+  function toggleFavorite(id) {
+    const favorites = new Set(currentFavorites());
+    if (favorites.has(id)) favorites.delete(id);
+    else favorites.add(id);
+    writeStorage(STORAGE_KEYS.favorites, [...favorites]);
+    updateFavoriteButtons();
+    renderStudyLibrary();
+    showToast(favorites.has(id) ? "Capítulo adicionado aos favoritos." : "Capítulo removido dos favoritos.");
+  }
+
+  function chapterMetadata(chapter) {
+    const checkbox = chapter?.querySelector("[data-progress-id]");
+    const title = chapter?.querySelector("h2")?.textContent.trim();
+    const kicker = chapter?.querySelector(".chapter-kicker")?.textContent.trim();
+    if (!checkbox || !title) return null;
+    return {
+      id: checkbox.dataset.progressId,
+      title,
+      chapter: kicker || "Capítulo",
+      url: `${window.location.pathname.split("/").pop()}#${chapter.id}`,
+      visitedAt: new Date().toISOString()
+    };
+  }
+
+  function recordVisit(chapter) {
+    const metadata = chapterMetadata(chapter);
+    if (!metadata) return;
+    const recent = currentRecent().filter((item) => item.id !== metadata.id);
+    recent.unshift(metadata);
+    writeStorage(STORAGE_KEYS.recent, recent.slice(0, 8));
+    writeStorage(STORAGE_KEYS.lastChapter, metadata);
+    updateContinueLinks();
+    renderStudyLibrary();
+  }
+
+  function resolveStoredChapterUrl(item) {
+    if (!item?.url) return siteUrl("index.html#modulos");
+    const moduleMatch = /^modulo-(\d{2})-/.exec(item.id || "");
+    if (!moduleMatch) return siteUrl("index.html#modulos");
+    const fragment = item.url.includes("#") ? item.url.slice(item.url.indexOf("#")) : "";
+    return siteUrl(`modulos/modulo-${moduleMatch[1]}.html${fragment}`);
+  }
+
+  function updateContinueLinks() {
+    const last = readStorage(STORAGE_KEYS.lastChapter, null);
+    document.querySelectorAll("[data-continue-learning]").forEach((link) => {
+      if (!last?.id) {
+        link.href = siteUrl("modulos/modulo-00.html#capitulo-01");
+        link.textContent = "Começar pelo Módulo 0";
+        return;
+      }
+      link.href = resolveStoredChapterUrl(last);
+      link.textContent = `Continuar: ${last.chapter}`;
+      link.title = last.title;
+    });
+  }
+
+  function addFavoriteControls() {
+    document.querySelectorAll("article.chapter").forEach((chapter) => {
+      const header = chapter.querySelector(".chapter-header");
+      const checkbox = header?.querySelector("[data-progress-id]");
+      if (!header || !checkbox || header.querySelector("[data-favorite-id]")) return;
+      const controls = document.createElement("div");
+      controls.className = "chapter-actions";
+      const favorite = document.createElement("button");
+      favorite.type = "button";
+      favorite.className = "button compact";
+      favorite.dataset.favoriteId = checkbox.dataset.progressId;
+      const completion = header.querySelector(".completion-control");
+      if (completion) controls.append(favorite, completion);
+      else controls.append(favorite);
+      header.append(controls);
+    });
+    updateFavoriteButtons();
+  }
+
+  function loadSearchIndex() {
+    if (Array.isArray(window.APOSTILA_SEARCH_INDEX)) return Promise.resolve(window.APOSTILA_SEARCH_INDEX);
+    if (searchIndexPromise) return searchIndexPromise;
+    searchIndexPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = siteUrl("assets/search-index.js");
+      script.onload = () => resolve(window.APOSTILA_SEARCH_INDEX || []);
+      script.onerror = () => reject(new Error("Não foi possível carregar o índice de busca."));
+      document.head.append(script);
+    });
+    return searchIndexPromise;
+  }
+
+  function searchEntryMatchesFilter(entry, filter) {
+    if (filter === "api") return entry.apis.length > 0;
+    if (filter === "diagnostic") return entry.hasDiagnostics;
+    if (filter === "exercise") return entry.hasExercises;
+    if (filter === "easy") return entry.difficulties.some((value) => normalizeSearch(value).includes("facil"));
+    if (filter === "intermediate") return entry.difficulties.some((value) => normalizeSearch(value).includes("intermedi"));
+    if (filter === "challenging") return entry.difficulties.some((value) => normalizeSearch(value).includes("desafi"));
+    return true;
+  }
+
+  function searchEntries(index, query, filter) {
+    const terms = normalizeSearch(query).split(/\s+/).filter(Boolean);
+    return index
+      .filter((entry) => searchEntryMatchesFilter(entry, filter))
+      .map((entry) => {
+        const title = normalizeSearch(`${entry.chapter} ${entry.title} ${entry.apis.join(" ")}`);
+        const body = normalizeSearch(`${entry.summary} ${entry.text}`);
+        if (!terms.every((term) => title.includes(term) || body.includes(term))) return null;
+        const score = terms.reduce((total, term) => total + (title.includes(term) ? 5 : 1), 0);
+        return { entry, score };
+      })
+      .filter(Boolean)
+      .sort((left, right) => right.score - left.score || left.entry.module - right.entry.module)
+      .slice(0, 30)
+      .map(({ entry }) => entry);
+  }
+
+  function createResultLink(entry) {
+    const link = document.createElement("a");
+    link.className = "search-result";
+    link.href = siteUrl(entry.url);
+    const heading = document.createElement("strong");
+    heading.textContent = `${entry.chapter} — ${entry.title}`;
+    const meta = document.createElement("span");
+    meta.className = "search-result-meta";
+    meta.textContent = `Módulo ${entry.module} · ${entry.moduleTitle}`;
+    const summary = document.createElement("span");
+    summary.textContent = entry.summary || "Abra o capítulo para estudar este conteúdo.";
+    link.append(heading, meta, summary);
+    if (entry.apis.length) {
+      const chips = document.createElement("span");
+      chips.className = "search-result-chips";
+      entry.apis.slice(0, 4).forEach((api) => {
+        const chip = document.createElement("code");
+        chip.textContent = api;
+        chips.append(chip);
+      });
+      link.append(chips);
+    }
+    return link;
+  }
+
+  async function renderSearchResults() {
+    const dialog = document.querySelector("[data-study-dialog]");
+    const results = dialog?.querySelector("[data-search-results]");
+    const input = dialog?.querySelector("[data-search-input]");
+    const filter = dialog?.querySelector("[data-search-filter]");
+    if (!results || !input || !filter) return;
+    results.replaceChildren();
+    results.setAttribute("aria-busy", "true");
+    try {
+      const index = await loadSearchIndex();
+      const matches = searchEntries(index, input.value, filter.value);
+      const status = document.createElement("p");
+      status.className = "search-status";
+      status.setAttribute("role", "status");
+      status.textContent = `${matches.length} resultado${matches.length === 1 ? "" : "s"}.`;
+      results.append(status);
+      matches.forEach((entry) => results.append(createResultLink(entry)));
+      if (!matches.length) {
+        const hint = document.createElement("p");
+        hint.textContent = "Tente um termo mais curto, o nome da API ou outro filtro.";
+        results.append(hint);
+      }
+    } catch (error) {
+      results.textContent = error.message;
+    } finally {
+      results.setAttribute("aria-busy", "false");
+    }
+  }
+
+  function renderStoredLinks(container, items, emptyMessage) {
+    if (!container) return;
+    container.replaceChildren();
+    if (!items.length) {
+      const empty = document.createElement("p");
+      empty.textContent = emptyMessage;
+      container.append(empty);
+      return;
+    }
+    items.forEach((item) => {
+      const link = document.createElement("a");
+      link.className = "stored-chapter-link";
+      link.href = resolveStoredChapterUrl(item);
+      link.textContent = `${item.chapter} — ${item.title}`;
+      container.append(link);
+    });
+  }
+
+  async function renderStudyLibrary() {
+    const dialog = document.querySelector("[data-study-dialog]");
+    if (!dialog) return;
+    renderStoredLinks(dialog.querySelector("[data-recent-list]"), currentRecent(), "Os capítulos visitados aparecerão aqui.");
+    const favoriteIds = currentFavorites();
+    try {
+      const index = await loadSearchIndex();
+      const items = favoriteIds.map((id) => {
+        const entry = index.find((candidate) => candidate.id === id);
+        return entry ? { id, chapter: entry.chapter, title: entry.title, url: entry.url } : null;
+      }).filter(Boolean);
+      renderStoredLinks(dialog.querySelector("[data-favorite-list]"), items, "Use “Favoritar” em um capítulo para guardá-lo aqui.");
+    } catch (_error) {
+      renderStoredLinks(dialog.querySelector("[data-favorite-list]"), [], "Não foi possível carregar os favoritos agora.");
+    }
+  }
+
+  function createStudyTools() {
+    const headerActions = document.querySelector(".header-actions");
+    if (!headerActions || document.querySelector("[data-open-study-tools]")) return;
+    const openButton = document.createElement("button");
+    openButton.type = "button";
+    openButton.className = "button";
+    openButton.dataset.openStudyTools = "";
+    openButton.textContent = "Buscar";
+    openButton.setAttribute("aria-keyshortcuts", "Control+K /");
+    headerActions.insertBefore(openButton, headerActions.lastElementChild);
+
+    const dialog = document.createElement("dialog");
+    dialog.className = "study-dialog";
+    dialog.dataset.studyDialog = "";
+    dialog.innerHTML = `
+      <div class="dialog-header"><div><span class="eyebrow">Central de estudo</span><h2>Encontre e retome conteúdos</h2></div><button class="icon-button" type="button" data-close-study-tools aria-label="Fechar busca">Fechar</button></div>
+      <div class="search-controls"><label><span>Buscar capítulos, APIs e conceitos</span><input type="search" data-search-input placeholder="Ex.: UpdateAsync, autoridade do servidor, erro" autocomplete="off"></label><label><span>Filtrar</span><select data-search-filter><option value="all">Tudo</option><option value="api">APIs</option><option value="diagnostic">Erros e diagnóstico</option><option value="exercise">Exercícios</option><option value="easy">Exercícios fáceis</option><option value="intermediate">Exercícios intermediários</option><option value="challenging">Exercícios desafiadores</option></select></label></div>
+      <div class="study-shortcuts"><a class="button primary" data-continue-learning href="${siteUrl("modulos/modulo-00.html#capitulo-01")}">Começar pelo Módulo 0</a><a class="button" href="${siteUrl("avaliacoes.html")}">Avaliações</a><a class="button" href="${siteUrl("projetos/index.html")}">Kits práticos</a><a class="button" href="${siteUrl("atualizacoes.html")}">Atualizações</a></div>
+      <div class="study-library"><section><h3>Favoritos</h3><div class="stored-links" data-favorite-list></div></section><section><h3>Visitados recentemente</h3><div class="stored-links" data-recent-list></div></section></div>
+      <section aria-labelledby="resultados-busca"><h3 id="resultados-busca">Resultados</h3><div class="search-results" data-search-results></div></section>`;
+    document.body.append(dialog);
+    updateContinueLinks();
+    renderStudyLibrary();
+  }
+
+  function openStudyTools() {
+    const dialog = document.querySelector("[data-study-dialog]");
+    if (!dialog) return;
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else dialog.setAttribute("open", "");
+    const input = dialog.querySelector("[data-search-input]");
+    input?.focus();
+    renderSearchResults();
+  }
+
+  function closeStudyTools() {
+    const dialog = document.querySelector("[data-study-dialog]");
+    if (!dialog?.hasAttribute("open")) return;
+    if (typeof dialog.close === "function") dialog.close();
+    else dialog.removeAttribute("open");
+    document.querySelector("[data-open-study-tools]")?.focus();
   }
 
   function preferredTheme() {
@@ -309,6 +597,21 @@
   });
 
   document.addEventListener("click", async (event) => {
+    const openStudyButton = event.target.closest("[data-open-study-tools]");
+    if (openStudyButton) {
+      openStudyTools();
+      return;
+    }
+    const closeStudyButton = event.target.closest("[data-close-study-tools]");
+    if (closeStudyButton) {
+      closeStudyTools();
+      return;
+    }
+    const favoriteButton = event.target.closest("[data-favorite-id]");
+    if (favoriteButton) {
+      toggleFavorite(favoriteButton.dataset.favoriteId);
+      return;
+    }
     const themeButton = event.target.closest("[data-theme-toggle]");
     if (themeButton) {
       setTheme(root.dataset.theme === "dark" ? "light" : "dark");
@@ -357,6 +660,14 @@
     }
   });
 
+  document.addEventListener("input", (event) => {
+    if (event.target.matches("[data-search-input], [data-search-filter]")) renderSearchResults();
+  });
+
+  document.addEventListener("change", (event) => {
+    if (event.target.matches("[data-search-filter]")) renderSearchResults();
+  });
+
   document.addEventListener("change", async (event) => {
     const checkbox = event.target.closest("[data-progress-id]");
     if (!checkbox) return;
@@ -377,6 +688,17 @@
   });
 
   document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && document.querySelector("[data-study-dialog][open]")) {
+      event.preventDefault();
+      closeStudyTools();
+      return;
+    }
+    const typing = event.target.matches("input, textarea, select, [contenteditable='true']");
+    if (!typing && ((event.ctrlKey && event.key.toLocaleLowerCase() === "k") || (!event.ctrlKey && !event.altKey && event.key === "/"))) {
+      event.preventDefault();
+      openStudyTools();
+      return;
+    }
     if (!event.altKey || (event.key !== "ArrowRight" && event.key !== "ArrowLeft")) return;
     const links = [...document.querySelectorAll(".chapter-nav a[href^='#']")];
     if (!links.length) return;
@@ -415,6 +737,7 @@
         if (isCurrent) link.setAttribute("aria-current", "true");
         else link.removeAttribute("aria-current");
       });
+      recordVisit(visible.target);
     }, { rootMargin: "-18% 0px -70% 0px" });
     observedSections.forEach((section) => chapterObserver.observe(section));
   }
@@ -422,7 +745,18 @@
   window.addEventListener("storage", (event) => {
     if (event.key === STORAGE_KEYS.progress) renderProgress();
     if (event.key === STORAGE_KEYS.theme) setTheme(preferredTheme(), false);
+    if (event.key === STORAGE_KEYS.favorites) updateFavoriteButtons();
+    if (event.key === STORAGE_KEYS.recent || event.key === STORAGE_KEYS.lastChapter) {
+      updateContinueLinks();
+      renderStudyLibrary();
+    }
   });
+  createStudyTools();
+  addFavoriteControls();
+  updateContinueLinks();
+  const initialHashId = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : "";
+  const initialChapter = initialHashId ? document.getElementById(initialHashId) : document.querySelector("article.chapter");
+  if (initialChapter?.matches("article.chapter")) recordVisit(initialChapter);
   renderProgress();
   updateAccountUi();
   discoverAccount();

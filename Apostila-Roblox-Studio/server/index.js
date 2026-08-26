@@ -284,8 +284,15 @@ app.put("/api/progress/:itemId", requireUser, async (request, response, next) =>
 
 app.use("/assets", express.static(path.join(siteRoot, "assets"), { maxAge: isProduction ? "1h" : 0 }));
 app.use("/modulos", express.static(path.join(siteRoot, "modulos"), { etag: true, maxAge: 0 }));
+app.use("/projetos", express.static(path.join(siteRoot, "projetos"), { etag: true, maxAge: 0 }));
+app.use("/reports", express.static(path.join(siteRoot, "reports"), { etag: true, maxAge: 0 }));
 app.get(["/", "/index.html"], (_request, response) => response.sendFile(path.join(siteRoot, "index.html")));
 app.get("/conta.html", (_request, response) => response.sendFile(path.join(siteRoot, "conta.html")));
+app.get("/avaliacoes.html", (_request, response) => response.sendFile(path.join(siteRoot, "avaliacoes.html")));
+app.get("/certificado.html", (_request, response) => response.sendFile(path.join(siteRoot, "certificado.html")));
+app.get("/atualizacoes.html", (_request, response) => response.sendFile(path.join(siteRoot, "atualizacoes.html")));
+app.get("/CONTENT-MANIFEST.json", (_request, response) => response.sendFile(path.join(siteRoot, "CONTENT-MANIFEST.json")));
+app.get("/CHANGELOG.md", (_request, response) => response.sendFile(path.join(siteRoot, "CHANGELOG.md")));
 
 app.use((request, response) => {
   if (request.path.startsWith("/api/")) return response.status(404).json({ error: "Recurso não encontrado." });

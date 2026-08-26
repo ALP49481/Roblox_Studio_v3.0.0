@@ -1,0 +1,40 @@
+{
+  "version": "3.1.0",
+  "releasedAt": "2026-08-26",
+  "technicalAuthority": "Roblox Creator Hub, Roblox Engine API Reference e Luau oficial",
+  "modules": [
+    { "number": 0, "reviewedAt": "2026-08-25", "status": "revisado", "apis": ["testing modes", "place files"] },
+    { "number": 1, "reviewedAt": "2026-08-25", "status": "revisado", "apis": ["Instance", "Workspace", "Lighting", "Terrain"] },
+    { "number": 2, "reviewedAt": "2026-08-25", "status": "revisado", "apis": ["Luau --!strict", "task library"] },
+    { "number": 3, "reviewedAt": "2026-08-25", "status": "revisado", "apis": ["CFrame", "Vector3", "Workspace:Raycast"] },
+    { "number": 4, "reviewedAt": "2026-08-25", "status": "revisado", "apis": ["Players", "Humanoid", "Tool", "Input Action System", "GuiButton"] },
+    { "number": 5, "reviewedAt": "2026-08-25", "status": "revisado", "apis": ["RemoteEvent", "RemoteFunction", "UnreliableRemoteEvent"] },
+    { "number": 6, "reviewedAt": "2026-08-25", "status": "revisado", "apis": ["ModuleScript", "Script Sync", "Version History"] },
+    { "number": 7, "reviewedAt": "2026-08-25", "status": "revisado", "apis": ["DataStoreService", "GetAsync", "UpdateAsync", "BindToClose"] },
+    { "number": 8, "reviewedAt": "2026-08-25", "status": "revisado", "apis": ["RunService", "PathfindingService", "AudioPlayer", "GetPartBoundsInBox"] },
+    { "number": 9, "reviewedAt": "2026-08-26", "status": "revisado", "apis": ["BindReceiptHandler", "ProcessReceipt", "GetProductInfoAsync", "AnalyticsService"] },
+    { "number": 10, "reviewedAt": "2026-08-26", "status": "revisado", "apis": ["TeleportAsync", "MemoryStoreService", "MessagingService", "HttpService:GetSecret", "Open Cloud"] },
+    { "number": 11, "reviewedAt": "2026-08-26", "status": "revisado", "apis": ["UpdateAsync", "LogOnboardingFunnelStepEvent", "LogEconomyEvent"] }
+  ],
+  "apiChanges": [
+    { "api": "MarketplaceService:GetProductInfo", "status": "depreciada", "replacement": "MarketplaceService:GetProductInfoAsync", "modules": [9] },
+    { "api": "MarketplaceService receipt handling", "status": "verificar antes da aula", "replacement": "Comparar BindReceiptHandler e ProcessReceipt na documentação da data", "modules": [9] },
+    { "api": "TeleportService legacy teleport methods", "status": "não usar em código novo", "replacement": "TeleportAsync", "modules": [10] },
+    { "api": "wait/spawn/delay globais", "status": "legadas", "replacement": "task.wait, task.spawn, task.delay e task.defer", "modules": [8] }
+  ],
+  "brokenLinks": [],
+  "examplesToRetest": [
+    { "id": "m09-receipts", "reason": "As abordagens de receipt handling precisam ser comparadas novamente imediatamente antes da aula.", "priority": "alta" },
+    { "id": "m10-http-open-cloud", "reason": "O subconjunto de endpoints Open Cloud permitido para HttpService pode mudar.", "priority": "alta" },
+    { "id": "m04-input-action-system", "reason": "O Input Action System evolui e precisa ser retestado em teclado, gamepad e touch.", "priority": "média" },
+    { "id": "kits-rbxlx", "reason": "Abrir inicio.rbxlx e resolvido.rbxlx no Studio após atualização relevante da serialização.", "priority": "média" }
+  ],
+  "deprecationProcess": [
+    "Marcar o exemplo como antigo e impedir que seja recomendado em código novo.",
+    "Registrar a fonte oficial, a data e o motivo da mudança.",
+    "Criar uma alternativa atual usando somente conceitos já ensinados.",
+    "Migrar a prática e o gabarito sem apagar imediatamente o histórico da decisão.",
+    "Retestar no Studio e atualizar módulo, índice de busca, kit e changelog.",
+    "Remover o exemplo antigo apenas em versão principal, com nota de migração."
+  ]
+}

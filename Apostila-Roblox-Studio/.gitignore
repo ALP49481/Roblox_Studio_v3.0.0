@@ -2,3 +2,5 @@ node_modules/
 .npm-cache/
 .env
 npm-debug.log*
+reports/playwright/
+test-results/

@@ -1,0 +1,1 @@
+-- Este projeto não precisa de Script no servidor.

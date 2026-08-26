@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     rootDir: Apostila-Roblox-Studio
-    buildCommand: npm ci --omit=dev && npm test
+    buildCommand: npm ci --omit=dev && npm run build && npm test
     startCommand: npm start
     healthCheckPath: /api/health
     autoDeployTrigger: commit

@@ -1,22 +1,29 @@
 {
   "name": "apostila-roblox-studio",
-  "version": "1.0.0",
+  "version": "3.1.0",
   "private": true,
   "description": "Apostila interativa com contas opcionais e progresso sincronizado.",
   "engines": {
     "node": ">=22 <25"
   },
   "scripts": {
+    "build": "node tools/build-search-index.js && node tools/build-project-kits.js && node tools/build-content-manifest.js",
+    "check:links": "node tools/check-official-links.js",
     "migrate": "node server/migrate.js",
     "start": "node server/start.js",
     "dev": "node --watch server/index.js",
     "preview": "node server/preview.js",
-    "test": "node --test"
+    "test": "node --test test/*.test.js",
+    "test:a11y": "playwright test"
   },
   "dependencies": {
     "express": "^5.1.0",
     "express-rate-limit": "^8.1.0",
     "helmet": "^8.1.0",
     "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.62.1"
   }
 }

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="4">
+  <External>null</External><External>nil</External>
+  <Item class="Workspace"><Properties><string name="Name">Workspace</string></Properties><Item class="Folder"><Properties><string name="Name">Laboratorio</string></Properties><Item class="Part"><Properties><string name="Name">Base</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>0</X><Y>0</Y><Z>0</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>60</X><Y>1</Y><Z>60</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Entrada</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>0</X><Y>3</Y><Z>24</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>10</X><Y>1</Y><Z>6</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Objetivo</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>0</X><Y>2</Y><Z>-20</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>8</X><Y>2</Y><Z>8</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Painel</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>-8</X><Y>3</Y><Z>0</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>6</X><Y>6</Y><Z>6</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Porta</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>0</X><Y>5</Y><Z>-10</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>8</X><Y>10</Y><Z>1</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Perigo</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>8</X><Y>1</Y><Z>2</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>10</X><Y>1</Y><Z>10</Z></Vector3></Properties></Item><Item class="Folder"><Properties><string name="Name">Coletaveis</string></Properties><Item class="Part"><Properties><string name="Name">Item1</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>-10</X><Y>2</Y><Z>-4</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>2</X><Y>2</Y><Z>2</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Item2</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>10</X><Y>2</Y><Z>-4</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>2</X><Y>2</Y><Z>2</Z></Vector3></Properties></Item></Item></Item></Item>
+  <Item class="ReplicatedStorage"><Properties><string name="Name">ReplicatedStorage</string></Properties><Item class="Folder"><Properties><string name="Name">Remotes</string></Properties><Item class="RemoteEvent"><Properties><string name="Name">RequestCollect</string></Properties></Item></Item></Item>
+  <Item class="ServerScriptService"><Properties><string name="Name">ServerScriptService</string></Properties><Item class="Script"><Properties><string name="Name">Projeto6Server</string><ProtectedString name="Source"><![CDATA[--!strict
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local remote = ReplicatedStorage.Remotes.RequestCollect
+local lastRequest: {[Player]: number} = {}
+
+remote.OnServerEvent:Connect(function(player: Player, collectible: unknown)
+ if typeof(collectible) ~= "Instance" or not collectible:IsA("BasePart") then return end
+ if not collectible:IsDescendantOf(workspace.Laboratorio.Coletaveis) or collectible:GetAttribute("Available") == false then return end
+ local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+ if not root or (root.Position - collectible.Position).Magnitude > 12 then return end
+ local now = os.clock()
+ if now - (lastRequest[player] or 0) < 0.25 then return end
+ lastRequest[player] = now
+ collectible:SetAttribute("Available", false)
+ player:SetAttribute("Coins", (player:GetAttribute("Coins") or 0) + 1)
+ collectible.Transparency = 1
+ task.delay(3, function()
+  if collectible.Parent then collectible.Transparency = 0; collectible:SetAttribute("Available", true) end
+ end)
+end)
+
+Players.PlayerRemoving:Connect(function(player) lastRequest[player] = nil end)
+]]></ProtectedString></Properties></Item></Item>
+  <Item class="StarterPlayer"><Properties><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts"><Properties><string name="Name">StarterPlayerScripts</string></Properties></Item></Item>
+  <Item class="StarterGui"><Properties><string name="Name">StarterGui</string></Properties></Item>
+  <Item class="StarterPack"><Properties><string name="Name">StarterPack</string></Properties></Item>
+  <Item class="Lighting"><Properties><string name="Name">Lighting</string></Properties></Item>
+</roblox>

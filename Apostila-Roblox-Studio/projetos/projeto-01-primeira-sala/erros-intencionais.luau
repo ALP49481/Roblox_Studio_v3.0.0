@@ -1,0 +1,5 @@
+-- ERROS INTENCIONAIS PARA DIAGNÓSTICO
+-- 1. Uma parede está sem Anchored e cai no teste.
+-- 2. A chegada ficou dentro do BlocoCentral.
+-- 3. Um Model importado não foi inspecionado.
+-- Corrija no Studio e registre a evidência; este arquivo não deve ser executado.

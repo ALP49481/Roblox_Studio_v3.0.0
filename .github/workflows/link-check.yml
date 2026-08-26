@@ -1,0 +1,32 @@
+name: Verificar links oficiais
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 10 * * 2"
+
+permissions:
+  contents: read
+
+jobs:
+  official-links:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Apostila-Roblox-Studio
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Apostila-Roblox-Studio/package-lock.json
+      - run: npm ci --omit=dev
+      - run: npm run build
+      - run: npm run check:links
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: relatorio-links-oficiais
+          path: Apostila-Roblox-Studio/reports/link-report.json
+          if-no-files-found: error

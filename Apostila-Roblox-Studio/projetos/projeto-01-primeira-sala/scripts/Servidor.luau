@@ -1,0 +1,2 @@
+-- Projeto de construção: nenhum Script é necessário.
+-- Use este arquivo para registrar decisões de medidas, nomes e iluminação.

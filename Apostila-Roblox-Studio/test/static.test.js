@@ -6,7 +6,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
-const htmlFiles = ["index.html", "conta.html", "modulos/modulo-00.html", "modulos/modulo-01.html", "modulos/modulo-02.html", "modulos/modulo-03.html", "modulos/modulo-04.html", "modulos/modulo-05.html", "modulos/modulo-06.html", "modulos/modulo-07.html", "modulos/modulo-08.html", "modulos/modulo-09.html", "modulos/modulo-10.html", "modulos/modulo-11.html"];
+const htmlFiles = ["index.html", "conta.html", "avaliacoes.html", "certificado.html", "atualizacoes.html", "projetos/index.html", "modulos/modulo-00.html", "modulos/modulo-01.html", "modulos/modulo-02.html", "modulos/modulo-03.html", "modulos/modulo-04.html", "modulos/modulo-05.html", "modulos/modulo-06.html", "modulos/modulo-07.html", "modulos/modulo-08.html", "modulos/modulo-09.html", "modulos/modulo-10.html", "modulos/modulo-11.html"];
 
 function html(file) {
   return fs.readFileSync(path.join(root, file), "utf8");
@@ -262,6 +262,60 @@ test("site não contém segredo real ou Markdown estudantil", () => {
   assert.match(example, /\.\.\./);
 });
 
+test("ferramentas de estudo possuem índice, avaliações e navegação persistente", () => {
+  const app = fs.readFileSync(path.join(root, "assets/app.js"), "utf8");
+  const assessments = fs.readFileSync(path.join(root, "assets/assessments.js"), "utf8");
+  const assessmentApp = fs.readFileSync(path.join(root, "assets/assessment-app.js"), "utf8");
+  const searchIndex = fs.readFileSync(path.join(root, "assets/search-index.js"), "utf8");
+  assert.match(app, /favorites: "apostila-roblox-favorites-v1"/);
+  assert.match(app, /recent: "apostila-roblox-recent-v1"/);
+  assert.match(app, /data-open-study-tools/);
+  assert.match(app, /data-continue-learning/);
+  assert.match(searchIndex, /window\.APOSTILA_SEARCH_INDEX/);
+  assert.equal((searchIndex.match(/"id":"modulo-\d{2}-capitulo-\d{2}"/g) || []).length, 57);
+  assert.equal((assessments.match(/id: "modulo-\d{2}"/g) || []).length, 12);
+  assert.match(assessments, /id: "banca-final"/);
+  assert.match(assessmentApp, /assessment-attempts-v1/);
+  assert.match(assessmentApp, /certificateReady/);
+});
+
+test("os 11 kits práticos estão completos e os arquivos rbxlx são estruturados", () => {
+  const projectsRoot = path.join(root, "projetos");
+  const directories = fs.readdirSync(projectsRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory());
+  assert.equal(directories.length, 11);
+  for (const directory of directories) {
+    const base = path.join(projectsRoot, directory.name);
+    for (const required of ["inicio.rbxlx", "resolvido.rbxlx", "CHECKLIST-TESTES.md", "erros-intencionais.luau", "preview.svg", "scripts/Servidor.luau", "scripts/Cliente.luau", "scripts/Modulo.luau"]) {
+      assert.equal(fs.existsSync(path.join(base, required)), true, `${directory.name}/${required}`);
+    }
+    for (const place of ["inicio.rbxlx", "resolvido.rbxlx"]) {
+      const xml = fs.readFileSync(path.join(base, place), "utf8");
+      assert.match(xml, /^<\?xml/);
+      assert.match(xml, /<roblox[\s\S]*<Item class="Workspace">[\s\S]*<\/roblox>$/);
+    }
+  }
+
+  const resolved = (directory) => fs.readFileSync(path.join(projectsRoot, directory, "resolvido.rbxlx"), "utf8");
+  const lantern = resolved("projeto-04-ferramenta-utilizavel");
+  assert.match(lantern, /<Item class="Tool">[\s\S]*<string name="Name">Lanterna<\/string>[\s\S]*<Item class="PointLight">[\s\S]*<Item class="LocalScript">/);
+  const checkpoint = resolved("projeto-05-percurso-checkpoint-interface");
+  assert.match(checkpoint, /<Item class="ScreenGui">[\s\S]*<string name="Name">CheckpointGui<\/string>[\s\S]*<Item class="TextLabel">[\s\S]*<Item class="LocalScript">/);
+  assert.match(resolved("projeto-09-simulador-enxuto"), /<Item class="Tool">[\s\S]*<string name="Name">Picareta<\/string>/);
+  assert.match(resolved("projeto-10-estudo-combate"), /<Item class="Tool">[\s\S]*<string name="Name">Blaster<\/string>[\s\S]*<Item class="LocalScript">/);
+  assert.doesNotMatch(lantern, /<Item class="Folder"><Properties><string name="Name">StarterPlayerScripts<\/string>/);
+});
+
+test("manifesto técnico e automações de manutenção estão presentes", () => {
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, "CONTENT-MANIFEST.json"), "utf8"));
+  assert.match(manifest.version, /^\d+\.\d+\.\d+$/);
+  assert.equal(manifest.modules.length, 12);
+  assert.ok(manifest.apiChanges.length >= 4);
+  assert.ok(manifest.examplesToRetest.length >= 4);
+  assert.ok(manifest.deprecationProcess.length >= 5);
+  assert.equal(fs.existsSync(path.resolve(root, "..", ".github/workflows/link-check.yml")), true);
+  assert.equal(fs.existsSync(path.join(root, "tools/check-official-links.js")), true);
+});
+
 test("impressão e acessibilidade possuem regras explícitas", () => {
   const css = fs.readFileSync(path.join(root, "assets/styles.css"), "utf8");
   const script = fs.readFileSync(path.join(root, "assets/app.js"), "utf8");
@@ -282,13 +336,15 @@ test("deploy Render e Aiven possui configuração reproduzível e sem segredos",
   const database = fs.readFileSync(path.join(root, "server/db.js"), "utf8");
   assert.match(render, /rootDir: Apostila-Roblox-Studio/);
   assert.match(render, /plan: free/);
-  assert.match(render, /buildCommand: npm ci --omit=dev && npm test/);
+  assert.match(render, /buildCommand: npm ci --omit=dev && npm run build && npm test/);
   assert.doesNotMatch(render, /preDeployCommand/);
   assert.match(render, /DATABASE_POOL_MAX[\s\S]*value: 3/);
   assert.match(render, /healthCheckPath: \/api\/health/);
   assert.match(render, /DATABASE_URL[\s\S]*sync: false/);
   assert.equal(packageJson.scripts.migrate, "node server/migrate.js");
   assert.equal(packageJson.scripts.start, "node server/start.js");
+  assert.match(packageJson.scripts.build, /build-search-index/);
+  assert.equal(packageJson.scripts["check:links"], "node tools/check-official-links.js");
   assert.match(start, /await migrate\(\)/);
   assert.match(start, /MAX_ATTEMPTS = 4/);
   assert.match(migrate, /pg_advisory_xact_lock/);

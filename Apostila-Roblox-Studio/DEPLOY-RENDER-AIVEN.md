@@ -55,7 +55,7 @@ O arquivo `render.yaml`, na raiz do repositório, define:
 | Etapa | Comando | O que acontece |
 | --- | --- | --- |
 | Root Directory | `Apostila-Roblox-Studio` | os comandos passam a usar a pasta da aplicação |
-| Build | `npm ci --omit=dev && npm test` | instala versões travadas e executa os testes sem acessar o banco |
+| Build | `npm ci --omit=dev && npm run build && npm test` | instala versões travadas, gera índices/kits/manifesto e executa os testes sem acessar o banco |
 | Pre-Deploy | **vazio** | o plano gratuito não oferece essa etapa |
 | Start | `npm start` | verifica o esquema do banco e só depois abre o servidor |
 | Health Check | `/api/health` | confirma que o processo e o banco respondem |
@@ -79,6 +79,7 @@ Na pasta `Apostila-Roblox-Studio`, use uma versão do Node.js aceita por `packag
 
 ```powershell
 npm ci
+npm run build
 npm test
 ```
 
@@ -117,7 +118,7 @@ Este é o caminho recomendado se o Web Service já existe.
 1. Abra o serviço no [Render Dashboard](https://dashboard.render.com/).
 2. Em **Settings**, confirme o repositório e a branch que contêm este projeto.
 3. Configure **Root Directory** como `Apostila-Roblox-Studio`.
-4. Configure **Build Command** como `npm ci --omit=dev && npm test`.
+4. Configure **Build Command** como `npm ci --omit=dev && npm run build && npm test`.
 5. Deixe **Pre-Deploy Command** vazio. Se houver um valor antigo como `npm run migrate`, remova-o.
 6. Configure **Start Command** como `npm start`.
 7. Confirme que o tipo é **Web Service**, runtime **Node** e instance type/plan **Free**.
@@ -194,7 +195,7 @@ Nunca faça essas verificações com uma senha usada em outro site.
 
 Para cada atualização:
 
-1. execute `npm ci` e `npm test` localmente;
+1. execute `npm ci`, `npm run build` e `npm test` localmente;
 2. confira que `.env`, certificados e credenciais não entraram no commit;
 3. envie o commit à branch conectada;
 4. deixe o auto-deploy executar ou use **Deploy latest commit**;
@@ -254,7 +255,7 @@ Alterar segredos reinicia o serviço e pode interromper sessões brevemente.
 - [ ] um único Render Web Service com plan `Free`;
 - [ ] um único Aiven PostgreSQL com plan `Free`;
 - [ ] Root Directory `Apostila-Roblox-Studio`;
-- [ ] Build Command `npm ci --omit=dev && npm test`;
+- [ ] Build Command `npm ci --omit=dev && npm run build && npm test`;
 - [ ] Pre-Deploy Command vazio;
 - [ ] Start Command `npm start`;
 - [ ] Health Check `/api/health`;
