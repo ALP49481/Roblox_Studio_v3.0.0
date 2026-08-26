@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: apostila-roblox-studio
+    runtime: node
+    plan: free
+    rootDir: Apostila-Roblox-Studio
+    buildCommand: npm ci --omit=dev && npm test
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_DAYS
+        value: 30
+      - key: DATABASE_POOL_MAX
+        value: 3
+      - key: DATABASE_URL
+        sync: false
+      - key: AIVEN_CA_CERT
+        sync: false
+      - key: PUBLIC_ORIGIN
+        sync: false

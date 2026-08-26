@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Módulo 3 da Apostila Roblox Studio: eventos, Instances, atributos, tags, Vector3, CFrame, raycasts, consultas espaciais e TweenService.">
+  <title>Módulo 3 — Programar a Engine e o mundo 3D</title>
+  <link rel="stylesheet" href="../assets/styles.css?v=20260826-11"><script src="../assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a><div class="header-actions"><a class="button" href="../index.html#modulos">Todos os módulos</a><a class="button" href="../conta.html" data-account-label>Conta</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div></div></header>
+
+  <main class="module-shell" id="conteudo">
+    <aside class="module-sidebar" data-module-sidebar data-collapsed="false">
+      <button class="button mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="true">Ocultar capítulos</button>
+      <h2>Módulo 3</h2><p>Programar a Engine e o mundo 3D</p>
+      <nav class="chapter-nav" aria-label="Capítulos do Módulo 3"><a href="#capitulo-01">3.1 Eventos e conexões</a><a href="#capitulo-02">3.2 Instances, atributos e tags</a><a href="#capitulo-03">3.3 Vector3, CFrame e pivôs</a><a href="#capitulo-04">3.4 Raycasts, consultas e Tween</a><a href="#glossario">Glossário</a><a href="#fontes">Fontes</a></nav>
+      <div class="sidebar-extra"><div class="progress-track" role="progressbar" aria-label="Progresso do módulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" data-progress-fill data-progress-scope="3"></div></div><p class="progress-label" data-progress-label data-progress-scope="3">0 de 4 capítulos disponíveis concluídos · 0%</p><p><small>Alt + ← e Alt + → alternam seções.</small></p></div>
+    </aside>
+
+    <div class="module-content">
+      <section class="module-intro" aria-labelledby="titulo-modulo"><span class="eyebrow">Dificuldade 2/5 · básica com integração à Engine</span><h1 id="titulo-modulo">Faça o código perceber e transformar o mundo 3D.</h1><p class="lead">A lógica do Módulo 2 agora encontrará objetos reais, responderá a sinais, organizará configurações e trabalhará com posição, orientação e espaço. Todos os exemplos continuam no servidor.</p><ul class="lesson-map"><li><strong>Ponto de partida:</strong> avaliação de domínio do Módulo 2</li><li><strong>Projetos:</strong> concluir a Primeira sala interativa, iniciar Obstáculo com eventos e preparar coletáveis</li><li><strong>Limite consciente:</strong> jogadores, personagens e dano entram somente no Módulo 4</li></ul><div class="callout attention"><strong>Engine não é sinônimo de magia</strong><p>Cada propriedade tem tipo, cada método tem parâmetros e cada evento tem um contrato. Confirme o objeto, preveja o resultado e observe o Output.</p></div></section>
+
+      <article class="chapter" id="capitulo-01" aria-labelledby="titulo-01">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 3.1</p><h2 id="titulo-01">Propriedades, métodos, eventos e conexões</h2><p>Diferencie estado, ação e sinal para reagir sem consultar o mundo em um laço constante.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-03-capitulo-01"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e pré-requisitos</h3><p><strong>Pré-requisitos:</strong> 1.2, 2.4, 2.6 e a avaliação do Módulo 2.</p><ul class="check-list"><li>Distinguir propriedade, método e evento.</li><li>Conectar callback com <code>:Connect()</code> e receber o parâmetro do evento.</li><li>Evitar repetição acidental com debounce simples.</li><li>Reconhecer quando guardar e desconectar uma conexão.</li></ul></section>
+          <section><h3>Vocabulário e modelo mental</h3><dl class="glossary-grid"><div class="glossary-item"><dt>Propriedade</dt><dd>Dado que descreve o estado de um objeto, como <code>Color</code>.</dd></div><div class="glossary-item"><dt>Método</dt><dd>Ação oferecida por um objeto, chamada com dois-pontos, como <code>connection:Disconnect()</code>.</dd></div><div class="glossary-item"><dt>Evento</dt><dd>Sinal emitido quando algo acontece, como <code>Touched</code>.</dd></div><div class="glossary-item"><dt>Callback</dt><dd>Função chamada quando o evento dispara.</dd></div><div class="glossary-item"><dt>Conexão</dt><dd>Objeto retornado por <code>Connect()</code> que representa a escuta ativa.</dd></div><div class="glossary-item"><dt>Debounce</dt><dd>Estado que impede a mesma resposta de iniciar novamente cedo demais.</dd></div></dl><div class="concept-diagram" aria-label="Fluxo dirigido por evento"><div><strong>Contato ocorre</strong><span>Touched dispara</span></div><span class="concept-arrow">→</span><div><strong>Conexão entrega</strong><span>outra Part</span></div><span class="concept-arrow">→</span><div><strong>Callback decide</strong><span>responde ou ignora</span></div></div></section>
+          <aside class="callout security"><strong><code>Touched</code> não significa “um jogador válido”</strong><p>O parâmetro é a <code>BasePart</code> que tocou o sensor: pode ser pé, acessório, peça solta ou veículo. Neste capítulo qualquer contato apenas muda uma cor. Identidade, personagem e estado por jogador serão validados depois de 4.1.</p></aside>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · conclusão do Projeto 2 e início do Projeto 3</p><h3>Crie um botão de contato com efeito temporário</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Primeira sala interativa</dd></div><div><dt>Objeto</dt><dd><code>BotaoEvento</code> · Part</dd></div><div><dt>Script</dt><dd><code>EventoDoBotao</code> · Script</dd></div><div><dt>Contexto</dt><dd>Servidor · quando houver contato</dd></div></dl>
+            <ol class="step-list"><li>Com o teste parado, em <code>game → Workspace → Ambiente → PrimeiraSala</code>, crie a Folder <code>Interacoes</code>.</li><li>Dentro dela crie uma Part <code>BotaoEvento</code>. Defina <code>Size = 6, 1, 6</code>, <code>Anchored = true</code>, <code>CanCollide = true</code>, <code>CanTouch = true</code> e uma posição acessível.</li><li>Em <code>game → ServerScriptService</code>, crie o Script <code>EventoDoBotao</code> com <code>RunContext = Server</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>EventoDoBotao.server.luau</strong><small>Script · ServerScriptService · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-301" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-301"><code>local botao = workspace.Ambiente.PrimeiraSala.Interacoes.BotaoEvento
+
+const COR_PRONTA = Color3.fromRGB(45, 170, 95)
+const COR_ATIVA = Color3.fromRGB(245, 175, 45)
+const TEMPO_DE_ESPERA = 1.5
+
+local ocupado = false
+
+local function aoTocar(outraParte)
+	if ocupado then
+		return
+	end
+
+	ocupado = true
+	botao.Color = COR_ATIVA
+	print("Contato recebido de:", outraParte:GetFullName())
+
+	task.delay(TEMPO_DE_ESPERA, function()
+		botao.Color = COR_PRONTA
+		ocupado = false
+		print("Botão pronto para novo contato.")
+	end)
+end
+
+botao.Color = COR_PRONTA
+local conexao = botao.Touched:Connect(aoTocar)
+print("Conexão ativa?", conexao.Connected)</code></pre></div>
+            <h4>Leitura por blocos</h4><ul><li>As constantes guardam valores imutáveis de configuração.</li><li><code>ocupado</code> é o debounce global: enquanto true, novos contatos retornam cedo.</li><li><code>aoTocar</code> recebe a Part informada pelo evento.</li><li><code>task.delay()</code> agenda a restauração sem bloquear o restante do Script.</li><li><code>Connect()</code> devolve <code>RBXScriptConnection</code>; sua propriedade <code>Connected</code> confirma o estado.</li></ul>
+            <ol class="step-list" start="4"><li>Use F5 e caminhe sobre o botão. A cor deve mudar, voltar após cerca de 1,5 segundo e o Output deve identificar a Part de contato.</li><li>Permaneça ou pule sobre o botão. Vários sinais podem ocorrer, mas o efeito não deve reiniciar enquanto <code>ocupado</code> for true.</li><li>Como experimento, adicione <code>conexao:Disconnect()</code> logo após o último print. Confirme que a conexão fica inativa e o toque deixa de responder; depois remova essa linha.</li></ol><div class="callout success"><strong>Resultado esperado</strong><p>A sala reage ao início e agora também a um evento do mundo. O botão alterna entre verde e laranja sem empilhar efeitos.</p></div><p><strong>Se falhar:</strong> confirme nomes e hierarquia, <code>CanTouch</code>, RunContext Server e se o personagem realmente encosta. Se a cor nunca voltar, procure erro dentro da função agendada. Stop restaura o estado editado; copie novamente o código para reiniciar.</p>
+          </section>
+
+          <section><h3>Exercícios e pequeno projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Adicione um contador de contatos aceitos e mostre-o no Output.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Faça o botão alternar também <code>Material</code> entre SmoothPlastic e Neon durante o efeito.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Guarde a conexão, desconecte após três contatos aceitos e explique por que o quarto não executa.</p></article></div><p><strong>Projeto 2 concluído:</strong> a Primeira sala reage ao início e ao contato. <strong>Projeto 3 iniciado:</strong> duplique a Part como <code>ObstaculoEvento</code> e crie um efeito visual temporário com debounce. Não aplique dano nem tente descobrir jogador ainda.</p></section>
+          <section><h3>Revisão</h3><ul class="check-list"><li>Distingo dado, ação e sinal.</li><li>Sei de onde vem o parâmetro do callback.</li><li>Consigo explicar o debounce.</li><li>Sei que conexões persistentes precisam de ciclo de vida consciente.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> declare <code>local contatosAceitos = 0</code> fora da função e incremente depois da guard clause.</p><p><strong>Intermediário:</strong> defina <code>botao.Material = Enum.Material.Neon</code> ao ativar e restaure <code>Enum.Material.SmoothPlastic</code> no callback de <code>task.delay</code>.</p><p><strong>Desafiador:</strong> após incrementar, use <code>if contatosAceitos == 3 then conexao:Disconnect() end</code>. Como a função referencia <code>conexao</code>, declare a variável antes e atribua a conexão depois.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td><code>Touched</code> e argumento <code>otherPart</code></td><td><a href="https://create.roblox.com/docs/scripting/events" target="_blank" rel="noopener noreferrer">Events</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/BasePart#Touched" target="_blank" rel="noopener noreferrer">BasePart.Touched</a></td><td><a href="https://www.youtube.com/watch?v=Wp3WhFo-km4" target="_blank" rel="noopener noreferrer">Events — #13</a></td><td>Atual, mas depende do contexto</td><td>Não foi tratado como prova de jogador; debounce explícito.</td></tr><tr><td><code>Connect</code>, conexão e <code>Disconnect</code></td><td><a href="https://create.roblox.com/docs/scripting/events" target="_blank" rel="noopener noreferrer">Events</a> e <a href="https://create.roblox.com/docs/reference/engine/datatypes/RBXScriptConnection" target="_blank" rel="noopener noreferrer">RBXScriptConnection</a></td><td>Não utilizada como autoridade</td><td>Atual e recomendada</td><td>Ciclo de vida demonstrado.</td></tr></tbody></table></div><div class="callout tip"><strong>Complemento opcional · Beginners Scripting — BrawlDev</strong><p><strong>Aula:</strong> “Events — #13”, depois de concluir a prática. <strong>Pré-requisitos:</strong> funções e condições. Observe evento, callback e argumentos; reproduza com outra cor. Atualize qualquer exemplo que confunda toque com jogador e acrescente debounce. Valide com Events e BasePart. <strong>Desafio:</strong> limite o efeito a três ativações.</p></div><p>O vídeo foi localizado, mas não analisado integralmente; não foi usado como autoridade técnica.</p></section><div class="chapter-pager"><a class="button" href="modulo-02.html#avaliacao" data-previous-chapter>← Rever avaliação</a><a class="button primary" href="#capitulo-02" data-next-chapter>3.2 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-02" aria-labelledby="titulo-02">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 3.2</p><h2 id="titulo-02">Encontrar e criar Instances, atributos e tags</h2><p>Construa objetos por código e separe configuração de comportamento.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-03-capitulo-02"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e termos</h3><p><strong>Pré-requisitos:</strong> 2.7 e 3.1.</p><ul class="check-list"><li>Criar uma Instance e definir <code>Parent</code> depois de configurá-la.</li><li>Escolher entre caminho direto, <code>FindFirstChild()</code> e <code>WaitForChild()</code>.</li><li>Percorrer filhos e descendentes.</li><li>Configurar objetos com atributos e agrupá-los por tag.</li></ul><dl class="glossary-grid"><div class="glossary-item"><dt>Instance</dt><dd>Unidade fundamental do DataModel: Part, Folder, Script e serviços são exemplos.</dd></div><div class="glossary-item"><dt>Filho</dt><dd>Objeto cujo Parent é o objeto atual.</dd></div><div class="glossary-item"><dt>Descendente</dt><dd>Qualquer objeto abaixo, mesmo várias camadas depois.</dd></div><div class="glossary-item"><dt>Atributo</dt><dd>Dado personalizado armazenado em uma Instance.</dd></div><div class="glossary-item"><dt>Tag</dt><dd>Rótulo que permite encontrar objetos relacionados sem depender da mesma pasta.</dd></div></dl></section>
+          <section><h3>Três formas de procurar</h3><div class="table-wrap"><table><thead><tr><th>Forma</th><th>Quando usar</th><th>Risco</th></tr></thead><tbody><tr><td><code>raiz.Pasta.Objeto</code></td><td>Estrutura conhecida e já existente</td><td>Erro imediato se algo faltar</td></tr><tr><td><code>raiz:FindFirstChild("Objeto")</code></td><td>Existência opcional ou validação</td><td>Retorna nil; deve ser verificado</td></tr><tr><td><code>raiz:WaitForChild("Objeto")</code></td><td>Objeto esperado que pode chegar depois</td><td>Pode suspender indefinidamente sem limite</td></tr></tbody></table></div><p><code>GetChildren()</code> devolve somente a camada imediata. <code>GetDescendants()</code> devolve toda a subárvore. Não percorra o Workspace inteiro quando uma pasta ou tag menor resolve.</p></section>
+          <aside class="callout attention"><strong>Configure antes de definir Parent</strong><p>Uma Instance pode começar a participar do mundo assim que recebe Parent. Defina nome, tamanho, posição, atributos e tag antes de colocá-la na pasta final, reduzindo estados incompletos observáveis.</p></aside>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · base futura do Projeto 6</p><h3>Crie e audite coletáveis configurados</h3><dl class="practice-facts"><div><dt>Script</dt><dd><code>PrepararColetaveis</code></dd></div><div><dt>Caminho</dt><dd><code>game → ServerScriptService → PrepararColetaveis</code></dd></div><div><dt>Contexto</dt><dd>Servidor · início da sessão</dd></div><div><dt>Recompensa</dt><dd>Somente configuração; nenhuma moeda é concedida</dd></div></dl><p>Crie o Script com RunContext Server. Ele criará <code>game → Workspace → Ambiente → PrimeiraSala → Coletaveis</code> quando necessário.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>PrepararColetaveis.server.luau</strong><small>Script · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-302" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-302"><code>local CollectionService = game:GetService("CollectionService")
+local raizDaSala = workspace.Ambiente.PrimeiraSala
+
+const TAG_COLETAVEL = "Coletavel"
+const RECOMPENSA_MAXIMA = 100
+
+local pasta = raizDaSala:FindFirstChild("Coletaveis")
+
+if pasta == nil then
+	pasta = Instance.new("Folder")
+	pasta.Name = "Coletaveis"
+	pasta.Parent = raizDaSala
+end
+
+local function criarColetavel(nome, posicao, recompensa, cor)
+	local coletavel = Instance.new("Part")
+	coletavel.Name = nome
+	coletavel.Shape = Enum.PartType.Ball
+	coletavel.Size = Vector3.new(2, 2, 2)
+	coletavel.Position = posicao
+	coletavel.Color = cor
+	coletavel.Anchored = true
+	coletavel.CanCollide = false
+	coletavel:SetAttribute("Reward", recompensa)
+	CollectionService:AddTag(coletavel, TAG_COLETAVEL)
+	coletavel.Parent = pasta
+end
+
+criarColetavel("MoedaA", Vector3.new(0, 4, 0), 5, Color3.fromRGB(255, 210, 40))
+criarColetavel("MoedaB", Vector3.new(5, 4, 0), 10, Color3.fromRGB(80, 180, 255))
+
+print("Filhos diretos:", #pasta:GetChildren())
+
+for _, instancia in CollectionService:GetTagged(TAG_COLETAVEL) do
+	local recompensa = instancia:GetAttribute("Reward")
+	local dentroDaPasta = instancia:IsDescendantOf(pasta)
+	local valorValido = typeof(recompensa) == "number"
+		and recompensa &gt; 0
+		and recompensa &lt;= RECOMPENSA_MAXIMA
+
+	if not instancia:IsA("BasePart") then
+		warn(instancia:GetFullName(), "não é uma BasePart.")
+	elseif not dentroDaPasta then
+		warn(instancia:GetFullName(), "está fora da pasta esperada.")
+	elseif not valorValido then
+		warn(instancia:GetFullName(), "possui Reward inválido.")
+	else
+		print("Coletável válido:", instancia.Name, recompensa)
+	end
+end</code></pre></div>
+            <p><code>game:GetService()</code> obtém o serviço existente. <code>Instance.new()</code> cria objetos. <code>SetAttribute()</code> mantém a recompensa junto do coletável; a tag descreve seu papel. A auditoria não confia apenas na tag: confirma classe, hierarquia, tipo e limite.</p><ol class="step-list"><li>Execute com F5. Espere dois filhos e dois logs “Coletável válido”.</li><li>No Explorer da sessão, selecione uma moeda e confirme o atributo <code>Reward</code> e a tag <code>Coletavel</code> no Properties.</li><li>Troque uma recompensa para -5. Execute e confirme o warning específico.</li><li>Crie manualmente uma Folder, aplique a mesma tag e execute; a auditoria deve rejeitá-la por não ser BasePart.</li></ol><p><strong>Diagnóstico:</strong> se duplicar objetos, lembre que cada nova sessão começa do estado editado; duplicação dentro da mesma sessão indica que a função foi chamada mais de uma vez. Se <code>pasta</code> for nil depois do if, confira Parent e nome. Stop remove as Instances criadas em teste.</p>
+          </section>
+
+          <section><h3><code>WaitForChild</code> sem espera cega</h3><p>No servidor desta prática, você mesmo cria a pasta, então <code>FindFirstChild</code> é suficiente. Quando um objeto esperado puder surgir depois, <code>WaitForChild</code> suspende a tarefa atual. Não o use para esconder erro de nome ou hierarquia. No futuro, cliente e replicação darão um contexto real para essa espera.</p><div class="copy-panel"><div class="copy-panel-header"><div><strong>Exemplo conceitual</strong><small>Não substituir a prática</small></div><button class="copy-button" type="button" data-copy-target="codigo-302-espera" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-302-espera"><code>local objetoEsperado = pasta:WaitForChild("MoedaA")
+print(objetoEsperado:GetFullName())
+
+for _, descendente in pasta:GetDescendants() do
+	print(descendente:GetFullName())
+end</code></pre></div></section>
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Crie terceira moeda com Reward 15 e confirme a contagem.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Adicione atributo <code>Kind</code> string e valide apenas “Coin” ou “Crystal”.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Faça a auditoria contar válidos e inválidos, sem interromper ao encontrar o primeiro problema.</p></article></div><p><strong>Base do Projeto 6:</strong> mantenha três coletáveis configurados e um relatório limpo. A tag não concede recompensa; autoridade, remotes e moedas entram no Módulo 5.</p></section>
+          <section><h3>Resumo</h3><ul class="check-list"><li>Escolho a busca apropriada.</li><li>Verifico nil de FindFirstChild.</li><li>Sei diferenciar filho e descendente.</li><li>Valido dados mesmo quando a tag está correta.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> chame <code>criarColetavel</code> com nome, posição diferente, 15 e outra cor.</p><p><strong>Intermediário:</strong> use <code>SetAttribute("Kind", "Coin")</code>; na auditoria, confirme <code>kind == "Coin" or kind == "Crystal"</code>.</p><p><strong>Desafiador:</strong> declare dois contadores antes do laço e incremente no ramo correspondente. O laço deve continuar após warnings para fornecer relatório completo.</p></div></details>
+          <section><h3>Validação técnica</h3><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Criação, busca e hierarquia</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/Instance" target="_blank" rel="noopener noreferrer">Instance</a> e <a href="https://create.roblox.com/docs/projects/data-model" target="_blank" rel="noopener noreferrer">Data model</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Parent definido após configuração; espera sem contexto evitada.</td></tr><tr><td>Atributos e tags</td><td><a href="https://create.roblox.com/docs/scripting/attributes" target="_blank" rel="noopener noreferrer">Properties and attributes</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/CollectionService" target="_blank" rel="noopener noreferrer">CollectionService</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Tag acompanhada de validação de classe, escopo e valor.</td></tr></tbody></table></div><p>Consulta: 26/08/2026. Nenhum episódio de “instances” foi associado porque o título e o conteúdo não foram confirmados integralmente.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-01" data-previous-chapter>← 3.1</a><a class="button primary" href="#capitulo-03" data-next-chapter>3.3 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-03" aria-labelledby="titulo-03">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 3.3</p><h2 id="titulo-03"><code>Vector3</code>, <code>CFrame</code>, pivôs e transformações</h2><p>Represente pontos, direções e orientações sem depender de coordenadas frágeis.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-03-capitulo-03"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e termos</h3><p><strong>Pré-requisitos:</strong> 1.3, 2.3 e 3.2.</p><ul class="check-list"><li>Usar Vector3 para posição, deslocamento, distância e direção.</li><li>Usar CFrame para posição + orientação.</li><li>Converter um deslocamento local em transformação no mundo.</li><li>Mover Parts e Models pelo pivô.</li></ul><dl class="glossary-grid"><div class="glossary-item"><dt>Vetor</dt><dd>Três números X, Y e Z que podem representar ponto ou deslocamento.</dd></div><div class="glossary-item"><dt>Magnitude</dt><dd>Comprimento de um vetor.</dd></div><div class="glossary-item"><dt>Vetor unitário</dt><dd>Direção com comprimento 1.</dd></div><div class="glossary-item"><dt>CFrame</dt><dd>Coordinate frame: posição e rotação em uma transformação.</dd></div><div class="glossary-item"><dt>Pivô</dt><dd>Ponto e orientação usados como referência para mover ou girar um objeto.</dd></div><div class="glossary-item"><dt>Espaço local</dt><dd>Eixos relativos ao objeto; o mundo usa eixos globais.</dd></div></dl></section>
+          <section><h3>Dois tipos, dois trabalhos</h3><p><code>Vector3.new(0, 4, -6)</code> pode ser uma posição ou um deslocamento; o contexto dá significado. <code>CFrame</code> carrega posição e orientação. O “frente” local de uma Part corresponde ao eixo Z negativo, então <code>CFrame.new(0, 0, -6)</code> significa seis studs à frente da referência.</p><div class="concept-diagram"><div><strong>Vector3</strong><span>ponto, diferença, distância</span></div><span class="concept-arrow">→</span><div><strong>CFrame local</strong><span>deslocamento orientado</span></div><span class="concept-arrow">→</span><div><strong>CFrame no mundo</strong><span>posição final</span></div></div><aside class="callout attention"><strong>Ordem importa</strong><p><code>referencia * deslocamento</code> aplica o deslocamento nos eixos da referência. Inverter a multiplicação produz outra transformação. Use <code>ToWorldSpace()</code> quando quiser tornar a intenção didática explícita.</p></aside></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada</p><h3>Gire uma porta pelo pivô e posicione um marcador à frente</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Primeira sala</dd></div><div><dt>Modelo</dt><dd><code>PortaPivo</code></dd></div><div><dt>Script</dt><dd><code>TransformacoesDaSala</code></dd></div><div><dt>Contexto</dt><dd>Servidor · sequência de teste</dd></div></dl>
+            <ol class="step-list"><li>Em <code>Workspace → Ambiente → PrimeiraSala → Interacoes</code>, crie o Model <code>PortaPivo</code>. Dentro, crie a Part <code>Folha</code>, com <code>Size = 6, 8, 1</code> e <code>Anchored = true</code>.</li><li>Selecione o Model. Na ferramenta Pivot, entre em edição e mova o pivô para o centro da borda esquerda da folha; finalize a edição. A rotação usará esse ponto como dobradiça.</li><li>Na mesma Folder, crie Parts ancoradas <code>Referencia</code> e <code>MarcadorFrontal</code>, ambas pequenas e afastadas da porta.</li><li>Em ServerScriptService, crie <code>TransformacoesDaSala</code> com RunContext Server.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>TransformacoesDaSala.server.luau</strong><small>Script · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-303" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-303"><code>local interacoes = workspace.Ambiente.PrimeiraSala.Interacoes
+local porta = interacoes.PortaPivo
+local referencia = interacoes.Referencia
+local marcador = interacoes.MarcadorFrontal
+
+const DISTANCIA_A_FRENTE = 6
+const ANGULO_DA_PORTA = -90
+
+local deslocamentoLocal = CFrame.new(0, 0, -DISTANCIA_A_FRENTE)
+local destinoDoMarcador = referencia.CFrame:ToWorldSpace(deslocamentoLocal)
+marcador:PivotTo(destinoDoMarcador)
+
+local deslocamento = marcador.Position - referencia.Position
+print("Distância:", deslocamento.Magnitude)
+print("Direção:", deslocamento.Unit)
+
+local portaFechada = porta:GetPivot()
+local rotacao = CFrame.fromEulerAnglesXYZ(0, math.rad(ANGULO_DA_PORTA), 0)
+local portaAberta = portaFechada * rotacao
+
+print("A porta abrirá em dois segundos.")
+task.wait(2)
+porta:PivotTo(portaAberta)
+
+print("A porta fechará em dois segundos.")
+task.wait(2)
+porta:PivotTo(portaFechada)
+print("Teste de transformação concluído.")</code></pre></div>
+            <p>O marcador recebe um CFrame no mundo derivado dos eixos da referência. A subtração de posições produz deslocamento; <code>Magnitude</code> mede seis studs e <code>Unit</code> informa só a direção. O Model guarda dois pivôs e alterna com <code>PivotTo()</code>.</p><ol class="step-list" start="5"><li>Gire <code>Referencia</code> no eixo Y antes do teste. O marcador deve continuar à frente dela, não no mesmo eixo global.</li><li>Execute com F5. Observe marcador, distância e giro da porta pela borda.</li><li>Se a porta girar pelo centro, use Stop e corrija o pivô no modo de edição; não compense com coordenadas aleatórias.</li></ol><p><strong>Erros comuns:</strong> graus passados sem <code>math.rad</code>, usar <code>Position</code> quando a rotação precisa ser preservada, e calcular <code>Unit</code> de vetor zero. Para reiniciar, Stop restaura os pivôs editados e posições originais.</p>
+          </section>
+
+          <section><h3>Exercícios e pequeno projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Posicione outro marcador três studs acima no eixo local da referência.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Faça a porta abrir 60 graus no sentido oposto e explique os sinais.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Crie plataforma ancorada e dois marcadores de destino; mova-a A → B → A com PivotTo e pausas finitas.</p></article></div><p><strong>Projeto prático:</strong> a plataforma móvel usa somente destinos existentes, movimento finito e logs. Movimento suave e verificação de caminho chegam em 3.4.</p></section>
+          <section><h3>Resumo</h3><ul class="check-list"><li>Distingo ponto, deslocamento e direção.</li><li>Não normalizo vetor zero.</li><li>Uso CFrame quando orientação importa.</li><li>Entendo que o pivô determina a rotação do Model.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> use <code>referencia.CFrame:ToWorldSpace(CFrame.new(0, 3, 0))</code>.</p><p><strong>Intermediário:</strong> altere para 60. O sinal escolhe o sentido conforme a orientação dos eixos; confirme visualmente, não memorize “direita” sem referência.</p><p><strong>Desafiador:</strong> guarde <code>destinoA.CFrame</code> e <code>destinoB.CFrame</code>, chame <code>plataforma:PivotTo()</code> e use pausas conhecidas. Um Model também aceita PivotTo.</p></div></details>
+          <section><h3>Validação técnica</h3><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Vector3, Magnitude e Unit</td><td><a href="https://create.roblox.com/docs/reference/engine/datatypes/Vector3" target="_blank" rel="noopener noreferrer">Vector3</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Vetor zero tratado como risco antes de Unit.</td></tr><tr><td>CFrame, espaço relativo e pivôs</td><td><a href="https://create.roblox.com/docs/workspace/cframes" target="_blank" rel="noopener noreferrer">CFrames</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/PVInstance" target="_blank" rel="noopener noreferrer">PVInstance</a> e <a href="https://create.roblox.com/docs/studio/pivot-tools" target="_blank" rel="noopener noreferrer">Pivot tools</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Models movidos com GetPivot/PivotTo; CFrame moderno.</td></tr></tbody></table></div><p>Consulta: 26/08/2026. Nenhum vídeo avançado foi associado porque episódio e implementação de CFrame não foram confirmados.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-02" data-previous-chapter>← 3.2</a><a class="button primary" href="#capitulo-04" data-next-chapter>3.4 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-04" aria-labelledby="titulo-04">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 3.4</p><h2 id="titulo-04">Colisões, raycasts, consultas espaciais e TweenService</h2><p>Faça perguntas explícitas ao espaço e anime propriedades sem laços manuais por frame.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-03-capitulo-04"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 3.1–3.3.</p><ul class="check-list"><li>Distinguir colisão física, evento de contato e consulta espacial.</li><li>Executar raycast com direção e filtro.</li><li>Interpretar RaycastResult ou nil.</li><li>Deduplicar Models retornados por consulta de volume.</li><li>Animar CFrame de uma Part com TweenService.</li></ul><dl class="glossary-grid"><div class="glossary-item"><dt>Raycast</dt><dd>Consulta ao longo de um segmento direcionado.</dd></div><div class="glossary-item"><dt>Filtro</dt><dd>Regra que inclui ou exclui candidatos da consulta.</dd></div><div class="glossary-item"><dt>Normal</dt><dd>Vetor perpendicular à superfície atingida.</dd></div><div class="glossary-item"><dt>Consulta de volume</dt><dd>Pergunta por Parts que sobrepõem caixa, raio ou outra Part.</dd></div><div class="glossary-item"><dt>Deduplicação</dt><dd>Transformar várias Parts do mesmo Model em um único resultado lógico.</dd></div><div class="glossary-item"><dt>Tween</dt><dd>Interpolação de propriedades ao longo de um intervalo.</dd></div></dl></section>
+          <section><h3>Qual ferramenta responde qual pergunta?</h3><div class="table-wrap"><table><thead><tr><th>Necessidade</th><th>Ferramenta</th></tr></thead><tbody><tr><td>Objetos empurram/bloqueiam fisicamente?</td><td><code>CanCollide</code> e grupos de colisão</td></tr><tr><td>Um contato acabou de ocorrer?</td><td><code>Touched</code>, com possibilidade de repetição</td></tr><tr><td>Existe obstáculo neste trajeto?</td><td><code>Workspace:Raycast()</code></td></tr><tr><td>Quais Parts estão nesta caixa agora?</td><td><code>GetPartBoundsInBox()</code></td></tr></tbody></table></div><aside class="callout error"><strong>APIs antigas não entram no código novo</strong><p><code>FindPartOnRay*</code> e consultas <code>Region3</code> estão depreciadas. Use RaycastParams e OverlapParams com as consultas atuais de WorldRoot.</p></aside></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · parte 1</p><h3>Teste o caminho e abra uma porta suavemente</h3><dl class="practice-facts"><div><dt>Objetos</dt><dd><code>OrigemRay</code>, <code>DestinoRay</code>, <code>ObstaculoTeste</code>, <code>VisualRay</code>, <code>PortaAnimada</code></dd></div><div><dt>Script</dt><dd><code>TesteDeCaminho</code></dd></div><div><dt>Contexto</dt><dd>Servidor · uma consulta no início</dd></div><div><dt>Resultado</dt><dd>linha vermelha/verde e porta</dd></div></dl>
+            <ol class="step-list"><li>Em <code>Workspace → Ambiente → PrimeiraSala → Interacoes</code>, crie cinco Parts com os nomes acima. Deixe todas Anchored.</li><li><code>OrigemRay</code> e <code>DestinoRay</code>: Size 1,1,1, separadas por cerca de 20 studs. Coloque <code>ObstaculoTeste</code> entre elas.</li><li><code>VisualRay</code>: <code>CanCollide = false</code>, <code>CanTouch = false</code>, <code>CanQuery = false</code>. <code>PortaAnimada</code>: tamanho semelhante a uma porta.</li><li>Crie <code>TesteDeCaminho</code> em ServerScriptService com RunContext Server.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>TesteDeCaminho.server.luau</strong><small>Script · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-304-ray" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-304-ray"><code>local Workspace = game:GetService("Workspace")
+local TweenService = game:GetService("TweenService")
+local interacoes = Workspace.Ambiente.PrimeiraSala.Interacoes
+
+local origem = interacoes.OrigemRay
+local destino = interacoes.DestinoRay
+local visual = interacoes.VisualRay
+local porta = interacoes.PortaAnimada
+
+local direcao = destino.Position - origem.Position
+local distancia = direcao.Magnitude
+
+if distancia &lt;= 0 then
+	warn("Origem e destino precisam estar em posições diferentes.")
+	return
+end
+
+visual.Size = Vector3.new(0.15, 0.15, distancia)
+visual.CFrame = CFrame.lookAt(origem.Position + (direcao / 2), destino.Position)
+
+local parametros = RaycastParams.new()
+parametros.FilterType = Enum.RaycastFilterType.Exclude
+parametros.FilterDescendantsInstances = { origem, destino, visual, porta }
+parametros.IgnoreWater = true
+
+local resultado = Workspace:Raycast(origem.Position, direcao, parametros)
+
+if resultado then
+	visual.Color = Color3.fromRGB(235, 75, 75)
+	warn("Caminho bloqueado por:", resultado.Instance:GetFullName())
+	print("Distância até o impacto:", resultado.Distance)
+	print("Normal da superfície:", resultado.Normal)
+else
+	visual.Color = Color3.fromRGB(55, 190, 105)
+	print("Caminho livre. Abrindo a porta.")
+
+	local portaAberta = porta.CFrame + Vector3.new(0, porta.Size.Y + 1, 0)
+	local informacoes = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+	local tween = TweenService:Create(porta, informacoes, { CFrame = portaAberta })
+	tween:Play()
+	tween.Completed:Wait()
+	print("Animação concluída.")
+end</code></pre></div>
+            <p>A direção já contém sentido e distância. O filtro exclui objetos auxiliares para não acertarem a si mesmos. Resultado nil significa nenhum candidato elegível; um RaycastResult oferece Instance, Position, Distance, Normal e Material. O tween interpola CFrame da Part sem um laço manual.</p><ol class="step-list" start="5"><li>Execute com o obstáculo no meio: linha vermelha, warning e porta parada.</li><li>Use Stop, mova o obstáculo para o lado e execute: linha verde e porta sobe suavemente.</li><li>Defina <code>ObstaculoTeste.CanQuery = false</code> e repita; ele deixa de ser candidato ao raycast mesmo podendo continuar visível.</li></ol><p><strong>Se o resultado surpreender:</strong> imprima origem, direção e membros do filtro. A direção não é um ponto final. Se a linha parecer invertida, confirme o eixo longo Z e o ponto médio. Stop restaura a porta.</p>
+          </section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · parte 2</p><h3>Consulte uma área e deduplique Models</h3><ol class="step-list"><li>Em <code>Interacoes</code>, crie Folder <code>AlvosSensor</code>. Dentro, crie Models <code>AlvoA</code> e <code>AlvoB</code>, cada um com duas Parts ancoradas.</li><li>Crie Part <code>SensorArea</code> ao redor dos alvos: Transparency 0.75, Anchored true, CanCollide/CanTouch/CanQuery false.</li><li>Crie Script <code>ConsultaDeArea</code> em ServerScriptService, RunContext Server.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ConsultaDeArea.server.luau</strong><small>Script · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-304-area" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-304-area"><code>local Workspace = game:GetService("Workspace")
+local interacoes = Workspace.Ambiente.PrimeiraSala.Interacoes
+local sensor = interacoes.SensorArea
+local pastaDeAlvos = interacoes.AlvosSensor
+
+local parametros = OverlapParams.new()
+parametros.FilterType = Enum.RaycastFilterType.Include
+parametros.FilterDescendantsInstances = { pastaDeAlvos }
+
+local partes = Workspace:GetPartBoundsInBox(
+	sensor.CFrame,
+	sensor.Size,
+	parametros
+)
+
+local modelosUnicos = {}
+
+for _, parte in partes do
+	local modelo = parte:FindFirstAncestorOfClass("Model")
+	if modelo then
+		modelosUnicos[modelo] = true
+	end
+end
+
+local quantidade = 0
+for modelo in modelosUnicos do
+	quantidade += 1
+	print("Model encontrado:", modelo:GetFullName())
+end
+
+print("Parts retornadas:", #partes)
+print("Models únicos:", quantidade)</code></pre></div>
+            <p>A consulta retorna Parts, não entidades lógicas. A tabela usa cada Model como chave e elimina repetições. O filtro Include restringe a busca à pasta de alvos; ambiente e sensor não poluem o resultado.</p><ol class="step-list" start="4"><li>Execute: espere quatro Parts e dois Models, se cada alvo tiver exatamente duas Parts dentro da caixa.</li><li>Mova uma Part parcialmente para fora. Como a consulta usa caixas delimitadoras, observe o resultado e compare com a geometria visual.</li><li>Mova AlvoB inteiro para fora e confirme um único Model.</li></ol><p><strong>Nota de precisão:</strong> <code>GetPartBoundsInBox</code> usa bounding boxes. Quando a geometria exata de uma Part-sensor for indispensável, <code>GetPartsInPart</code> é a alternativa atual. Escolha pelo requisito, não por hábito.</p>
+          </section>
+
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Troque o filtro do raycast para Include e permita somente ObstaculoTeste; explique o resultado.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Anime simultaneamente CFrame, Transparency e Color da porta e restaure após dois segundos.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Faça três raycasts paralelos e considere livre somente se nenhum atingir obstáculo; visualize cada linha.</p></article></div><p><strong>Incremento do Projeto 3:</strong> crie um sensor de área que lista Models únicos e um obstáculo visual animado. O sistema ainda não procura Humanoid nem aplica dano; isso conclui somente em 4.1.</p></section>
+          <section><h3>Revisão e fechamento</h3><ul class="check-list"><li>Escolho contato, raio ou volume conforme a pergunta.</li><li>Sei que direção do raycast inclui distância.</li><li>Configuro filtros explicitamente.</li><li>Deduplifico Parts antes de tratá-las como uma entidade.</li><li>Uso TweenService para propriedades compatíveis.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> use <code>FilterType = Include</code> e <code>{interacoes.ObstaculoTeste}</code>. Outros objetos deixam de ser candidatos.</p><p><strong>Intermediário:</strong> a tabela de meta pode conter <code>CFrame</code>, <code>Transparency</code> e <code>Color</code>. Guarde valores originais e crie segundo tween para restaurar; evite tweens concorrentes na mesma propriedade.</p><p><strong>Desafiador:</strong> desloque as três origens lateralmente, execute a mesma direção e guarde cada resultado. “Livre” é true apenas quando os três são nil. Crie uma Part visual por raio.</p></div></details>
+          <section><h3>Validação técnica</h3><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Raycast, filtros e resultado</td><td><a href="https://create.roblox.com/docs/workspace/raycasting" target="_blank" rel="noopener noreferrer">Raycasting</a>, <a href="https://create.roblox.com/docs/reference/engine/datatypes/RaycastParams" target="_blank" rel="noopener noreferrer">RaycastParams</a> e <a href="https://create.roblox.com/docs/reference/engine/datatypes/RaycastResult" target="_blank" rel="noopener noreferrer">RaycastResult</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Filtros Include/Exclude e CanQuery explicados.</td></tr><tr><td>Consultas de volume</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/WorldRoot" target="_blank" rel="noopener noreferrer">WorldRoot</a> e <a href="https://create.roblox.com/docs/reference/engine/datatypes/OverlapParams" target="_blank" rel="noopener noreferrer">OverlapParams</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>GetPartBoundsInBox com deduplicação.</td></tr><tr><td>FindPartOnRay e Region3</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/WorldRoot" target="_blank" rel="noopener noreferrer">WorldRoot</a></td><td>Não utilizada</td><td>Antiga ou obsoleta</td><td>Substituídas por Raycast e consultas com OverlapParams.</td></tr><tr><td>TweenService:Create</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/TweenService" target="_blank" rel="noopener noreferrer">TweenService</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/Tween" target="_blank" rel="noopener noreferrer">Tween</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Animação finita; nenhum laço por frame.</td></tr></tbody></table></div><p>Consulta: 26/08/2026. Nenhum episódio de raycasting foi associado porque título, versão e implementação não foram confirmados.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-03" data-previous-chapter>← 3.3</a><a class="button primary" href="#glossario" data-next-chapter>Glossário →</a></div>
+        </div>
+      </article>
+
+      <section class="chapter reference-section" id="glossario" aria-labelledby="titulo-glossario"><div class="reading-flow"><h2 id="titulo-glossario">Glossário do módulo</h2><dl class="glossary-grid"><div class="glossary-item"><dt>Evento</dt><dd>Sinal emitido por uma ocorrência.</dd></div><div class="glossary-item"><dt>Conexão</dt><dd>Vínculo entre sinal e callback.</dd></div><div class="glossary-item"><dt>Instance</dt><dd>Objeto da hierarquia Roblox.</dd></div><div class="glossary-item"><dt>Atributo</dt><dd>Dado personalizado de uma Instance.</dd></div><div class="glossary-item"><dt>Tag</dt><dd>Rótulo de agrupamento consultável.</dd></div><div class="glossary-item"><dt>Vector3</dt><dd>Três componentes espaciais.</dd></div><div class="glossary-item"><dt>CFrame</dt><dd>Posição e orientação combinadas.</dd></div><div class="glossary-item"><dt>Pivô</dt><dd>Referência de transformação.</dd></div><div class="glossary-item"><dt>Raycast</dt><dd>Consulta em um segmento dirigido.</dd></div><div class="glossary-item"><dt>Tween</dt><dd>Interpolação temporal de propriedades.</dd></div></dl><div class="callout success"><strong>Módulo 3 concluído</strong><p>Você fez o código responder a sinais, criar e validar objetos, trabalhar com transformações e consultar o espaço. O Módulo 4 já está disponível.</p></div></div></section>
+
+      <section class="chapter reference-section" id="fontes" aria-labelledby="titulo-fontes"><div class="reading-flow"><h2 id="titulo-fontes">Fontes oficiais consolidadas</h2><p>Consultadas em 26 de agosto de 2026.</p><ul><li><a href="https://create.roblox.com/docs/scripting/events" target="_blank" rel="noopener noreferrer">Events</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/BasePart" target="_blank" rel="noopener noreferrer">BasePart</a> e <a href="https://create.roblox.com/docs/reference/engine/datatypes/RBXScriptConnection" target="_blank" rel="noopener noreferrer">RBXScriptConnection</a></li><li><a href="https://create.roblox.com/docs/reference/engine/classes/Instance" target="_blank" rel="noopener noreferrer">Instance</a>, <a href="https://create.roblox.com/docs/scripting/attributes" target="_blank" rel="noopener noreferrer">atributos</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/CollectionService" target="_blank" rel="noopener noreferrer">CollectionService</a></li><li><a href="https://create.roblox.com/docs/reference/engine/datatypes/Vector3" target="_blank" rel="noopener noreferrer">Vector3</a>, <a href="https://create.roblox.com/docs/workspace/cframes" target="_blank" rel="noopener noreferrer">CFrames</a> e <a href="https://create.roblox.com/docs/studio/pivot-tools" target="_blank" rel="noopener noreferrer">Pivot tools</a></li><li><a href="https://create.roblox.com/docs/workspace/raycasting" target="_blank" rel="noopener noreferrer">Raycasting</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/WorldRoot" target="_blank" rel="noopener noreferrer">WorldRoot</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/TweenService" target="_blank" rel="noopener noreferrer">TweenService</a></li></ul><div class="button-row"><a class="button" href="modulo-02.html">Módulo 2</a><a class="button primary" href="modulo-04.html">Módulo 4</a></div></div></section>
+    </div>
+  </main>
+  <footer class="site-footer"><p>Módulo 3 completo · conteúdo técnico consultado em 26 de agosto de 2026.</p></footer>
+</body>
+</html>
+
+

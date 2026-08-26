@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Módulo 2 da Apostila Roblox Studio: lógica de programação e Luau desde o primeiro Script até tipagem estrita.">
+  <title>Módulo 2 — Lógica de programação e Luau do zero</title>
+  <link rel="stylesheet" href="../assets/styles.css?v=20260826-11"><script src="../assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a><div class="header-actions"><a class="button" href="../index.html#modulos">Todos os módulos</a><a class="button" href="../conta.html" data-account-label>Conta</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div></div></header>
+
+  <main class="module-shell" id="conteudo">
+    <aside class="module-sidebar" data-module-sidebar data-collapsed="false">
+      <button class="button mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="true">Ocultar capítulos</button>
+      <h2>Módulo 2</h2><p>Lógica de programação e Luau do zero</p>
+      <nav class="chapter-nav" aria-label="Capítulos do Módulo 2"><a href="#capitulo-01">2.1 Primeiro Script</a><a href="#capitulo-02">2.2 Valores e variáveis</a><a href="#capitulo-03">2.3 Operadores</a><a href="#capitulo-04">2.4 Condições</a><a href="#capitulo-05">2.5 Laços</a><a href="#capitulo-06">2.6 Funções</a><a href="#capitulo-07">2.7 Tabelas</a><a href="#capitulo-08">2.8 Escopo e diagnóstico</a><a href="#capitulo-09">2.9 Tipagem Luau</a><a href="#avaliacao">Avaliação de domínio</a><a href="#glossario">Glossário</a><a href="#fontes">Fontes</a></nav>
+      <div class="sidebar-extra"><div class="progress-track" role="progressbar" aria-label="Progresso do módulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" data-progress-fill data-progress-scope="2"></div></div><p class="progress-label" data-progress-label data-progress-scope="2">0 de 9 capítulos disponíveis concluídos · 0%</p><p><small>Alt + ← e Alt + → alternam capítulos.</small></p></div>
+    </aside>
+
+    <div class="module-content">
+      <section class="module-intro" aria-labelledby="titulo-modulo"><span class="eyebrow">Dificuldade 1–2/5 · básica</span><h1 id="titulo-modulo">Faça o computador seguir instruções que você entende.</h1><p class="lead">Você começará com uma mensagem no Output e avançará em passos testáveis até condições, laços, funções, tabelas, diagnóstico e tipagem. Todo código roda no servidor e usa apenas conceitos já apresentados.</p><ul class="lesson-map"><li><strong>Ponto de partida:</strong> Primeira sala concluída</li><li><strong>Projeto progressivo 2:</strong> Primeira sala interativa</li><li><strong>Resultado:</strong> nove capítulos e uma avaliação de domínio</li></ul><div class="callout attention"><strong>Faça os exemplos na ordem</strong><p>Cada arquivo cresce sobre ideias anteriores. Digite o código, execute, altere uma parte pequena e observe. Copiar sem testar esconde dúvidas que apareceriam cedo.</p></div></section>
+
+      <article class="chapter" id="capitulo-01" aria-labelledby="titulo-01">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 2.1</p><h2 id="titulo-01">Primeiro Script, <code>print()</code> e Output</h2><p>Transforme texto em instruções executadas pelo servidor, uma linha de cada vez.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-02-capitulo-01"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e pré-requisitos</h3><ul class="check-list"><li>Criar um Script no local recomendado para código do servidor.</li><li>Distinguir comentário, instrução, log e erro.</li><li>Ler ordem, origem e linha no Output.</li><li>Iniciar o Projeto 2 com uma mudança observável no começo do teste.</li></ul><p><strong>Pré-requisitos:</strong> 1.1, 1.2 e a versão final da Primeira sala.</p></section>
+          <section><h3>Vocabulário novo</h3><dl class="glossary-grid"><div class="glossary-item"><dt>Código</dt><dd>Texto escrito em uma linguagem formal para descrever instruções.</dd></div><div class="glossary-item"><dt>Luau</dt><dd>Linguagem usada nos scripts Roblox, derivada de Lua 5.1 e ampliada pela Roblox.</dd></div><div class="glossary-item"><dt>Script</dt><dd>Instance que guarda código executável. Neste capítulo será configurada para servidor.</dd></div><div class="glossary-item"><dt>Função</dt><dd>Ação nomeada que pode ser chamada; por enquanto você apenas usará <code>print()</code>.</dd></div><div class="glossary-item"><dt>Comentário</dt><dd>Texto iniciado por <code>--</code> para humanos; não é executado.</dd></div><div class="glossary-item"><dt>Log</dt><dd>Mensagem registrada para observar o que ocorreu.</dd></div></dl></section>
+          <section><h3>Modelo mental: uma receita lida de cima para baixo</h3><p>Quando o servidor inicia o Script, ele lê instruções sequencialmente. <code>print()</code> recebe um texto entre parênteses e o envia ao Output. Aspas delimitam o texto; parênteses delimitam o que a função recebe.</p><div class="concept-diagram"><div><strong>Script inicia</strong><span>servidor</span></div><span class="concept-arrow">→</span><div><strong>Linhas executam</strong><span>de cima para baixo</span></div><span class="concept-arrow">→</span><div><strong>Output registra</strong><span>evidência</span></div></div></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · início do Projeto progressivo 2</p><h3>Faça a sala anunciar sua preparação</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Versão final da Primeira sala</dd></div><div><dt>Tipo</dt><dd><code>Script</code></dd></div><div><dt>Caminho</dt><dd><code>game → ServerScriptService → InicioSala</code></dd></div><div><dt>Contexto</dt><dd>Servidor, no início de cada sessão</dd></div></dl>
+            <ol class="step-list"><li>Com o teste parado, no Explorer use o <strong>+</strong> de <code>ServerScriptService</code> e crie <strong>Script</strong>.</li><li>Renomeie para <code>InicioSala</code>. No Properties, defina <code>RunContext = Server</code>. Isso remove a ambiguidade do modo Legacy.</li><li>Apague o conteúdo de exemplo do editor e digite o código abaixo.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>InicioSala.server.luau</strong><small>Script · ServerScriptService · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-201" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-201"><code>-- Este comentário explica a intenção e não é executado.
+print("Preparando a Primeira sala...")
+print("Estrutura carregada.")
+
+workspace.Ambiente.PrimeiraSala.Marcadores.Chegada.Name = "ChegadaAtivada"
+
+print("Primeira sala pronta!")</code></pre></div>
+            <h4>O que cada bloco faz</h4><ul><li>Linha 1 é comentário.</li><li>As duas primeiras chamadas registram a ordem de preparação.</li><li>A linha longa percorre a hierarquia já conhecida e atribui novo texto à propriedade <code>Name</code> da chegada.</li><li>O último log confirma que a linha anterior terminou.</li></ul>
+            <ol class="step-list" start="4"><li>Abra Output e pressione <kbd>F5</kbd>. Procure três mensagens na ordem e confirme a origem de servidor.</li><li>No Explorer da sessão, encontre <code>ChegadaAtivada</code>. Use Stop: o nome volta ao estado editado, pois a mudança ocorreu apenas durante o teste.</li><li>Para investigar um erro, troque temporariamente o primeiro <code>print</code> por <code>pront</code>. Execute, clique na mensagem vermelha do Output, observe script e linha, depois restaure <code>print</code>.</li></ol>
+            <div class="callout success"><strong>Resultado esperado</strong><p>Três logs aparecem em ordem, a chegada muda de nome apenas durante a sessão e, após corrigir a digitação, o Output não mostra erro do Script.</p></div><p><strong>Se falhar:</strong> confirme caminho e letras maiúsculas; uma parte ausente faz a cadeia encontrar <code>nil</code>. Confirme também que o Script está Enabled, em ServerScriptService e com RunContext Server. Para reiniciar, use Stop, restaure o nome <code>Chegada</code> no editor e execute novamente.</p>
+          </section>
+          <section><h3>Exercícios e incremento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><h4>Nova mensagem</h4><p>Adicione um quarto log que informe “Teste iniciado pelo servidor”. Preveja sua posição no Output.</p></article><article class="card"><span class="difficulty">Intermediário</span><h4>Ordem invertida</h4><p>Mova o log “sala pronta” para antes da mudança de nome. Explique por que o texto fica enganoso mesmo sem erro técnico.</p></article><article class="card"><span class="difficulty">Desafiador</span><h4>Diagnóstico</h4><p>Altere uma letra em <code>Marcadores</code>, execute, registre a linha do erro e corrija sem recriar objetos.</p></article></div><h4>Projeto 2</h4><p>Mantenha o nome do Script e os três logs corretos. Essa é a primeira versão da Primeira sala interativa: ela reage ao início da sessão; eventos de toque chegarão no Módulo 3.</p></section>
+          <section><h3>Revisão</h3><ul class="check-list"><li>Sei onde o Script fica e onde executa.</li><li>Sei diferenciar comentário, log e erro.</li><li>Consigo clicar no erro e encontrar a linha.</li><li>Comprovei que Stop desfaz mudanças da sessão.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> coloque <code>print("Teste iniciado pelo servidor")</code> onde deseja que apareça; a posição no arquivo determina a ordem.</p><p><strong>Intermediário:</strong> código executa, mas anuncia conclusão antes da mudança, portanto o log não representa o estado real. Logs também precisam ser honestos.</p><p><strong>Desafiador:</strong> o Output deve indicar tentativa de indexar um membro ausente/nil na linha do caminho. Corrigir a grafia resolve; criar outro objeto esconderia a causa.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Script no servidor e RunContext</td><td><a href="https://create.roblox.com/docs/scripting/locations" target="_blank" rel="noopener noreferrer">Script types and locations</a></td><td>BrawlDev #2</td><td>Atual e recomendada</td><td>RunContext Server explícito; comparação completa adiada.</td></tr><tr><td><code>print()</code>, editor e Output</td><td><a href="https://create.roblox.com/docs/studio/script-editor" target="_blank" rel="noopener noreferrer">Script Editor</a> e <a href="https://create.roblox.com/docs/studio/output" target="_blank" rel="noopener noreferrer">Output</a></td><td><a href="https://www.youtube.com/watch?v=ei2Pc4xV1cQ" target="_blank" rel="noopener noreferrer">Printing #2</a></td><td>Atual e recomendada</td><td>Vídeo localizado, não usado como autoridade.</td></tr></tbody></table></div>
+            <div class="callout tip"><strong>Complemento opcional · Beginners Scripting — BrawlDev</strong><p><strong>Aula:</strong> “Printing — #2”, depois desta prática. <strong>Pré-requisitos:</strong> Output e primeiro Script. Observe ordem e mensagens; reproduza sem copiar. Se o vídeo usar RunContext Legacy, mantenha Server. Validação: Script locations, Script Editor e Output. <strong>Desafio:</strong> troque as mensagens e faça uma delas citar o nome da sala.</p></div>
+          </section><div class="chapter-pager"><a class="button" href="modulo-01.html#capitulo-04" data-previous-chapter>← Rever 1.4</a><a class="button primary" href="#capitulo-02" data-next-chapter>Ir para 2.2 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-02" aria-labelledby="titulo-02">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 2.2</p><h2 id="titulo-02">Valores, variáveis, <code>const</code> e tipos básicos</h2><p>Dê nomes claros aos dados para que o código consiga guardá-los, consultá-los e alterá-los.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-02-capitulo-02"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisito:</strong> 2.1.</p><ul class="check-list"><li>Representar texto, número, verdadeiro/falso e ausência.</li><li>Criar variáveis locais e constantes nativas.</li><li>Usar <code>typeof()</code> para observar o tipo em runtime.</li></ul><dl class="glossary-grid"><div class="glossary-item"><dt>Valor</dt><dd>Dado concreto, como <code>25</code> ou <code>"Sala"</code>.</dd></div><div class="glossary-item"><dt>Variável</dt><dd>Nome que referencia um valor e pode receber outro.</dd></div><div class="glossary-item"><dt>Tipo</dt><dd>Categoria do valor e operações possíveis.</dd></div><div class="glossary-item"><dt><code>nil</code></dt><dd>Ausência ou inexistência de valor.</dd></div></dl></section>
+          <section><h3>Quatro tipos para começar</h3><div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Exemplo</th><th>Uso</th></tr></thead><tbody><tr><td>string</td><td><code>"Primeira Sala"</code></td><td>Texto</td></tr><tr><td>number</td><td><code>30</code> ou <code>2.5</code></td><td>Quantidades</td></tr><tr><td>boolean</td><td><code>true</code>/<code>false</code></td><td>Decisões binárias</td></tr><tr><td>nil</td><td><code>nil</code></td><td>Valor ausente</td></tr></tbody></table></div><p><code>local</code> limita o nome ao Script/bloco. <code>const</code>, novidade atual do Luau, também cria um nome local, mas impede reatribuição. A convenção <code>LOUD_SNAKE_CASE</code> torna constantes reconhecíveis.</p><aside class="callout attention"><strong>Constante não congela tudo</strong><p>Se uma <code>const</code> referencia uma tabela, o nome não pode apontar para outra tabela, mas o conteúdo ainda pode mudar. <code>table.freeze()</code> será apresentado em 2.7.</p></aside></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada</p><h3>Crie a ficha de configuração da sala</h3><dl class="practice-facts"><div><dt>Script</dt><dd><code>ConfiguracaoSala</code></dd></div><div><dt>Caminho</dt><dd><code>game → ServerScriptService → ConfiguracaoSala</code></dd></div><div><dt>Contexto</dt><dd>Servidor · início da sessão</dd></div><div><dt>Resultado</dt><dd>Valores e tipos no Output</dd></div></dl><p>Crie o Script, defina RunContext Server e escreva:</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ConfiguracaoSala.server.luau</strong><small>Script · servidor</small></div><button class="copy-button" data-copy-target="codigo-202" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-202"><code>const NOME_FASE = "Primeira Sala"
+const TEMPO_MAXIMO = 60
+
+local pontuacao = 0
+local portaAberta = false
+local melhorTempo = nil
+
+print(NOME_FASE, typeof(NOME_FASE))
+print(TEMPO_MAXIMO, typeof(TEMPO_MAXIMO))
+print(pontuacao, typeof(pontuacao))
+print(portaAberta, typeof(portaAberta))
+print(melhorTempo, typeof(melhorTempo))
+
+pontuacao = 10
+print("Nova pontuação:", pontuacao)</code></pre></div>
+            <p>As linhas de cima declaram dados. <code>typeof(valor)</code> devolve o nome do tipo observado durante a execução. A última atribuição prova que <code>local</code> pode mudar. Não tente reatribuir <code>TEMPO_MAXIMO</code>: o editor marcará erro de constante.</p><ol class="step-list"><li>Execute com F5 e compare cada par valor/tipo.</li><li>Troque <code>portaAberta</code> para <code>true</code> e preveja a única linha que muda.</li><li>Troque <code>melhorTempo</code> para <code>42.5</code> e confirme que o tipo vira number.</li></ol><p><strong>Erros comuns:</strong> usar aspas em <code>"false"</code> cria string, nomes diferenciam maiúsculas, e <code>=</code> atribui. Para reiniciar, restaure o código do painel e limpe o Output.</p>
+          </section>
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Crie <code>local quantidadeObstaculos = 1</code> e imprima tipo.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Represente “modo de treino ativo” e “nome do objetivo” com tipos adequados.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Explique por que <code>"60"</code> e <code>60</code> não são intercambiáveis.</p></article></div><p><strong>Incremento:</strong> mantenha uma ficha com nome, tempo máximo, pontuação inicial e estado da porta para a Primeira sala.</p></section>
+          <section><h3>Resumo e checklist</h3><ul class="check-list"><li>Distingo valor, variável e tipo.</li><li>Uso strings, numbers, booleans e nil.</li><li>Sei quando usar local e const.</li><li>Consigo confirmar tipos com typeof.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> <code>local quantidadeObstaculos = 1</code> e <code>print(typeof(quantidadeObstaculos))</code> resultam em number.</p><p><strong>Intermediário:</strong> <code>local modoTreinoAtivo = true</code> e <code>local nomeObjetivo = "Alcançar a chegada"</code>.</p><p><strong>Desafiador:</strong> o primeiro é texto; o segundo é número e participa de aritmética. Conversão explícita aparece em 2.3.</p></div></details>
+          <section><h3>Validação técnica</h3><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>local, const e tipos</td><td><a href="https://create.roblox.com/docs/luau/variables" target="_blank" rel="noopener noreferrer">Variables</a>, <a href="https://create.roblox.com/docs/luau/nil" target="_blank" rel="noopener noreferrer">Nil</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Plano atualizado de constante por convenção para <code>const</code> nativo + convenção de nome.</td></tr></tbody></table></div><p>Consulta: 26/08/2026. Playlist não associada: os episódios Data Types #3 e Variables #4 foram localizados, mas não analisados integralmente.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-01" data-previous-chapter>← 2.1</a><a class="button primary" href="#capitulo-03" data-next-chapter>2.3 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-03" aria-labelledby="titulo-03">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 2.3</p><h2 id="titulo-03">Operadores, expressões e conversões</h2><p>Combine valores para calcular, comparar e produzir novas informações.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-02-capitulo-03"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos, pré-requisito e termos</h3><p><strong>Pré-requisito:</strong> 2.2.</p><ul class="check-list"><li>Usar operadores aritméticos, relacionais e lógicos.</li><li>Distinguir atribuição <code>=</code> de comparação <code>==</code>.</li><li>Combinar texto por interpolação e converter explicitamente.</li></ul><dl class="glossary-grid"><div class="glossary-item"><dt>Operador</dt><dd>Símbolo ou palavra que realiza uma operação.</dd></div><div class="glossary-item"><dt>Expressão</dt><dd>Trecho que produz um valor.</dd></div><div class="glossary-item"><dt>Precedência</dt><dd>Ordem em que operações são avaliadas.</dd></div><div class="glossary-item"><dt>Conversão</dt><dd>Criação de um valor de outro tipo de forma explícita.</dd></div></dl></section>
+          <section><h3>Famílias essenciais</h3><p>Aritmética: <code>+ - * / // % ^</code>. Comparação: <code>== ~= &lt; &lt;= &gt; &gt;=</code>. Lógica: <code>and or not</code>. Parênteses tornam a intenção visível. Em Luau, somente <code>false</code> e <code>nil</code> são falsos; zero e string vazia são verdadeiros.</p><aside class="callout tip"><strong>Interpolação Luau</strong><p>Crases permitem inserir expressões em chaves: <code>`Pontuação: {pontuacao}`</code>. É mais legível que muitas concatenações com <code>..</code>.</p></aside></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada</p><h3>Calculadora de recompensa</h3><dl class="practice-facts"><div><dt>Script</dt><dd><code>CalculoRecompensa</code></dd></div><div><dt>Caminho</dt><dd>ServerScriptService</dd></div><div><dt>Contexto</dt><dd>Servidor · início</dd></div><div><dt>Saída</dt><dd>Cálculo e comparações no Output</dd></div></dl>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>CalculoRecompensa.server.luau</strong><small>Script · servidor</small></div><button class="copy-button" data-copy-target="codigo-203" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-203"><code>local moedasBase = 20
+local obstaculosConcluidos = 3
+local bonusPorObstaculo = 5
+local terminouSemCair = true
+
+local subtotal = moedasBase + (obstaculosConcluidos * bonusPorObstaculo)
+local bonusPerfeito = terminouSemCair and 10 or 0
+local total = subtotal + bonusPerfeito
+
+print(`Subtotal: {subtotal}`)
+print(`Bônus perfeito: {bonusPerfeito}`)
+print(`Total: {total}`)
+print("Atingiu 40 ou mais?", total &gt;= 40)
+
+local textoMoedas = "25"
+local moedasConvertidas = tonumber(textoMoedas)
+print(moedasConvertidas, typeof(moedasConvertidas))
+print(tostring(total), typeof(tostring(total)))</code></pre></div>
+            <p>A multiplicação ocorre antes da soma, mas os parênteses documentam a intenção. A expressão com <code>and/or</code> escolhe 10 ou 0; condições completas vêm em 2.4. <code>tonumber()</code> pode retornar nil se o texto não representar número.</p><ol class="step-list"><li>Execute e calcule no papel: subtotal 35, bônus 10, total 45.</li><li>Defina <code>terminouSemCair = false</code>; confirme total 35 e comparação falsa.</li><li>Troque texto para <code>"vinte"</code>, observe nil e restaure.</li></ol><p><strong>Diagnóstico:</strong> <code>=</code> não compara; <code>..</code> concatena; divisão por zero pode produzir valor não finito e não deve entrar em regras importantes. Restaure os valores iniciais para reiniciar.</p>
+          </section>
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Calcule 4 obstáculos de 7 moedas mais 12 moedas base.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Crie booleans para “tem chave” e “nível suficiente” e combine com <code>and</code>.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Explique o resultado de <code>10 + 2 * 3</code> e de <code>(10 + 2) * 3</code>.</p></article></div><p><strong>Incremento:</strong> registre a fórmula de recompensa da sala com nomes claros e três casos de teste.</p></section>
+          <section><h3>Resumo</h3><ul class="check-list"><li>Distingo atribuição e comparação.</li><li>Uso parênteses para explicitar precedência.</li><li>Converto texto/número de modo explícito.</li><li>Sei que tonumber pode retornar nil.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> <code>12 + 4 * 7</code> resulta 40.</p><p><strong>Intermediário:</strong> <code>local podeAbrir = temChave and nivelSuficiente</code>.</p><p><strong>Desafiador:</strong> 16 e 36. Multiplicação tem precedência; parênteses mudam a ordem.</p></div></details>
+          <section><h3>Validação técnica</h3><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Operadores, interpolação e conversão</td><td><a href="https://create.roblox.com/docs/luau/operators" target="_blank" rel="noopener noreferrer">Operators</a>, <a href="https://create.roblox.com/docs/luau/strings" target="_blank" rel="noopener noreferrer">Strings</a>, <a href="https://create.roblox.com/docs/luau/type-coercion" target="_blank" rel="noopener noreferrer">Type coercion</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Conversões implícitas foram evitadas.</td></tr></tbody></table></div><p>Consulta: 26/08/2026. Playlist não associada; Operators #10 foi localizado, mas não analisado integralmente.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-02" data-previous-chapter>← 2.2</a><a class="button primary" href="#capitulo-04" data-next-chapter>2.4 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-04" aria-labelledby="titulo-04">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 2.4</p><h2 id="titulo-04">Condições, decisões e saídas antecipadas</h2><p>Faça o programa escolher um caminho com regras que podem ser explicadas e testadas.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-02-capitulo-04"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Base do capítulo</h3><p><strong>Pré-requisito:</strong> 2.3.</p><ul class="check-list"><li>Escrever <code>if</code>, <code>elseif</code> e <code>else</code>.</li><li>Ordenar condições da mais específica para a alternativa geral.</li><li>Combinar condições com <code>and</code>, <code>or</code> e <code>not</code>.</li></ul><dl class="glossary-grid"><div class="glossary-item"><dt>Condição</dt><dd>Expressão avaliada para decidir um caminho.</dd></div><div class="glossary-item"><dt>Bloco</dt><dd>Conjunto de instruções delimitado por palavras como <code>then</code> e <code>end</code>.</dd></div><div class="glossary-item"><dt>Guard clause</dt><dd>Verificação que encerra cedo quando um requisito falha. Será codificada com funções em 2.6.</dd></div></dl></section>
+          <section><h3>Uma cadeia escolhe somente um ramo</h3><p>Luau testa de cima para baixo, executa o primeiro ramo verdadeiro e ignora os demais. Não escreva <code>== true</code> quando o valor já é boolean; <code>if temChave then</code> é direto.</p><aside class="callout attention"><strong>Zero não é falso em Luau</strong><p><code>0</code> e <code>""</code> contam como verdadeiros. Compare números explicitamente, por exemplo <code>moedas &gt; 0</code>.</p></aside></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada</p><h3>Decida se a porta pode abrir</h3><dl class="practice-facts"><div><dt>Script</dt><dd><code>RegraDaPorta</code></dd></div><div><dt>Caminho</dt><dd>ServerScriptService</dd></div><div><dt>Contexto</dt><dd>Servidor · início</dd></div><div><dt>Teste</dt><dd>Três conjuntos de valores</dd></div></dl>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>RegraDaPorta.server.luau</strong><small>Script · servidor</small></div><button class="copy-button" data-copy-target="codigo-204" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-204"><code>local temChave = true
+local nivelDoJogador = 3
+const NIVEL_NECESSARIO = 2
+
+if not temChave then
+	print("Acesso negado: falta a chave.")
+elseif nivelDoJogador &lt; NIVEL_NECESSARIO then
+	print("Acesso negado: nível insuficiente.")
+else
+	print("Acesso permitido: a porta pode abrir.")
+end</code></pre></div>
+            <p>O primeiro ramo trata a ausência da chave. O segundo só é testado se há chave. O <code>else</code> representa o caso em que todos os requisitos foram satisfeitos.</p><ol class="step-list"><li>Teste <code>true/3</code>: permitido.</li><li>Teste <code>false/3</code>: falta chave.</li><li>Teste <code>true/1</code>: nível insuficiente.</li><li>Antes de executar cada caso, escreva sua previsão.</li></ol><p><strong>Erro comum:</strong> vários <code>if</code> separados podem imprimir mensagens contraditórias. Use uma cadeia quando os resultados são mutuamente exclusivos. Para reiniciar, restaure <code>true</code> e <code>3</code>.</p>
+          </section>
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Adicione mensagem específica para nível exatamente igual ao necessário.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Permita modo de treino mesmo sem chave usando <code>or</code>, sem ignorar o nível.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Monte regras para três portas: livre, chave, e chave + nível 5. Liste casos de teste.</p></article></div><p><strong>Incremento:</strong> documente a regra da porta da Primeira sala. A porta ainda não se move; eventos e métodos chegam depois.</p></section>
+          <section><h3>Resumo</h3><ul class="check-list"><li>Prevejo qual ramo executa.</li><li>Sei que ordem das condições importa.</li><li>Uso condições explícitas para números.</li><li>Entendo a ideia de saída antecipada sem usar função antes do capítulo 2.6.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> coloque um <code>elseif nivelDoJogador == NIVEL_NECESSARIO then</code> antes do else; o resultado ainda pode permitir acesso com mensagem específica.</p><p><strong>Intermediário:</strong> uma condição possível é <code>(temChave or modoTreino) and nivelDoJogador &gt;= NIVEL_NECESSARIO</code>.</p><p><strong>Desafiador:</strong> as regras devem crescer sem reutilizar conceitos futuros; teste pelo menos sucesso e falha de cada requisito.</p></div></details>
+          <section><h3>Validação técnica</h3><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>if/elseif/else e verdade</td><td><a href="https://create.roblox.com/docs/luau/control-structures" target="_blank" rel="noopener noreferrer">Control structures</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Guard clause completa adiada até funções.</td></tr></tbody></table></div><p>Consulta: 26/08/2026. If Statements #8 foi localizado na playlist, mas não analisado integralmente.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-03" data-previous-chapter>← 2.3</a><a class="button primary" href="#capitulo-05" data-next-chapter>2.5 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-05" aria-labelledby="titulo-05">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 2.5</p><h2 id="titulo-05">Laços, repetição segura e tempo</h2><p>Repita uma instrução com limite, condição de término e espaço para a Engine trabalhar.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-02-capitulo-05"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e termos</h3><p><strong>Pré-requisito:</strong> 2.4.</p><ul class="check-list"><li>Usar <code>for</code> quando a quantidade é conhecida.</li><li>Usar <code>while</code> somente com condição que muda.</li><li>Encerrar com <code>break</code> e ceder tempo com <code>task.wait()</code>.</li></ul><dl class="glossary-grid"><div class="glossary-item"><dt>Laço</dt><dd>Bloco que pode executar repetidamente.</dd></div><div class="glossary-item"><dt>Iteração</dt><dd>Uma passagem pelo bloco.</dd></div><div class="glossary-item"><dt>Condição de término</dt><dd>Regra que torna a repetição finita.</dd></div><div class="glossary-item"><dt>Scheduler</dt><dd>Sistema que coordena quando tarefas de código recebem tempo de execução.</dd></div></dl></section>
+          <aside class="callout security"><strong>Laço infinito pode travar a sessão</strong><p>Nunca escreva <code>while true do</code> sem compreender espera e saída. Prefira limites explícitos. <code>task.wait()</code> não corrige uma regra que jamais termina.</p></aside>
+          <section class="practice-card"><p class="practice-label">Prática guiada</p><h3>Conte checkpoints e execute um cronômetro finito</h3><dl class="practice-facts"><div><dt>Script</dt><dd><code>RepeticoesSeguras</code></dd></div><div><dt>Caminho</dt><dd>ServerScriptService</dd></div><div><dt>Contexto</dt><dd>Servidor · início</dd></div><div><dt>Duração</dt><dd>Aproximadamente 3 segundos</dd></div></dl>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>RepeticoesSeguras.server.luau</strong><small>Script · servidor</small></div><button class="copy-button" data-copy-target="codigo-205" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-205"><code>const TOTAL_CHECKPOINTS = 3
+
+for numeroCheckpoint = 1, TOTAL_CHECKPOINTS do
+	print(`Verificando checkpoint {numeroCheckpoint}`)
+end
+
+local tempoRestante = 3
+
+while tempoRestante &gt; 0 do
+	print(`Tempo restante: {tempoRestante}`)
+	task.wait(1)
+	tempoRestante -= 1
+end
+
+print("Cronômetro encerrado com segurança.")</code></pre></div>
+            <p>O <code>for</code> controla início, fim e passo. No <code>while</code>, a condição é testada antes de cada iteração; o contador diminui e eventualmente chega a zero. <code>task.wait(1)</code> agenda a continuação depois de aproximadamente um segundo — não é cronômetro de alta precisão.</p><ol class="step-list"><li>Preveja as sete mensagens e execute.</li><li>Troque o total para 5; confirme duas novas iterações.</li><li>Troque o cronômetro para 2 e use <code>break</code> após o primeiro print somente como experimento; restaure depois.</li></ol><p><strong>Se o Output não parar:</strong> use Stop e procure uma condição que não muda. Não use <code>pcall</code> nem esconda o erro. Para reiniciar, restaure os limites 3.</p>
+          </section>
+          <section><h3>Exercícios e pequeno projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Faça um for imprimir números de 5 até 1 usando passo -1.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Some os números de 1 a 4 em uma variável acumuladora.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Crie contagem regressiva que encerra cedo se <code>cancelado</code> for true.</p></article></div><p><strong>Projeto:</strong> acrescente um cronômetro de preparação de três segundos à sala. Ele apenas registra logs; interface visual vem depois.</p></section>
+          <section><h3>Resumo</h3><ul class="check-list"><li>Escolho for para quantidade conhecida.</li><li>Consigo apontar a condição de término.</li><li>Entendo o papel de task.wait e break.</li><li>Sei parar um teste que não termina.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> <code>for numero = 5, 1, -1 do print(numero) end</code>.</p><p><strong>Intermediário:</strong> comece <code>local soma = 0</code> e use <code>soma += numero</code>; resultado 10.</p><p><strong>Desafiador:</strong> dentro do while, <code>if cancelado then break end</code>. A variável deve ser declarada antes; teste true e false.</p></div></details>
+          <section><h3>Validação técnica</h3><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>for, while, break e task.wait</td><td><a href="https://create.roblox.com/docs/luau/control-structures" target="_blank" rel="noopener noreferrer">Control structures</a>, <a href="https://create.roblox.com/docs/scripting/scheduler" target="_blank" rel="noopener noreferrer">Schedule code</a></td><td><a href="https://www.youtube.com/watch?v=sipD9pFL2lU" target="_blank" rel="noopener noreferrer">Loops #11</a></td><td>Atual e recomendada</td><td>Limites explícitos e task.* atual.</td></tr></tbody></table></div><div class="callout tip"><strong>Complemento opcional · Beginners Scripting — BrawlDev</strong><p><strong>Aula:</strong> “Loops — #11”, após esta prática. <strong>Pré-requisitos:</strong> condições e operadores. Observe for/while e término; reproduza só exemplos finitos. Se aparecer <code>wait()</code>, use <code>task.wait()</code>. Validação: Control structures e Scheduler. <strong>Desafio:</strong> transforme qualquer exemplo em contagem regressiva cancelável.</p></div><p>Vídeo localizado; não foi usado como autoridade nem analisado integralmente. Consulta: 26/08/2026.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-04" data-previous-chapter>← 2.4</a><a class="button primary" href="#capitulo-06" data-next-chapter>2.6 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-06" aria-labelledby="titulo-06">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 2.6</p><h2 id="titulo-06">Funções, parâmetros e retornos</h2><p>Agrupe uma responsabilidade, dê um nome a ela e reutilize a regra sem duplicar código.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-02-capitulo-06"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e conexão</h3><p><strong>Pré-requisitos:</strong> 2.2–2.5. Você já criou valores, expressões e decisões; agora dará nomes a essas operações.</p><ul class="check-list"><li>Declarar e chamar funções locais.</li><li>Receber parâmetros e devolver resultados com <code>return</code>.</li><li>Usar uma saída antecipada para rejeitar um caso inválido.</li></ul><dl class="glossary-grid"><div class="glossary-item"><dt>Função</dt><dd>Bloco nomeado que realiza uma responsabilidade.</dd></div><div class="glossary-item"><dt>Parâmetro</dt><dd>Nome que recebe um valor fornecido na chamada.</dd></div><div class="glossary-item"><dt>Argumento</dt><dd>Valor concreto enviado para um parâmetro.</dd></div><div class="glossary-item"><dt>Retorno</dt><dd>Valor devolvido ao ponto da chamada.</dd></div></dl></section>
+          <section><h3>Modelo mental: entrada, trabalho e saída</h3><div class="concept-diagram" aria-label="Fluxo de uma função"><div><strong>Argumentos</strong><span>20 e 3</span></div><span class="concept-arrow">→</span><div><strong>Função</strong><span>calcula e valida</span></div><span class="concept-arrow">→</span><div><strong>Retorno</strong><span>35</span></div></div><p>Declarar uma função ensina sua regra ao programa; chamar a função pede que ela execute. Um <code>return</code> devolve o resultado e encerra aquela chamada.</p></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada</p><h3>Separe a regra de recompensa</h3><dl class="practice-facts"><div><dt>Script</dt><dd><code>FuncoesDaSala</code></dd></div><div><dt>Caminho</dt><dd><code>game → ServerScriptService → FuncoesDaSala</code></dd></div><div><dt>Contexto</dt><dd>Servidor · início</dd></div><div><dt>Executa</dt><dd>Quando cada função é chamada</dd></div></dl>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>FuncoesDaSala.server.luau</strong><small>Script · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-206" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-206"><code>const RECOMPENSA_MAXIMA = 100
+
+local function valorValido(valor)
+	return valor &gt;= 0 and valor &lt;= RECOMPENSA_MAXIMA
+end
+
+local function calcularRecompensa(base, obstaculos)
+	local total = base + (obstaculos * 5)
+
+	if not valorValido(total) then
+		return 0
+	end
+
+	return total
+end
+
+local function mostrarResultado(nomeDaSala, recompensa)
+	print(`{nomeDaSala}: {recompensa} moedas`)
+end
+
+local recompensa = calcularRecompensa(20, 3)
+mostrarResultado("Primeira Sala", recompensa)</code></pre></div>
+            <p><code>valorValido</code> responde com boolean. <code>calcularRecompensa</code> usa dois parâmetros e guarda uma variável local. A verificação com retorno antecipado é a <em>guard clause</em> anunciada em 2.4: uma entrada fora do limite termina com 0 antes de alcançar o retorno normal.</p><ol class="step-list"><li>Crie o Script, use RunContext Server e execute. O Output deve mostrar 35 moedas.</li><li>Troque a base para 95; o cálculo vira 110, falha na validação e retorna 0.</li><li>Adicione uma segunda chamada com base 10 e 2 obstáculos. Guarde e mostre o retorno.</li></ol><p><strong>Se aparecer nil:</strong> confira quantidade e ordem dos argumentos e se a função possui <code>return</code>. Para reiniciar, restaure a chamada final. O Output deve ficar sem erros.</p>
+          </section>
+          <section><h3>Exercícios e incremento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Crie <code>dobrar(numero)</code> e teste com 4 e 7.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Faça <code>podeAbrir(temChave, nivel)</code> retornar boolean, exigindo chave e nível 2.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Faça a recompensa rejeitar base ou obstáculos negativos antes do cálculo. Liste três testes.</p></article></div><p><strong>Projeto 2:</strong> substitua a regra longa da porta por funções <code>podeAbrirPorta</code> e <code>mostrarEstadoDaPorta</code>. A mudança física continua reservada ao Módulo 3.</p></section>
+          <section><h3>Resumo</h3><ul class="check-list"><li>Distingo declarar e chamar.</li><li>Distingo parâmetro e argumento.</li><li>Uso retorno como resultado, não só print.</li><li>Consigo testar uma função com casos diferentes.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> <code>local function dobrar(numero) return numero * 2 end</code>; os resultados são 8 e 14.</p><p><strong>Intermediário:</strong> <code>return temChave and nivel &gt;= 2</code>. Quem chama decide o que fazer com true/false.</p><p><strong>Desafiador:</strong> uma solução verifica <code>if base &lt; 0 or obstaculos &lt; 0 then return 0 end</code>. Teste dois valores válidos e cada entrada negativa; outras decomposições são válidas.</p></div></details>
+          <section><h3>Validação técnica</h3><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Funções, parâmetros e retornos</td><td><a href="https://create.roblox.com/docs/luau/functions" target="_blank" rel="noopener noreferrer">Functions</a> e <a href="https://create.roblox.com/docs/luau/tuples" target="_blank" rel="noopener noreferrer">Tuples</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Exemplo limitado a um retorno e funções locais.</td></tr></tbody></table></div><p>Consulta: 26/08/2026. Functions #6 e Parameters/Math/Returns #7 foram localizados na playlist, mas não analisados integralmente.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-05" data-previous-chapter>← 2.5</a><a class="button primary" href="#capitulo-07" data-next-chapter>2.7 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-07" aria-labelledby="titulo-07">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 2.7</p><h2 id="titulo-07">Tabelas: listas, dicionários e configurações</h2><p>Organize vários valores relacionados em uma única estrutura.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-02-capitulo-07"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisito:</strong> 2.6.</p><ul class="check-list"><li>Criar uma lista indexada a partir de 1.</li><li>Criar um dicionário acessado por chave.</li><li>Percorrer tabelas e compreender cópia rasa e congelamento.</li></ul><dl class="glossary-grid"><div class="glossary-item"><dt>Tabela</dt><dd>Estrutura Luau que associa chaves a valores.</dd></div><div class="glossary-item"><dt>Array</dt><dd>Tabela usada como sequência, normalmente com índices 1, 2, 3… sem buracos.</dd></div><div class="glossary-item"><dt>Dicionário</dt><dd>Tabela cujas chaves descrevem os valores.</dd></div><div class="glossary-item"><dt>Cópia rasa</dt><dd>Duplica a primeira camada; tabelas internas continuam compartilhadas.</dd></div></dl></section>
+          <aside class="callout attention"><strong><code>nil</code> remove uma entrada</strong><p>Uma chave de tabela não guarda nil. Em arrays, criar buracos torna o comprimento e parte das operações ambíguos. Prefira sequências contínuas.</p></aside>
+          <section class="practice-card"><p class="practice-label">Prática guiada</p><h3>Monte o catálogo da sala</h3><dl class="practice-facts"><div><dt>Script</dt><dd><code>CatalogoDaSala</code></dd></div><div><dt>Caminho</dt><dd>ServerScriptService</dd></div><div><dt>Contexto</dt><dd>Servidor · início</dd></div><div><dt>Resultado</dt><dd>Fases e preços no Output</dd></div></dl>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>CatalogoDaSala.server.luau</strong><small>Script · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-207" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-207"><code>const FASES = table.freeze({"Entrada", "Obstáculo", "Chegada"})
+
+local precos = {
+	Chave = 25,
+	Escudo = 40,
+	Lanterna = 15,
+}
+
+local catalogo = {
+	Moeda = { valor = 1, cor = "Amarela" },
+	Cristal = { valor = 5, cor = "Azul" },
+	Estrela = { valor = 10, cor = "Dourada" },
+}
+
+for indice, nomeDaFase in FASES do
+	print(`Fase {indice}: {nomeDaFase}`)
+end
+
+for nomeDoItem, preco in precos do
+	print(`{nomeDoItem}: {preco} moedas`)
+end
+
+local copiaDosPrecos = table.clone(precos)
+copiaDosPrecos.Chave = 30
+print("Original:", precos.Chave, "Cópia:", copiaDosPrecos.Chave)
+print("Cristal:", catalogo.Cristal.valor, catalogo.Cristal.cor)</code></pre></div>
+            <p><code>FASES</code> é array congelado: não aceita mudanças. <code>precos</code> é dicionário. <code>catalogo</code> contém pequenas tabelas descritivas. A iteração generalizada entrega índice/chave e valor. <code>table.clone()</code> cria uma cópia rasa; aqui isso basta porque os preços são números.</p><ol class="step-list"><li>Execute e confirme três fases, três preços, 25/30 e os dados do Cristal.</li><li>Adicione <code>Mapa = 20</code> e confirme que aparece no percurso.</li><li>Em uma cópia do array não congelada, experimente <code>table.insert(fasesEditaveis, "Bônus")</code>.</li></ol><p><strong>Erros comuns:</strong> tentar acessar <code>FASES[0]</code>, escrever uma chave diferente ou modificar a tabela congelada. Clique no erro para localizar a linha. Para reiniciar, restaure o painel.</p>
+          </section>
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Crie uma lista com três mensagens e percorra com índice e texto.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Acrescente <code>disponivel</code> a cada item do catálogo e mostre apenas os disponíveis.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Explique por que clonar um catálogo aninhado não isola as tabelas internas.</p></article></div><p><strong>Projeto 2:</strong> centralize em uma tabela o nome da sala, nível exigido, recompensa e três mensagens. As funções do capítulo anterior devem receber essa configuração.</p></section>
+          <section><h3>Resumo</h3><ul class="check-list"><li>Sei escolher array ou dicionário.</li><li>Uso índices a partir de 1.</li><li>Percorro sem depender da ordem de dicionário.</li><li>Distingo const, freeze e clone.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> crie <code>local mensagens = {"Preparando", "Testando", "Pronto"}</code> e percorra como no exemplo.</p><p><strong>Intermediário:</strong> cada entrada pode ter <code>disponivel = true</code>; dentro do laço, use <code>if dados.disponivel then print(...) end</code>.</p><p><strong>Desafiador:</strong> clone copia as referências das tabelas internas. Alterar <code>copia.Cristal.valor</code> também afeta o original, a menos que essa camada seja clonada separadamente.</p></div></details>
+          <section><h3>Validação técnica</h3><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Tabelas, iteração, clone e freeze</td><td><a href="https://create.roblox.com/docs/luau/tables" target="_blank" rel="noopener noreferrer">Tables</a> e <a href="https://create.roblox.com/docs/luau/control-structures" target="_blank" rel="noopener noreferrer">Control structures</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Ordem de dicionário não foi tratada como garantida; cópia identificada como rasa.</td></tr></tbody></table></div><p>Consulta: 26/08/2026. Tables #17 foi localizado na playlist, mas não analisado integralmente.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-06" data-previous-chapter>← 2.6</a><a class="button primary" href="#capitulo-08" data-next-chapter>2.8 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-08" aria-labelledby="titulo-08">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 2.8</p><h2 id="titulo-08">Escopo, nil, erros e diagnóstico</h2><p>Leia a evidência, encontre a primeira causa e corrija o menor trecho responsável.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-02-capitulo-08"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e termos</h3><p><strong>Pré-requisitos:</strong> 2.1–2.7.</p><ul class="check-list"><li>Explicar onde um nome local existe.</li><li>Tratar nil antes de uma operação que exige valor.</li><li>Usar Output, número da linha e Script Analysis para diagnosticar.</li></ul><dl class="glossary-grid"><div class="glossary-item"><dt>Escopo</dt><dd>Região do código em que um nome pode ser acessado.</dd></div><div class="glossary-item"><dt>Erro de execução</dt><dd>Falha ocorrida enquanto o programa roda.</dd></div><div class="glossary-item"><dt>Stack trace</dt><dd>Rastro de chamadas e linhas que levou ao erro.</dd></div><div class="glossary-item"><dt>Warning</dt><dd>Aviso que merece atenção, mas não interrompe necessariamente a execução.</dd></div></dl></section>
+          <section><h3>Três perguntas de diagnóstico</h3><ol class="step-list"><li><strong>O que a mensagem diz?</strong> Leia sem adivinhar.</li><li><strong>Em qual Script e linha começou?</strong> Clique na primeira linha relevante do seu código.</li><li><strong>Qual valor real chegou ali?</strong> Use um print temporário e <code>typeof()</code>.</li></ol><aside class="callout error"><strong>Não esconda erros de programação</strong><p><code>pcall()</code> existe para operações que podem falhar mesmo com código correto. Ele não corrige nome digitado errado, escopo incorreto ou nil inesperado. Será aplicado de verdade quando DataStore introduzir falhas externas.</p></aside></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada · laboratório controlado</p><h3>Produza, leia e corrija dois erros</h3><dl class="practice-facts"><div><dt>Script</dt><dd><code>LaboratorioDiagnostico</code></dd></div><div><dt>Caminho</dt><dd>ServerScriptService</dd></div><div><dt>Contexto</dt><dd>Servidor · início</dd></div><div><dt>Ferramentas</dt><dd>Output e Script Analysis</dd></div></dl>
+            <p>Primeiro use este trecho <strong>propositalmente defeituoso</strong>. Ele é sintaticamente válido, mas tenta medir um nil:</p><div class="copy-panel"><div class="copy-panel-header"><div><strong>Experimento com erro</strong><small>Script · servidor · não manter</small></div><button class="copy-button" type="button" data-copy-target="codigo-208-erro" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-208-erro"><code>local configuracao = { objetivo = "Chegada" }
+local nomeDoObjetivo = configuracao.objetivoo
+
+print("Valor observado:", nomeDoObjetivo, typeof(nomeDoObjetivo))
+print("Tamanho:", #nomeDoObjetivo)</code></pre></div>
+            <ol class="step-list"><li>Execute, observe nil no primeiro log e clique no erro da linha seguinte.</li><li>Compare <code>objetivoo</code> com a chave declarada. Corrija para <code>objetivo</code> e confirme tamanho 7.</li><li>Abra Script Analysis; corrija avisos relacionados antes de continuar.</li></ol>
+            <p>Substitua pelo código final, que mantém a verificação explícita:</p><div class="copy-panel"><div class="copy-panel-header"><div><strong>LaboratorioDiagnostico.server.luau</strong><small>Script · servidor · versão final</small></div><button class="copy-button" type="button" data-copy-target="codigo-208" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-208"><code>const OBJETIVO_PADRAO = "Chegada"
+
+local function mostrarObjetivo()
+	local objetivoAtual = OBJETIVO_PADRAO
+	print("Objetivo da função:", objetivoAtual)
+end
+
+local configuracao = { objetivo = OBJETIVO_PADRAO }
+local objetivo = configuracao.objetivo
+
+if objetivo == nil then
+	warn("Objetivo ausente na configuração.")
+else
+	print("Objetivo encontrado:", objetivo)
+	print("Quantidade de caracteres:", #objetivo)
+end
+
+mostrarObjetivo()</code></pre></div>
+            <p><code>objetivoAtual</code> só existe dentro da função. Já <code>objetivo</code> foi declarado no escopo do Script. O teste de nil refina o caminho: a operação <code>#objetivo</code> acontece somente quando existe texto.</p><p><strong>Para reiniciar:</strong> Stop, substitua pelo código final, limpe o Output e execute. Espere três logs e nenhum erro.</p>
+          </section>
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Corrija uma variável escrita como <code>recompesa</code> e explique a mensagem.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Leia uma chave ausente de tabela, detecte nil e use um valor padrão sem causar erro.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Crie um erro de escopo dentro de uma cópia do Script, registre Script/linha/causa e corrija.</p></article></div><p><strong>Projeto 2:</strong> execute todos os Scripts da sala, elimine erros e warnings sob seu controle e mantenha logs que informem valores importantes, não mensagens vagas.</p></section>
+          <section><h3>Resumo</h3><ul class="check-list"><li>Consigo delimitar escopos locais.</li><li>Não opero sobre nil sem verificar.</li><li>Começo pela mensagem e linha.</li><li>Não uso pcall para mascarar defeitos.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> use o nome declarado em todas as ocorrências; a mensagem/aviso aponta nome desconhecido ou valor nil.</p><p><strong>Intermediário:</strong> <code>local tempo = configuracao.tempo or 60</code> é uma solução quando zero não precisa ser substituído; um <code>if tempo == nil</code> é mais explícito.</p><p><strong>Desafiador:</strong> declarar um local dentro da função e tentar usá-lo fora demonstra o limite. A correção pode mover a declaração para o escopo externo ou manter todo o uso dentro da função, conforme a intenção.</p></div></details>
+          <section><h3>Validação técnica</h3><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Escopo, Output e depuração</td><td><a href="https://create.roblox.com/docs/luau/scope" target="_blank" rel="noopener noreferrer">Scope</a>, <a href="https://create.roblox.com/docs/studio/output" target="_blank" rel="noopener noreferrer">Output</a> e <a href="https://create.roblox.com/docs/studio/debugging" target="_blank" rel="noopener noreferrer">Debugging</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>pcall apenas contextualizado; uso aplicado adiado para DataStore.</td></tr></tbody></table></div><p>Consulta: 26/08/2026. Scoping #9 foi localizado na playlist, mas não analisado integralmente.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-07" data-previous-chapter>← 2.7</a><a class="button primary" href="#capitulo-09" data-next-chapter>2.9 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-09" aria-labelledby="titulo-09">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 2.9</p><h2 id="titulo-09">Tipagem Luau, inferência, anotações e <code>--!strict</code></h2><p>Faça o editor verificar contratos antes que parte dos erros chegue ao teste.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-02-capitulo-09"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 2.1–2.8.</p><ul class="check-list"><li>Distinguir tipo observado em execução de análise estática.</li><li>Usar inferência, anotações, alias e tipo opcional.</li><li>Ativar <code>--!strict</code> e interpretar avisos.</li></ul><dl class="glossary-grid"><div class="glossary-item"><dt>Inferência</dt><dd>Dedução automática de um tipo pelo analisador.</dd></div><div class="glossary-item"><dt>Anotação</dt><dd>Tipo escrito explicitamente após dois-pontos.</dd></div><div class="glossary-item"><dt>Alias de tipo</dt><dd>Nome reutilizável criado com <code>type</code>.</dd></div><div class="glossary-item"><dt>Tipo opcional</dt><dd>Valor que pode ser do tipo indicado ou nil, escrito com <code>?</code>.</dd></div><div class="glossary-item"><dt>Refinamento</dt><dd>Informação mais precisa obtida após uma verificação.</dd></div></dl></section>
+          <section><h3>Dois momentos diferentes</h3><p><code>typeof(valor)</code> roda durante a sessão e observa um valor real. O verificador estático examina o texto antes da execução. Ele ajuda a encontrar incompatibilidades, mas não prova que toda regra do jogo está correta nem torna dados recebidos confiáveis.</p><aside class="callout tip"><strong>Anote contratos, não cada detalhe</strong><p>A inferência já entende muitos locais. Anotações são especialmente úteis nos parâmetros, retornos e estruturas compartilhadas. Evite <code>any</code> como atalho: ele desliga verificações importantes naquele caminho.</p></aside></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada · conclusão do Projeto 2</p><h3>Transforme a configuração em contrato estrito</h3><dl class="practice-facts"><div><dt>Script</dt><dd><code>RegrasEstritasDaSala</code></dd></div><div><dt>Caminho</dt><dd>ServerScriptService</dd></div><div><dt>Contexto</dt><dd>Servidor · início</dd></div><div><dt>Primeira linha</dt><dd><code>--!strict</code></dd></div></dl>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>RegrasEstritasDaSala.server.luau</strong><small>Script · servidor · modo estrito</small></div><button class="copy-button" type="button" data-copy-target="codigo-209" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-209"><code>--!strict
+
+type ConfiguracaoSala = {
+	nome: string,
+	recompensaBase: number,
+	tempoLimite: number?,
+}
+
+local function calcularRecompensa(
+	configuracao: ConfiguracaoSala,
+	obstaculos: number
+): number
+	local bonus = obstaculos * 5
+	return configuracao.recompensaBase + bonus
+end
+
+local function descreverTempo(tempoLimite: number?): string
+	if tempoLimite == nil then
+		return "Sem limite de tempo"
+	end
+
+	return `Limite: {tempoLimite} segundos`
+end
+
+local configuracao: ConfiguracaoSala = {
+	nome = "Primeira Sala",
+	recompensaBase = 20,
+	tempoLimite = 60,
+}
+
+local recompensa = calcularRecompensa(configuracao, 3)
+print(configuracao.nome, recompensa)
+print(descreverTempo(configuracao.tempoLimite))</code></pre></div>
+            <p>O alias descreve a forma da tabela. O <code>?</code> permite número ou nil. Depois do <code>if</code>, o analisador refina <code>tempoLimite</code> para number. O retorno e os parâmetros formam um contrato legível.</p><ol class="step-list"><li>Digite o código e aguarde a análise do editor. Execute: espere “Primeira Sala 35” e o limite.</li><li>Remova <code>tempoLimite</code> da configuração: isso é permitido e deve imprimir “Sem limite”.</li><li>Como experimento, envie <code>"três"</code> no lugar de 3. Observe o aviso antes de executar e restaure o número.</li></ol><p><strong>Se houver sublinhado:</strong> passe o cursor, leia os tipos esperado e recebido, e corrija a origem. Não use <code>:: any</code> apenas para silenciar. Para reiniciar, restaure o painel.</p>
+          </section>
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Anote uma função <code>dobrar(number): number</code>.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Crie tipo <code>Item</code> com nome, preço e descrição opcional.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Ative strict em uma cópia de um Script anterior e elimine avisos sem usar any.</p></article></div><p><strong>Conclusão do Projeto 2:</strong> a Primeira sala interativa tem Scripts pequenos, funções testáveis, configuração tipada, logs úteis e Output sem erros. A interação física por evento começa no Módulo 3.</p></section>
+          <section><h3>Resumo</h3><ul class="check-list"><li>Distingo verificação estática e runtime.</li><li>Sei quando a inferência basta.</li><li>Leio tipos opcionais e refinamentos.</li><li>Uso strict para descobrir problemas, não para escondê-los.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> <code>local function dobrar(numero: number): number return numero * 2 end</code>.</p><p><strong>Intermediário:</strong> <code>type Item = { nome: string, preco: number, descricao: string? }</code>.</p><p><strong>Desafiador:</strong> os ajustes dependem do Script. Corrija valores incompatíveis, caminhos possivelmente nil e retornos ausentes; mais de uma solução pode preservar o comportamento.</p></div></details>
+          <section><h3>Validação técnica</h3><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Strict, inferência e anotações</td><td><a href="https://create.roblox.com/docs/luau/type-checking" target="_blank" rel="noopener noreferrer">Type checking</a> e <a href="https://luau.org/types/" target="_blank" rel="noopener noreferrer">Luau types</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Link antigo de type annotations removido do plano; prática usa Script, não ModuleScript futuro.</td></tr><tr><td>Tipos opcionais e refinamento</td><td><a href="https://luau.org/types/type-refinements/" target="_blank" rel="noopener noreferrer">Type refinements</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Refinamento demonstrado após teste de nil.</td></tr></tbody></table></div><p>Consulta: 26/08/2026. Nenhuma playlist foi associada; conteúdo avançado só entra depois da base de arquitetura.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-08" data-previous-chapter>← 2.8</a><a class="button primary" href="#avaliacao" data-next-chapter>Avaliação →</a></div>
+        </div>
+      </article>
+
+      <section class="chapter mastery-check" id="avaliacao" aria-labelledby="titulo-avaliacao">
+        <div class="reading-flow"><header><p class="chapter-kicker">Avaliação de domínio · não conta como capítulo</p><h2 id="titulo-avaliacao">Você consegue explicar, testar e corrigir?</h2><p>Avance somente quando conseguir demonstrar as habilidades, não apenas reconhecer o código.</p></header>
+          <section><h3>Parte A · previsão</h3><p>Sem executar, escreva as quatro linhas produzidas:</p><div class="copy-panel"><div class="copy-panel-header"><div><strong>Previsao.server.luau</strong><small>Leitura e raciocínio</small></div><button class="copy-button" type="button" data-copy-target="codigo-avaliacao-2" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-avaliacao-2"><code>--!strict
+const LIMITE = 3
+local valores = {2, 4, 6}
+
+local function classificar(numero: number): string
+	if numero &gt; LIMITE then
+		return "alto"
+	end
+	return "baixo"
+end
+
+for indice, valor in valores do
+	print(indice, valor, classificar(valor))
+end
+print("fim")</code></pre></div></section>
+          <section><h3>Parte B · diagnóstico</h3><ol><li>Explique por que <code>local preco = "20"; print(preco + 5)</code> não deve depender de conversão implícita e corrija.</li><li>Uma função deveria devolver número, mas só usa print. Corrija o contrato mental.</li><li>Uma leitura <code>configuracao.temppo</code> devolve nil. Descreva os três primeiros passos de diagnóstico.</li></ol></section>
+          <section><h3>Parte C · demonstração prática</h3><p>Na Primeira sala, mantenha um único Script estrito que:</p><ul class="check-list"><li>declare uma configuração tipada;</li><li>calcule recompensa com função e validação;</li><li>percorra três mensagens em tabela;</li><li>produza Output limpo em dois casos válidos e um inválido;</li><li>tenha ao menos uma alteração sua que não esteja nos exemplos.</li></ul><p><strong>Critério para avançar:</strong> preveja corretamente pelo menos 3 das 4 linhas, corrija os três diagnósticos, explique cada função do seu Script e execute sem erro. Se não conseguir, volte ao capítulo indicado pela dificuldade — isso é parte do aprendizado.</p></section>
+          <details class="answer"><summary>Gabarito e rubrica</summary><div class="answer-body"><p><strong>Parte A:</strong> <code>1 2 baixo</code>, <code>2 4 alto</code>, <code>3 6 alto</code> e <code>fim</code>.</p><p><strong>Parte B:</strong> use <code>tonumber</code> e verifique nil antes da soma; uma função que produz resultado precisa de <code>return</code>; leia mensagem/linha, observe o valor e compare a chave declarada.</p><p><strong>Parte C:</strong> não há código único. Uma solução válida combina o tipo de 2.9, a função validada de 2.6 e uma lista de 2.7. Sua mudança pode incluir outro limite, nova mensagem ou regra, desde que você explique e teste.</p></div></details>
+          <div class="callout success"><strong>Módulo 2 concluído</strong><p>Marque os nove capítulos somente após realizar as práticas. O Módulo 3 já está disponível com eventos, conexões e mudanças observáveis no mundo.</p></div><div class="chapter-pager"><a class="button" href="#capitulo-09" data-previous-chapter>← Rever 2.9</a><a class="button primary" href="modulo-03.html">Abrir Módulo 3 →</a></div>
+        </div>
+      </section>
+
+      <section class="chapter reference-section" id="glossario" aria-labelledby="titulo-glossario"><div class="reading-flow"><h2 id="titulo-glossario">Glossário do módulo</h2><dl class="glossary-grid"><div class="glossary-item"><dt>Luau</dt><dd>Linguagem de programação usada na Roblox.</dd></div><div class="glossary-item"><dt>Script</dt><dd>Instance que contém código executável.</dd></div><div class="glossary-item"><dt>Runtime</dt><dd>Momento em que o código está executando.</dd></div><div class="glossary-item"><dt>Expressão</dt><dd>Trecho que produz um valor.</dd></div><div class="glossary-item"><dt>Iteração</dt><dd>Uma passagem por um laço.</dd></div><div class="glossary-item"><dt>Função</dt><dd>Bloco nomeado e reutilizável.</dd></div><div class="glossary-item"><dt>Tabela</dt><dd>Estrutura de chaves e valores.</dd></div><div class="glossary-item"><dt>Escopo</dt><dd>Região onde um nome existe.</dd></div><div class="glossary-item"><dt>nil</dt><dd>Ausência de valor.</dd></div><div class="glossary-item"><dt>Tipagem estática</dt><dd>Análise de compatibilidade feita antes da execução.</dd></div></dl></div></section>
+
+      <section class="chapter reference-section" id="fontes" aria-labelledby="titulo-fontes"><div class="reading-flow"><h2 id="titulo-fontes">Fontes oficiais consolidadas</h2><p>Consultadas em 26 de agosto de 2026. Os links complementares aparecem somente nos capítulos em que foram relacionados.</p><ul><li><a href="https://create.roblox.com/docs/scripting/locations" target="_blank" rel="noopener noreferrer">Tipos e locais de Script</a></li><li><a href="https://create.roblox.com/docs/studio/script-editor" target="_blank" rel="noopener noreferrer">Script Editor</a> e <a href="https://create.roblox.com/docs/studio/output" target="_blank" rel="noopener noreferrer">Output</a></li><li><a href="https://create.roblox.com/docs/luau/variables" target="_blank" rel="noopener noreferrer">Variáveis</a>, <a href="https://create.roblox.com/docs/luau/operators" target="_blank" rel="noopener noreferrer">operadores</a> e <a href="https://create.roblox.com/docs/luau/control-structures" target="_blank" rel="noopener noreferrer">controle de fluxo</a></li><li><a href="https://create.roblox.com/docs/luau/functions" target="_blank" rel="noopener noreferrer">Funções</a>, <a href="https://create.roblox.com/docs/luau/tables" target="_blank" rel="noopener noreferrer">tabelas</a> e <a href="https://create.roblox.com/docs/luau/scope" target="_blank" rel="noopener noreferrer">escopo</a></li><li><a href="https://create.roblox.com/docs/studio/debugging" target="_blank" rel="noopener noreferrer">Depuração</a></li><li><a href="https://create.roblox.com/docs/luau/type-checking" target="_blank" rel="noopener noreferrer">Type checking no Creator Hub</a> e <a href="https://luau.org/types/" target="_blank" rel="noopener noreferrer">sistema de tipos Luau</a></li></ul><div class="button-row"><a class="button" href="modulo-01.html">Módulo 1</a><a class="button primary" href="../index.html#modulos">Voltar ao sumário</a></div></div></section>
+    </div>
+  </main>
+  <footer class="site-footer"><p>Módulo 2 completo · conteúdo técnico consultado em 26 de agosto de 2026.</p></footer>
+</body>
+</html>
+
+

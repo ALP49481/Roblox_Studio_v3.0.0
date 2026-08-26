@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Módulo 5 da Apostila Roblox Studio: replicação, remotes, validação, limites de frequência, moedas e loja segura.">
+  <title>Módulo 5 — Cliente, servidor, rede e segurança</title>
+  <link rel="stylesheet" href="../assets/styles.css?v=20260826-11"><script src="../assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a><div class="header-actions"><a class="button" href="../index.html#modulos">Todos os módulos</a><a class="button" href="../conta.html" data-account-label>Conta</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div></div></header>
+
+  <main class="module-shell" id="conteudo">
+    <aside class="module-sidebar" data-module-sidebar data-collapsed="false">
+      <button class="button mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="true">Ocultar capítulos</button>
+      <h2>Módulo 5</h2><p>Cliente, servidor, rede e segurança</p>
+      <nav class="chapter-nav" aria-label="Capítulos do Módulo 5"><a href="#capitulo-01">5.1 Replicação e autoridade</a><a href="#capitulo-02">5.2 Remotes e contratos</a><a href="#capitulo-03">5.3 Validação e frequência</a><a href="#capitulo-04">5.4 Moedas seguras</a><a href="#capitulo-05">5.5 Loja transacional</a><a href="#avaliacao">Avaliação de domínio</a><a href="#glossario">Glossário</a><a href="#fontes">Fontes</a></nav>
+      <div class="sidebar-extra"><div class="progress-track" role="progressbar" aria-label="Progresso do módulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" data-progress-fill data-progress-scope="5"></div></div><p class="progress-label" data-progress-label data-progress-scope="5">0 de 5 capítulos disponíveis concluídos · 0%</p><p><small>Alt + ← e Alt + → alternam seções.</small></p></div>
+    </aside>
+
+    <div class="module-content">
+      <section class="module-intro" aria-labelledby="titulo-modulo"><span class="eyebrow">Dificuldade 3/5 · intermediária</span><h1 id="titulo-modulo">Faça o cliente pedir — e o servidor decidir com evidências.</h1><p class="lead">Você observará a replicação, criará contratos de rede estreitos, validará solicitações hostis e terminará com moedas e uma loja controladas pelo servidor. Segurança aqui não é medo: é transformar regras do jogo em verificações simples e testáveis.</p><ul class="lesson-map"><li><strong>Ponto de partida:</strong> cliente, servidor, GUI, Tools, Players, eventos e tabelas dos módulos anteriores</li><li><strong>Projetos:</strong> concluir Coleta e moedas seguras; iniciar Loja segura</li><li><strong>Limite consciente:</strong> moedas e inventário duram apenas a sessão; DataStore e persistência chegam no Módulo 7</li></ul><div class="callout security"><strong>Regra central</strong><p>O cliente pode dizer “quero comprar este item”. Ele não decide preço, saldo, distância nem recompensa. O servidor refaz todas as verificações usando o estado que controla.</p></div></section>
+
+      <article class="chapter" id="capitulo-01" aria-labelledby="titulo-01">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 5.1</p><h2 id="titulo-01">Replicação, latência, autoridade e fronteira de confiança</h2><p>Veja duas cópias do mesmo mundo e escolha qual delas pode decidir cada resultado.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-05-capitulo-01"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e novas palavras</h3><p><strong>Pré-requisitos:</strong> 4.1, 4.2 e 4.5. Ao terminar, você distinguirá cópia do servidor e cópia do cliente, preverá o sentido da replicação, reconhecerá latência e escreverá uma tabela de responsabilidades.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Replicação</dt><dd>Sincronização seletiva de objetos e mudanças entre servidor e clientes.</dd></div><div class="glossary-item"><dt>Latência</dt><dd>Tempo entre enviar uma informação e ela chegar ao outro lado.</dd></div><div class="glossary-item"><dt>Autoridade</dt><dd>Lado autorizado a decidir o valor verdadeiro de uma regra.</dd></div><div class="glossary-item"><dt>Fonte da verdade</dt><dd>Estado que o sistema consulta para resolver divergências.</dd></div><div class="glossary-item"><dt>Fronteira de confiança</dt><dd>Ponto em que dados de um ambiente menos confiável entram em outro.</dd></div><div class="glossary-item"><dt>Network ownership</dt><dd>Controle temporário da simulação física de uma peça por servidor ou cliente.</dd></div></dl></section>
+          <section><h3>Um mundo, várias cópias</h3><div class="concept-diagram" aria-label="Fluxo entre servidor e dois clientes"><div><strong>Cliente A</strong><span>input e apresentação local</span></div><span class="concept-arrow">↔</span><div><strong>Servidor</strong><span>fonte da verdade compartilhada</span></div><span class="concept-arrow">↔</span><div><strong>Cliente B</strong><span>outra cópia, outro dispositivo</span></div></div><p>Uma mudança válida feita pelo servidor costuma ser replicada aos clientes. Uma mudança local do cliente pode existir apenas naquela cópia e não prova nada ao servidor. Isso permite interfaces rápidas e efeitos pessoais, mas impede que saldo, dano ou propriedade de item sejam aceitos só porque aparecem na tela de alguém.</p><div class="table-wrap"><table><thead><tr><th>Responsabilidade</th><th>Lado principal</th><th>Motivo</th></tr></thead><tbody><tr><td>tecla, toque, câmera, HUD</td><td>cliente</td><td>precisa responder ao dispositivo do jogador</td></tr><tr><td>preço, saldo, dano, checkpoint válido</td><td>servidor</td><td>afeta regras compartilhadas e recompensas</td></tr><tr><td>cor decorativa pessoal</td><td>cliente</td><td>não altera resultado importante</td></tr><tr><td>posição física relevante</td><td>servidor valida</td><td>network ownership não transforma o cliente em autoridade</td></tr></tbody></table></div><aside class="callout tip"><strong>Latência é normal</strong><p>Não esconda a espera com uma recompensa local falsa. Mostre “solicitando…”, aguarde a confirmação do servidor e só então apresente sucesso. No Studio, use Network Simulation para observar atrasos sem alterar as regras.</p></aside></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · laboratório de duas cópias</p><h3>Mude a mesma Part no cliente e no servidor</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Primeira sala interativa</dd></div><div><dt>Objetos</dt><dd>Folder <code>LaboratorioRede</code> e Part <code>Indicador</code></dd></div><div><dt>Scripts</dt><dd><code>MudancaDoServidor</code> e <code>MudancaDoCliente</code></dd></div><div><dt>Teste</dt><dd>Test → Server &amp; Clients · 2 clientes</dd></div></dl><ol class="step-list"><li>Com o teste parado, crie <code>game → Workspace → LaboratorioRede → Indicador</code>. Defina Anchored true, Size 6,1,6 e uma cor neutra.</li><li>Crie um Script em <code>game → ServerScriptService → MudancaDoServidor</code>, RunContext Server.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>MudancaDoServidor.server.luau</strong><small>Script · ServerScriptService · servidor · início da sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-501-servidor" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-501-servidor"><code>local indicador = workspace.LaboratorioRede.Indicador
+
+task.wait(4)
+indicador.Color = Color3.fromRGB(70, 210, 120)
+indicador:SetAttribute("OrigemDaMudanca", "Servidor")
+print("[SERVIDOR] estado compartilhado atualizado")</code></pre></div>
+            <p><code>indicador</code> aponta para a Part conhecida. Depois de quatro segundos, o servidor altera a cor e um atributo; os clientes recebem esse estado compartilhado.</p><ol class="step-list" start="3"><li>Crie um Script em <code>game → ReplicatedStorage → MudancaDoCliente</code> e defina RunContext Client.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>MudancaDoCliente.client.luau</strong><small>Script · ReplicatedStorage · cliente · uma cópia por jogador</small></div><button class="copy-button" type="button" data-copy-target="codigo-501-cliente" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-501-cliente"><code>local Players = game:GetService("Players")
+local indicador = workspace.LaboratorioRede.Indicador
+
+task.wait(2)
+indicador.Color = Color3.fromRGB(230, 80, 80)
+indicador:SetAttribute("OrigemDaMudanca", Players.LocalPlayer.Name)
+print("[CLIENTE] mudança feita somente nesta cópia")</code></pre></div>
+            <p><code>LocalPlayer</code> identifica apenas o jogador daquele cliente. A mudança vermelha é local; ela não autoriza o cliente a editar o servidor ou o outro cliente.</p><ol class="step-list" start="4"><li>Abra View → Output e ative a identificação do contexto nas mensagens.</li><li>Use Server &amp; Clients com dois clientes. Aos dois segundos, cada cliente verá sua mudança local. Aos quatro, a atualização do servidor deve chegar aos dois.</li><li>No Explorer de cada janela, compare o atributo. Se só uma janela muda, confirme o RunContext; se nada executa, confirme caminhos e nomes.</li><li>Repita com 100 ms de atraso de entrada e saída em Test → Network Simulation. Observe a diferença de tempo sem mover regras para o cliente.</li></ol><p><strong>Para reiniciar:</strong> Stop restaura o projeto salvo. Remova scripts duplicados antes do novo teste.</p>
+          </section>
+          <section><h3>Exercícios e fechamento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Classifique câmera, moedas, som local e dano como responsabilidade inicial de cliente ou servidor, justificando cada uma.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Troque os tempos e use dois clientes para registrar uma linha do tempo observada.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Desenhe a fronteira de confiança de uma porta: intenção, distância, chave e abertura.</p></article></div><p><strong>Incremento:</strong> o laboratório de rede vira o ambiente de teste dos próximos capítulos. Nenhuma recompensa foi criada ainda.</p><ul class="check-list"><li>Cliente e servidor mantêm cópias diferentes.</li><li>Servidor é fonte da verdade compartilhada.</li><li>Latência não concede autoridade ao cliente.</li><li>Network ownership exige validação para consequências importantes.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> câmera e som pessoal ficam no cliente; moedas e dano são decididos no servidor. Um som compartilhado pode partir do servidor, então o contexto importa.</p><p><strong>Intermediário:</strong> uma resposta válida registra instante local e instante compartilhado em cada janela; a ordem pode variar com a simulação.</p><p><strong>Desafiador:</strong> o cliente envia “interagir com porta A”; o servidor encontra A, confirma chave, personagem vivo, distância, estado e frequência; só então abre.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Modelo cliente-servidor e replicação</td><td><a href="https://create.roblox.com/docs/projects/client-server" target="_blank" rel="noopener noreferrer">Client-server runtime</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Duas cópias foram observadas antes de introduzir remotes.</td></tr><tr><td>Cliente não confiável e network ownership</td><td><a href="https://create.roblox.com/docs/scripting/security/security-tactics" target="_blank" rel="noopener noreferrer">Security tactics</a></td><td>Playlist não usada como autoridade</td><td>Insegura sem validação</td><td>Resultados compartilhados ficaram no servidor.</td></tr><tr><td>Testes multi-client e simulação de rede</td><td><a href="https://create.roblox.com/docs/studio/testing-modes" target="_blank" rel="noopener noreferrer">Studio testing modes</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Teste com dois clientes e latência incluído.</td></tr></tbody></table></div><p>Uma aula específica de “Local Scripts” não foi analisada integralmente; nenhuma afirmação do vídeo foi tratada como validação.</p></section><div class="chapter-pager"><a class="button" href="modulo-04.html#capitulo-06" data-previous-chapter>← Rever 4.6</a><a class="button primary" href="#capitulo-02" data-next-chapter>5.2 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-02" aria-labelledby="titulo-02">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 5.2</p><h2 id="titulo-02"><code>RemoteEvent</code>, <code>RemoteFunction</code> e contratos de rede</h2><p>Envie intenções pequenas, não autoridade disfarçada de argumento.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-05-capitulo-02"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 5.1 e 4.5. Você criará comunicação cliente→servidor→cliente, escolherá o tipo de remote e documentará um contrato de payload.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Remote</dt><dd>Objeto que atravessa a fronteira entre cliente e servidor.</dd></div><div class="glossary-item"><dt>Payload</dt><dd>Conjunto de valores enviados em uma mensagem.</dd></div><div class="glossary-item"><dt>Contrato</dt><dd>Formato, significado e limites aceitos para uma solicitação.</dd></div><div class="glossary-item"><dt>Assíncrono</dt><dd>O emissor continua sem esperar um retorno direto.</dd></div><div class="glossary-item"><dt>Síncrono</dt><dd>O emissor aguarda a função remota responder.</dd></div><div class="glossary-item"><dt>Não confiável</dt><dd>Mensagem que pode ser descartada ou chegar fora de ordem em troca de menor custo.</dd></div></dl></section>
+          <section><h3>Escolha pelo comportamento</h3><div class="table-wrap"><table><thead><tr><th>Objeto</th><th>Fluxo</th><th>Use quando</th><th>Não use para</th></tr></thead><tbody><tr><td>RemoteEvent</td><td>uma direção, assíncrono</td><td>pedido e confirmação separados</td><td>inventar retorno imediato</td></tr><tr><td>RemoteFunction</td><td>pedido e retorno, síncrono</td><td>consulta curta com resposta necessária</td><td>operações longas ou servidor chamando cliente crítico</td></tr><tr><td>UnreliableRemoteEvent</td><td>uma direção, sem garantia</td><td>efeito contínuo e não crítico</td><td>moeda, dano, compra, inventário</td></tr></tbody></table></div><p>Remotes compartilhados ficam em ReplicatedStorage para ambos os lados encontrá-los. Em <code>OnServerEvent</code>, o primeiro argumento é o <code>Player</code> fornecido pela engine — não o aceite como argumento enviado pelo cliente. Clientes não falam diretamente entre si; o servidor continua sendo o porteiro.</p><aside class="callout error"><strong>Contrato perigoso</strong><p><code>AlterarParte:FireServer(parte, propriedade, valor)</code> permite pedir alterações arbitrárias. Prefira <code>SolicitarCor:FireServer("azul")</code>: o servidor mapeia o identificador permitido para a Part e a cor que controla.</p></aside></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · primeira conversa validada</p><h3>Peça uma cor e receba uma resposta separada</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Primeira sala interativa</dd></div><div><dt>Remotes</dt><dd><code>ReplicatedStorage → Remotes → SolicitarCor / ResultadoCor</code></dd></div><div><dt>Cliente</dt><dd><code>StarterGui → HUDRede → ControleCor</code> · LocalScript</dd></div><div><dt>Servidor</dt><dd><code>ServerScriptService → ServidorDeCor</code> · Script</dd></div></dl><ol class="step-list"><li>Com o teste parado, crie Folder <code>Remotes</code> em ReplicatedStorage. Dentro, crie dois RemoteEvents: <code>SolicitarCor</code> e <code>ResultadoCor</code>.</li><li>Em StarterGui, crie ScreenGui <code>HUDRede</code>. Dentro, crie TextButton <code>BotaoSolicitarCor</code> com texto “Pedir cor azul” e TextLabel <code>Resposta</code> com texto “Aguardando”. Use o layout, área segura e foco ensinados em 4.5–4.6.</li><li>Dentro de HUDRede, crie LocalScript <code>ControleCor</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ControleCor.client.luau</strong><small>LocalScript · StarterGui/HUDRede · cliente · quando a GUI é clonada</small></div><button class="copy-button" type="button" data-copy-target="codigo-502-cliente" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-502-cliente"><code>local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local remotes = ReplicatedStorage:WaitForChild("Remotes")
+local solicitarCor = remotes:WaitForChild("SolicitarCor")
+local resultadoCor = remotes:WaitForChild("ResultadoCor")
+local botao = script.Parent:WaitForChild("BotaoSolicitarCor")
+local resposta = script.Parent:WaitForChild("Resposta")
+local aguardando = false
+
+botao.Activated:Connect(function()
+	if aguardando then
+		return
+	end
+	aguardando = true
+	botao.Active = false
+	resposta.Text = "Solicitando..."
+	solicitarCor:FireServer("azul")
+end)
+
+resultadoCor.OnClientEvent:Connect(function(aceito, mensagem)
+	aguardando = false
+	botao.Active = true
+	resposta.Text = mensagem
+	print("[CLIENTE] resposta do servidor:", aceito, mensagem)
+end)</code></pre></div>
+            <p><code>aguardando</code> evita cliques normais duplicados e melhora a interface, mas não é defesa: um cliente modificado pode ignorá-lo. O servidor ainda precisa validar.</p><ol class="step-list" start="4"><li>Crie Script <code>ServidorDeCor</code> em ServerScriptService, RunContext Server.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ServidorDeCor.server.luau</strong><small>Script · ServerScriptService · servidor · início da sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-502-servidor" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-502-servidor"><code>local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local remotes = ReplicatedStorage.Remotes
+local solicitarCor = remotes.SolicitarCor
+local resultadoCor = remotes.ResultadoCor
+local indicador = workspace.LaboratorioRede.Indicador
+
+local CORES_PERMITIDAS = {
+	azul = Color3.fromRGB(70, 140, 255),
+	verde = Color3.fromRGB(70, 210, 120),
+}
+
+solicitarCor.OnServerEvent:Connect(function(player, identificadorDaCor)
+	if typeof(identificadorDaCor) ~= "string" then
+		resultadoCor:FireClient(player, false, "Pedido recusado: tipo inválido.")
+		return
+	end
+
+	local cor = CORES_PERMITIDAS[identificadorDaCor]
+	if not cor then
+		resultadoCor:FireClient(player, false, "Essa cor não está no catálogo.")
+		return
+	end
+
+	indicador.Color = cor
+	resultadoCor:FireClient(player, true, "Cor aplicada pelo servidor.")
+	print("[SERVIDOR]", player.Name, "pediu", identificadorDaCor)
+end)</code></pre></div>
+            <p><code>CORES_PERMITIDAS</code> é uma allowlist: a chave enviada escolhe uma opção conhecida; o cliente não envia a Part nem um Color3 arbitrário. <code>player</code> chega automaticamente como primeiro argumento.</p><ol class="step-list" start="5"><li>Use Server &amp; Clients com dois clientes. Clique no cliente A: os dois devem ver a cor compartilhada; só A recebe a mensagem de resposta.</li><li>Temporariamente troque <code>"azul"</code> por <code>"roxo"</code> e depois por <code>123</code>. O servidor deve recusar sem erro e sem mudar a Part.</li><li>No Output, filtre servidor e cliente. Se houver espera infinita, compare nomes e localização dos remotes. Se a tela não voltar, confirme ResultadoCor e sua conexão.</li><li>Restaure <code>"azul"</code> e use Stop. Mantenha o laboratório para 5.3.</li></ol>
+          </section>
+          <section><h3>Contrato escrito</h3><div class="table-wrap"><table><thead><tr><th>Remote</th><th>Quem envia</th><th>Payload aceito</th><th>Resposta</th><th>Efeito autorizado</th></tr></thead><tbody><tr><td>SolicitarCor</td><td>cliente</td><td>string “azul” ou “verde”</td><td>ResultadoCor para o mesmo Player</td><td>cor de uma Part conhecida</td></tr><tr><td>ResultadoCor</td><td>servidor</td><td>boolean + mensagem curta</td><td>nenhuma</td><td>feedback visual local</td></tr></tbody></table></div><p>O contrato também deve dizer frequência, contexto e falhas. No próximo capítulo ele ganhará personagem vivo, distância e token bucket.</p></section>
+          <section><h3>Exercícios e fechamento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Acrescente “verde” ao botão sem permitir Color3 vindo do cliente.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Modele uma consulta curta adequada a RemoteFunction e explique por que ela pode esperar.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Escolha RemoteEvent, RemoteFunction ou UnreliableRemoteEvent para cinco mensagens de um combate e justifique.</p></article></div><p><strong>Incremento:</strong> a primeira intenção cliente→servidor está funcional, mas ainda não tem validação de contexto nem limite de frequência.</p><ul class="check-list"><li>RemoteEvent não bloqueia esperando retorno.</li><li>RemoteFunction deve responder rápido.</li><li>UnreliableRemoteEvent nunca carrega resultado crítico.</li><li>Payload pequeno identifica intenção, não autoridade.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> altere o texto e envie <code>"verde"</code>; a tabela do servidor já contém a cor. Não envie <code>Color3</code>.</p><p><strong>Intermediário:</strong> “qual é o nome de exibição deste item?” pode retornar uma string imediatamente. Se exigir DataStore, espera externa ou decisão crítica longa, prefira eventos e estado de carregamento.</p><p><strong>Desafiador:</strong> compra/dano: RemoteEvent confiável; consulta curta: RemoteFunction; posição visual frequente de mira: UnreliableRemoteEvent. O servidor calcula acerto e dano.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: 26/08/2026.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>RemoteEvent e RemoteFunction</td><td><a href="https://create.roblox.com/docs/scripting/events/remote" target="_blank" rel="noopener noreferrer">Remote events and callbacks</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/RemoteEvent" target="_blank" rel="noopener noreferrer">RemoteEvent API</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/RemoteFunction" target="_blank" rel="noopener noreferrer">RemoteFunction API</a></td><td>Advanced Scripting — BrawlDev, aula específica não confirmada</td><td>Atual e recomendada</td><td>Resposta separada evita espera síncrona nesta prática.</td></tr><tr><td>UnreliableRemoteEvent</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/UnreliableRemoteEvent" target="_blank" rel="noopener noreferrer">UnreliableRemoteEvent API</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Restrito a dados contínuos e não críticos.</td></tr><tr><td>Validação de argumentos remotos</td><td><a href="https://create.roblox.com/docs/scripting/security/client-server-boundary" target="_blank" rel="noopener noreferrer">Client-server boundary</a></td><td>Playlist não usada como autoridade</td><td>Insegura sem validação</td><td>Tipo, allowlist e alvo conhecido foram exigidos.</td></tr></tbody></table></div><p>Não foi possível confirmar uma aula específica das playlists avançadas nesta execução. Assista somente depois da prática; observe o contrato e substitua qualquer confiança no cliente pelas validações oficiais.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-01" data-previous-chapter>← 5.1</a><a class="button primary" href="#capitulo-03" data-next-chapter>5.3 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-03" aria-labelledby="titulo-03">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 5.3</p><h2 id="titulo-03">Validação em camadas e limite de frequência</h2><p>Recuse cedo, confirme o contexto e limite trabalho por jogador e ação.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-05-capitulo-03"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos, pré-requisitos e termos</h3><p><strong>Pré-requisitos:</strong> 5.2, 2.7 e 2.9. Você validará estrutura, tipos, números finitos, allowlists, personagem, distância, estado e frequência; depois executará testes hostis deliberados.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Validação</dt><dd>Prova de que um dado satisfaz as regras antes de ser usado.</dd></div><div class="glossary-item"><dt>Número finito</dt><dd>Número que não é infinito nem NaN.</dd></div><div class="glossary-item"><dt>Rate limiting</dt><dd>Restrição da frequência de solicitações.</dd></div><div class="glossary-item"><dt>Token bucket</dt><dd>Balde que recupera fichas com o tempo e gasta uma por ação.</dd></div><div class="glossary-item"><dt>Allowlist</dt><dd>Lista explícita do que é permitido.</dd></div><div class="glossary-item"><dt>Teste hostil</dt><dd>Teste intencional com tipos, valores, ritmo ou contexto inválidos.</dd></div></dl></section>
+          <section><h3>A ordem reduz custo e risco</h3><div class="concept-diagram" aria-label="Camadas de validação"><div><strong>1 Estrutura</strong><span>table, campos e tamanho</span></div><span class="concept-arrow">→</span><div><strong>2 Valores</strong><span>finito, inteiro, limites</span></div><span class="concept-arrow">→</span><div><strong>3 Contexto</strong><span>estado, distância, permissão</span></div><span class="concept-arrow">→</span><div><strong>4 Efeito</strong><span>servidor altera estado</span></div></div><p>Faça verificações baratas antes das caras. O cooldown visual do cliente continua útil para experiência, mas o limitador real fica no servidor. O balde permite uma pequena rajada legítima e repõe fichas gradualmente.</p><aside class="callout attention"><strong><code>pcall</code> não corrige regra ruim</strong><p>Tipos e contexto inválidos são fluxo esperado: use condições e retorne. <code>pcall</code> será aplicado a operações externas que podem falhar, principalmente DataStore; não o use para esconder bugs de programação.</p></aside></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · defesa reutilizável</p><h3>Crie um token bucket por jogador e ação</h3><dl class="practice-facts"><div><dt>Módulo</dt><dd><code>game → ServerScriptService → TokenBucket</code></dd></div><div><dt>Tipo</dt><dd>ModuleScript · somente servidor</dd></div><div><dt>Carregamento</dt><dd>quando ServidorDeInteracao chama require()</dd></div></dl><ol class="step-list"><li>Crie ModuleScript <code>TokenBucket</code> em ServerScriptService. O cliente não precisa conhecer sua implementação.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>TokenBucket.luau</strong><small>ModuleScript · ServerScriptService · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-503-bucket" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-503-bucket"><code>--!strict
+local TokenBucket = {}
+TokenBucket.__index = TokenBucket
+
+function TokenBucket.new(capacidade: number, fichasPorSegundo: number)
+	assert(capacidade > 0, "capacidade deve ser positiva")
+	assert(fichasPorSegundo > 0, "reposição deve ser positiva")
+
+	return setmetatable({
+		capacidade = capacidade,
+		fichasPorSegundo = fichasPorSegundo,
+		baldes = {},
+	}, TokenBucket)
+end
+
+function TokenBucket:permitir(userId: number, acao: string): boolean
+	local agora = time()
+	local porUsuario = self.baldes[userId]
+	if not porUsuario then
+		porUsuario = {}
+		self.baldes[userId] = porUsuario
+	end
+
+	local balde = porUsuario[acao]
+	if not balde then
+		balde = { fichas = self.capacidade, atualizadoEm = agora }
+		porUsuario[acao] = balde
+	end
+
+	local decorrido = agora - balde.atualizadoEm
+	balde.fichas = math.min(
+		self.capacidade,
+		balde.fichas + decorrido * self.fichasPorSegundo
+	)
+	balde.atualizadoEm = agora
+
+	if balde.fichas &lt; 1 then
+		return false
+	end
+
+	balde.fichas -= 1
+	return true
+end
+
+function TokenBucket:limpar(userId: number)
+	self.baldes[userId] = nil
+end
+
+return TokenBucket</code></pre></div>
+            <p><code>capacidade</code> é a rajada máxima; <code>fichasPorSegundo</code> é a recuperação. As tabelas são separadas por UserId e nome de ação. <code>limpar()</code> evita manter estado de quem saiu.</p>
+          </section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · contrato completo</p><h3>Valide payload, número, personagem, alvo e distância</h3><ol class="step-list"><li>Em <code>Workspace → LaboratorioRede</code>, crie Part <code>AlvoInteracao</code>, Anchored true, a até 10 studs do ponto de teste.</li><li>Em ReplicatedStorage/Remotes, crie RemoteEvents <code>SolicitarInteracao</code> e <code>ResultadoInteracao</code>.</li><li>Em ServerScriptService, crie Script <code>ServidorDeInteracao</code>, RunContext Server.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ServidorDeInteracao.server.luau</strong><small>Script · ServerScriptService · servidor · início da sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-503-servidor" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-503-servidor"><code>local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TokenBucket = require(script.Parent.TokenBucket)
+
+local remotes = ReplicatedStorage.Remotes
+local solicitar = remotes.SolicitarInteracao
+local resultado = remotes.ResultadoInteracao
+local alvoPermitido = workspace.LaboratorioRede.AlvoInteracao
+local limitador = TokenBucket.new(3, 1)
+local DISTANCIA_MAXIMA = 12
+
+local function recusar(player, mensagem)
+	resultado:FireClient(player, false, mensagem)
+end
+
+solicitar.OnServerEvent:Connect(function(player, pedido)
+	if typeof(pedido) ~= "table" then
+		recusar(player, "Estrutura inválida.")
+		return
+	end
+	if typeof(pedido.acao) ~= "string"
+		or typeof(pedido.alvo) ~= "string"
+		or typeof(pedido.quantidade) ~= "number" then
+		recusar(player, "Campos ou tipos inválidos.")
+		return
+	end
+	if pedido.acao ~= "ativar" or pedido.alvo ~= "alvo-rede" then
+		recusar(player, "Ação ou alvo não permitido.")
+		return
+	end
+	if not math.isfinite(pedido.quantidade)
+		or pedido.quantidade ~= math.floor(pedido.quantidade)
+		or pedido.quantidade ~= 1 then
+		recusar(player, "Quantidade inválida.")
+		return
+	end
+	if not limitador:permitir(player.UserId, "ativar-alvo") then
+		recusar(player, "Muitas solicitações; aguarde.")
+		return
+	end
+
+	local character = player.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	local raiz = character and character:FindFirstChild("HumanoidRootPart")
+	if not humanoid or humanoid.Health &lt;= 0 or not raiz then
+		recusar(player, "Personagem indisponível.")
+		return
+	end
+	if (raiz.Position - alvoPermitido.Position).Magnitude > DISTANCIA_MAXIMA then
+		recusar(player, "Aproxime-se do alvo.")
+		return
+	end
+
+	alvoPermitido:SetAttribute("AtivadoPor", player.UserId)
+	alvoPermitido.Color = Color3.fromRGB(255, 200, 60)
+	resultado:FireClient(player, true, "Interação aceita pelo servidor.")
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	limitador:limpar(player.UserId)
+end)</code></pre></div>
+            <p>A string <code>alvo-rede</code> é mapeada para uma Instance do servidor; o cliente não escolhe caminho ou propriedade. <code>math.isfinite()</code> rejeita NaN e infinitos antes de comparações. A distância é recalculada a partir do Character conhecido.</p><ol class="step-list" start="4"><li>No LocalScript ControleCor, obtenha os dois novos remotes. Em um botão de teste, envie <code>{ acao = "ativar", alvo = "alvo-rede", quantidade = 1 }</code> e mostre ResultadoInteracao no label.</li><li>Use Play perto do alvo. O pedido correto deve deixar a Part amarela.</li><li>Teste separadamente: string em vez de table; quantidade <code>0/0</code>; <code>math.huge</code>; ação desconhecida; distância maior que 12; seis chamadas rápidas. Cada caso deve ser recusado sem alterar a Part e sem erro vermelho.</li><li>Use dois clientes: esgote o balde de A e confirme que B ainda possui suas fichas.</li><li>Se tudo é recusado, imprima temporariamente a distância calculada. Se spam passa, procure outro script sem limitador. Depois do diagnóstico, remova prints excessivos.</li></ol><p><strong>Para desfazer:</strong> Stop, restaure o payload correto e posicione o alvo novamente. Não deixe o emissor de ataques no projeto final.</p>
+          </section>
+          <section><h3>Exercícios e fechamento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Explique por que <code>math.huge</code> é number, mas não é um valor válido para quantidade.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Adicione um segundo alvo conhecido com distância própria sem aceitar Instance do cliente.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Monte uma suíte de dez pedidos hostis e registre camada, resposta e estado final.</p></article></div><p><strong>Incremento:</strong> agora você possui um guardião reutilizável de frequência e um modelo de validação em camadas.</p><ul class="check-list"><li>Tipo não basta; valor e contexto também importam.</li><li>Números importantes precisam ser finitos e limitados.</li><li>Servidor encontra alvo e distância por conta própria.</li><li>Rate limit é por jogador e ação e tem limpeza.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> <code>typeof(math.huge)</code> é number, mas ele não representa uma quantidade finita. Por isso tipo e validade são verificações diferentes.</p><p><strong>Intermediário:</strong> crie uma tabela do servidor <code>ALVOS = { ["alvo-a"] = partA, ["alvo-b"] = partB }</code>; procure pelo id e calcule distância para a Instance encontrada.</p><p><strong>Desafiador:</strong> inclua nil, string, table incompleta, NaN, infinito, decimal, negativo, id inválido, distância e spam. O estado deve mudar somente no controle válido.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: 26/08/2026.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Validação de tipo, valor e contexto</td><td><a href="https://create.roblox.com/docs/scripting/security/client-server-boundary" target="_blank" rel="noopener noreferrer">Client-server boundary</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Estrutura, allowlist, finitude, estado e distância foram separadas.</td></tr><tr><td>math.isfinite()</td><td><a href="https://luau.org/library" target="_blank" rel="noopener noreferrer">Biblioteca padrão Luau</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>NaN e infinitos recusados explicitamente.</td></tr><tr><td>Token bucket e rate limiting</td><td><a href="https://create.roblox.com/docs/scripting/security/client-server-boundary#rate-limiting" target="_blank" rel="noopener noreferrer">Rate limiting</a></td><td>Implementações de playlist não validadas</td><td>Atual e recomendada</td><td>Balde separado por UserId/ação e limpeza ao sair.</td></tr><tr><td>pcall</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores" target="_blank" rel="noopener noreferrer">Data stores</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Não usado para esconder erros; adiado para falhas externas.</td></tr></tbody></table></div><p>Exemplos de playlists podem omitir validações para caber em vídeo. Nenhum foi validado integralmente; aplique esta suíte ao comparar qualquer implementação.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-02" data-previous-chapter>← 5.2</a><a class="button primary" href="#capitulo-04" data-next-chapter>5.4 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-04" aria-labelledby="titulo-04">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 5.4</p><h2 id="titulo-04">Coleta e moedas controladas pelo servidor</h2><p>Transforme objetos marcados em recompensas de sessão sem duplicação.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-05-capitulo-04"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 5.3, 3.2 e 3.4. Você criará leaderstats no servidor, configurará coletáveis por tag, validará ProximityPrompt e resolverá duas tentativas sobre o mesmo objeto sem dupla recompensa.</p><dl class="glossary-grid"><div class="glossary-item"><dt>leaderstats</dt><dd>Folder com esse nome exato que alimenta a lista integrada de estatísticas da sessão.</dd></div><div class="glossary-item"><dt>Moeda de sessão</dt><dd>Saldo que existe somente enquanto o servidor atual está vivo.</dd></div><div class="glossary-item"><dt>Idempotência</dt><dd>Repetir a mesma intenção não repetir a concessão.</dd></div><div class="glossary-item"><dt>Corrida</dt><dd>Duas execuções tentam alterar o mesmo estado quase ao mesmo tempo.</dd></div><div class="glossary-item"><dt>ProximityPrompt</dt><dd>Interação próxima com apresentação adaptada ao dispositivo.</dd></div><div class="glossary-item"><dt>Tag</dt><dd>Rótulo do CollectionService usado para agrupar Instances.</dd></div></dl><aside class="callout security"><strong>Prompt também atravessa a fronteira</strong><p>O evento <code>Triggered</code> oferece proteção de distância no servidor, mas ainda valide tag, pasta, personagem, recompensa, estado e frequência. Outros eventos do prompt não têm a mesma garantia.</p></aside></section>
+          <section><h3>Fluxo de uma concessão única</h3><div class="concept-diagram" aria-label="Fluxo seguro de coleta"><div><strong>Jogador ativa</strong><span>intenção pelo prompt</span></div><span class="concept-arrow">→</span><div><strong>Servidor valida</strong><span>alvo, vida, distância, valor</span></div><span class="concept-arrow">→</span><div><strong>Servidor reserva</strong><span>marca como coletado</span></div><span class="concept-arrow">→</span><div><strong>Servidor concede</strong><span>saldo e remoção</span></div></div><p>A reserva acontece antes de somar. Como o trecho entre conferir, reservar e somar não faz yield, outra tentativa encontra o objeto já reservado. Isso é atomicidade prática dentro desta sessão; persistência será uma transação diferente no Módulo 7.</p></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · Projeto 6 concluído</p><h3>Configure coletáveis e conceda moedas uma única vez</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Primeira sala interativa</dd></div><div><dt>Mundo</dt><dd><code>game → Workspace → Coletaveis → MoedaA, MoedaB, MoedaC</code></dd></div><div><dt>Servidor</dt><dd><code>game → ServerScriptService → SistemaDeMoedas</code> · Script</dd></div><div><dt>Execução</dt><dd>Servidor · início da sessão e ativações posteriores</dd></div></dl><ol class="step-list"><li>Crie Folder <code>Coletaveis</code> em Workspace. Dentro, crie três Parts Anchored, CanCollide false, com nomes MoedaA/B/C.</li><li>Em cada Part, adicione a tag <code>Coletavel</code> pela seção Tags de Properties e o atributo numérico <code>Recompensa</code>: 5, 10 e 15.</li><li>Posicione-as em pontos alcançáveis e separados. Não crie ProximityPrompt manualmente: o servidor fará isso de forma consistente.</li><li>Crie Script <code>SistemaDeMoedas</code> em ServerScriptService, RunContext Server.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>SistemaDeMoedas.server.luau</strong><small>Script · ServerScriptService · servidor · início da sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-504-moedas" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-504-moedas"><code>local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
+local ProximityPromptService = game:GetService("ProximityPromptService")
+local TokenBucket = require(script.Parent.TokenBucket)
+
+local pastaColetaveis = workspace:WaitForChild("Coletaveis")
+local preparados = {}
+local coletados = {}
+local limitador = TokenBucket.new(6, 3)
+local DISTANCIA_EXTRA = 2
+
+local function prepararPlayer(player)
+	local leaderstats = Instance.new("Folder")
+	leaderstats.Name = "leaderstats"
+	leaderstats.Parent = player
+
+	local moedas = Instance.new("IntValue")
+	moedas.Name = "Moedas"
+	moedas.Value = 0
+	moedas.Parent = leaderstats
+end
+
+local function prepararColetavel(coletavel)
+	if preparados[coletavel] or not coletavel:IsA("BasePart") then
+		return
+	end
+	if not coletavel:IsDescendantOf(pastaColetaveis) then
+		warn("Tag Coletavel fora da pasta permitida:", coletavel:GetFullName())
+		return
+	end
+	preparados[coletavel] = true
+
+	local prompt = coletavel:FindFirstChild("Coletar")
+	if not prompt then
+		prompt = Instance.new("ProximityPrompt")
+		prompt.Name = "Coletar"
+		prompt.ActionText = "Coletar"
+		prompt.ObjectText = coletavel.Name
+		prompt.MaxActivationDistance = 10
+		prompt.RequiresLineOfSight = true
+		prompt.Parent = coletavel
+	end
+end
+
+local function obterMoedas(player)
+	local leaderstats = player:FindFirstChild("leaderstats")
+	local moedas = leaderstats and leaderstats:FindFirstChild("Moedas")
+	if moedas and moedas:IsA("IntValue") then
+		return moedas
+	end
+	return nil
+end
+
+ProximityPromptService.PromptTriggered:Connect(function(prompt, player)
+	if prompt.Name ~= "Coletar" then
+		return
+	end
+
+	local coletavel = prompt.Parent
+	if not coletavel or not coletavel:IsA("BasePart")
+		or not CollectionService:HasTag(coletavel, "Coletavel")
+		or not coletavel:IsDescendantOf(pastaColetaveis)
+		or coletados[coletavel] then
+		return
+	end
+	if not limitador:permitir(player.UserId, "coletar") then
+		return
+	end
+
+	local recompensa = coletavel:GetAttribute("Recompensa")
+	if typeof(recompensa) ~= "number" or not math.isfinite(recompensa)
+		or recompensa ~= math.floor(recompensa)
+		or recompensa &lt; 1 or recompensa > 100 then
+		warn("Recompensa inválida em", coletavel:GetFullName())
+		return
+	end
+
+	local character = player.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	local raiz = character and character:FindFirstChild("HumanoidRootPart")
+	local moedas = obterMoedas(player)
+	if not humanoid or humanoid.Health &lt;= 0 or not raiz or not moedas then
+		return
+	end
+	if (raiz.Position - coletavel.Position).Magnitude
+		> prompt.MaxActivationDistance + DISTANCIA_EXTRA then
+		return
+	end
+
+	coletados[coletavel] = true
+	prompt.Enabled = false
+	moedas.Value += recompensa
+	print(player.Name, "coletou", recompensa, "moedas")
+
+	coletavel.Transparency = 1
+	coletavel.CanQuery = false
+	coletavel.CanTouch = false
+	task.defer(function()
+		preparados[coletavel] = nil
+		coletados[coletavel] = nil
+		coletavel:Destroy()
+	end)
+end)
+
+for _, player in Players:GetPlayers() do
+	prepararPlayer(player)
+end
+Players.PlayerAdded:Connect(prepararPlayer)
+Players.PlayerRemoving:Connect(function(player)
+	limitador:limpar(player.UserId)
+end)
+
+for _, coletavel in CollectionService:GetTagged("Coletavel") do
+	prepararColetavel(coletavel)
+end
+CollectionService:GetInstanceAddedSignal("Coletavel"):Connect(prepararColetavel)</code></pre></div>
+            <p><code>preparados</code> evita prompts duplicados. <code>coletados</code> é a trava da recompensa. O valor vem de atributo criado pelo desenvolvedor e ainda assim é validado, porque configuração incorreta também causa bugs.</p><ol class="step-list" start="5"><li>Use Server &amp; Clients com dois clientes. Aproxime ambos da mesma moeda e ative quase ao mesmo tempo. Só um saldo deve aumentar.</li><li>Confirme no Player → leaderstats → Moedas e na lista integrada. O cliente pode ver esse IntValue replicado, mas alterar sua cópia não muda o saldo do servidor.</li><li>Tente uma Part com tag fora da pasta, recompensa 0, 1.5, 500 e <code>math.huge</code> definida temporariamente por script de servidor. Nenhuma deve conceder.</li><li>Ative o prompt longe por um emissor de teste do cliente: a validação de distância do servidor deve recusar.</li><li>Se há dois prompts, confirme nomes e scripts duplicados. Se a estatística não aparece, o Folder precisa chamar exatamente <code>leaderstats</code>.</li></ol><p><strong>Para reiniciar:</strong> Stop restaura as Parts do projeto salvo e zera moedas; isso comprova que ainda não existe DataStore.</p>
+          </section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · apresentação local</p><h3>Mostre o saldo no HUD sem calculá-lo no cliente</h3><ol class="step-list"><li>Em <code>StarterGui → HUDRede</code>, crie TextLabel <code>Saldo</code> e LocalScript <code>ControleSaldo</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ControleSaldo.client.luau</strong><small>LocalScript · StarterGui/HUDRede · cliente · quando a GUI é clonada</small></div><button class="copy-button" type="button" data-copy-target="codigo-504-hud" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-504-hud"><code>local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local moedas = player:WaitForChild("leaderstats"):WaitForChild("Moedas")
+local saldo = script.Parent:WaitForChild("Saldo")
+
+local function atualizarSaldo()
+	saldo.Text = string.format("Moedas: %d", moedas.Value)
+end
+
+moedas:GetPropertyChangedSignal("Value"):Connect(atualizarSaldo)
+atualizarSaldo()</code></pre></div><p>O cliente apenas apresenta o IntValue replicado. <code>atualizarSaldo()</code> é chamada no início e sempre que o servidor muda Value.</p><ol class="step-list" start="2"><li>Colete cada Part e espere 5, depois 15, depois 30. Compare HUD, leaderstats e Output.</li><li>Se o texto para em zero, confirme que o LocalScript está dentro da ScreenGui e que o servidor criou leaderstats/Moedas.</li></ol>
+          </section>
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Mude os três valores dentro do intervalo permitido e calcule o saldo esperado.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Adicione uma quarta moeda em tempo de edição e prove que o signal de tag a prepara.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Registre teste de corrida com dois clientes em vídeo ou tabela e prove uma única concessão.</p></article></div><p><strong>Projeto 6 concluído:</strong> coleta marcada por tags, interação multiplataforma, valor limitado, distância verificada, trava contra duplicação, saldo autoritativo e HUD de apresentação.</p><ul class="check-list"><li>Moedas são criadas e alteradas no servidor.</li><li>Prompt não substitui validação de contexto.</li><li>A reserva ocorre antes da recompensa.</li><li>Saldo é de sessão e não é chamado de salvo.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> some os atributos válidos; o HUD deve mostrar exatamente essa soma. Valores fora de 1–100 ou não inteiros são recusados.</p><p><strong>Intermediário:</strong> a nova Part precisa estar na pasta, ser BasePart, possuir tag e recompensa válida; <code>GetInstanceAddedSignal()</code> cria o prompt.</p><p><strong>Desafiador:</strong> o resultado válido mostra dois pedidos próximos, uma única linha de concessão e soma em apenas um Player. Varia quem vence; não varia o total concedido.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: 26/08/2026.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>CollectionService tags e signals</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/CollectionService" target="_blank" rel="noopener noreferrer">CollectionService API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>GetTagged/GetInstanceAddedSignal usados; GetCollection e eventos antigos evitados.</td></tr><tr><td>ProximityPromptService.PromptTriggered</td><td><a href="https://create.roblox.com/docs/ui/proximity-prompts" target="_blank" rel="noopener noreferrer">Proximity prompts</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/ProximityPromptService#PromptTriggered" target="_blank" rel="noopener noreferrer">PromptTriggered API</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Tag, pasta, vida, distância, estado e recompensa revalidados.</td></tr><tr><td>leaderstats</td><td><a href="https://create.roblox.com/docs/players/leaderboards" target="_blank" rel="noopener noreferrer">In-experience leaderboards</a></td><td>Beginners Scripting — BrawlDev, vídeo não confirmado</td><td>Atual e recomendada</td><td>Nome exato e autoridade do servidor explicitados.</td></tr></tbody></table></div><p>Uma aula de eventos pode servir de comparação depois da prática. Não foi analisada integralmente; corrija qualquer recompensa no cliente ou ausência de corrida/validação.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-03" data-previous-chapter>← 5.3</a><a class="button primary" href="#capitulo-05" data-next-chapter>5.5 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-05" aria-labelledby="titulo-05">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 5.5</p><h2 id="titulo-05">Loja simples, transacional e idempotente</h2><p>O cliente escolhe um item; o servidor calcula preço, saldo, contexto e concessão.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-05-capitulo-05"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e termos</h3><p><strong>Pré-requisitos:</strong> 5.4 e 5.3. Você usará RemoteFunction em uma resposta curta, protegerá uma compra contra repetição e concorrência e testará saldo exato, item inválido, distância e inventário cheio.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Catálogo</dt><dd>Tabela do servidor com ids, preços e limites permitidos.</dd></div><div class="glossary-item"><dt>Transação</dt><dd>Conjunto de verificações e mudanças que representa uma compra.</dd></div><div class="glossary-item"><dt>Request ID</dt><dd>Identificador de uma tentativa lógica usado para reconhecer repetição.</dd></div><div class="glossary-item"><dt>Lock</dt><dd>Trava curta que impede duas compras simultâneas do mesmo jogador.</dd></div><div class="glossary-item"><dt>Rollback</dt><dd>Reversão quando uma operação parcial falha.</dd></div><div class="glossary-item"><dt>Inventário de sessão</dt><dd>Itens controlados durante o servidor atual, ainda sem DataStore.</dd></div><div class="glossary-item"><dt>HttpService</dt><dd>Serviço da engine com utilidades de texto, identificadores e, em módulos futuros, requisições web.</dd></div><div class="glossary-item"><dt>GUID</dt><dd>Identificador praticamente único usado aqui como request ID.</dd></div></dl></section>
+          <section><h3>Preço exibido não é preço confiável</h3><div class="concept-diagram" aria-label="Fluxo de compra segura"><div><strong>Cliente</strong><span>itemId + requestId</span></div><span class="concept-arrow">→</span><div><strong>Servidor</strong><span>catálogo, distância, saldo, limite</span></div><span class="concept-arrow">→</span><div><strong>Transação curta</strong><span>debita + concede</span></div><span class="concept-arrow">→</span><div><strong>Resposta</strong><span>resultado e saldo</span></div></div><p>O texto “25 moedas” na GUI é só apresentação. O servidor procura <code>lanterna_dourada</code> no próprio catálogo. Um <code>requestId</code> repetido devolve o resultado já registrado em vez de conceder outra vez.</p><aside class="callout attention"><strong>O que esta transação ainda não faz</strong><p>Ela não atravessa servidores e não sobrevive a desligamentos. No Módulo 7, o recibo persistente e o inventário salvo precisarão de UpdateAsync, tratamento de falhas e idempotência durável.</p></aside></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · Projeto 7 iniciado</p><h3>Prepare ponto de loja, molde do item e remote</h3><ol class="step-list"><li>Em <code>Workspace → LaboratorioRede</code>, crie Part <code>BalcaoLoja</code>, Anchored true. O jogador deve ficar a no máximo 12 studs.</li><li>Em ServerStorage, crie Folder <code>ItensDaLoja</code>. Duplique a Tool Lanterna do Módulo 4 para dentro dele, renomeie <code>LanternaDourada</code> e altere apenas cor/luz. O molde precisa ter Handle não ancorado.</li><li>Em ReplicatedStorage/Remotes, crie RemoteFunction <code>ComprarItem</code>.</li><li>Em StarterGui/HUDRede, crie Frame <code>PainelLoja</code>, TextLabel <code>DescricaoItem</code> com “Lanterna dourada · 25 moedas”, TextButton <code>BotaoComprar</code> com “Comprar” e TextLabel <code>ResultadoCompra</code>. Aplique área segura, foco e responsividade de 4.5–4.6.</li></ol>
+          </section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · autoridade do servidor</p><h3>Valide, trave, debite e conceda sem yield</h3><dl class="practice-facts"><div><dt>Script</dt><dd><code>ServidorDaLoja</code> · Script</dd></div><div><dt>Caminho</dt><dd><code>game → ServerScriptService → ServidorDaLoja</code></dd></div><div><dt>Contexto</dt><dd>Servidor · início da sessão e cada InvokeServer</dd></div></dl><div class="copy-panel"><div class="copy-panel-header"><div><strong>ServidorDaLoja.server.luau</strong><small>Script · ServerScriptService · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-505-servidor" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-505-servidor"><code>local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
+local TokenBucket = require(script.Parent.TokenBucket)
+
+local comprarItem = ReplicatedStorage.Remotes.ComprarItem
+local balcao = workspace.LaboratorioRede.BalcaoLoja
+local moldes = ServerStorage:WaitForChild("ItensDaLoja")
+local limitador = TokenBucket.new(3, 0.5)
+local DISTANCIA_MAXIMA = 12
+local MAXIMO_RESULTADOS = 20
+
+local CATALOGO = {
+	lanterna_dourada = {
+		preco = 25,
+		limite = 1,
+		molde = moldes:WaitForChild("LanternaDourada"),
+	},
+}
+
+local inventarios = {}
+local emCompra = {}
+local resultados = {}
+local ordemDosResultados = {}
+
+local function resposta(ok, mensagem, saldo)
+	return { ok = ok, mensagem = mensagem, saldo = saldo }
+end
+
+local function moedasDo(player)
+	local leaderstats = player:FindFirstChild("leaderstats")
+	local moedas = leaderstats and leaderstats:FindFirstChild("Moedas")
+	if moedas and moedas:IsA("IntValue") then
+		return moedas
+	end
+	return nil
+end
+
+local function guardarResultado(player, requestId, valor)
+	resultados[player] = resultados[player] or {}
+	ordemDosResultados[player] = ordemDosResultados[player] or {}
+	resultados[player][requestId] = valor
+	table.insert(ordemDosResultados[player], requestId)
+
+	if #ordemDosResultados[player] > MAXIMO_RESULTADOS then
+		local antigo = table.remove(ordemDosResultados[player], 1)
+		resultados[player][antigo] = nil
+	end
+	return valor
+end
+
+comprarItem.OnServerInvoke = function(player, itemId, requestId)
+	if typeof(itemId) ~= "string" or #itemId &lt; 1 or #itemId > 50
+		or typeof(requestId) ~= "string" or #requestId &lt; 1 or #requestId > 80 then
+		return resposta(false, "Pedido inválido.", nil)
+	end
+
+	local anterior = resultados[player] and resultados[player][requestId]
+	if anterior then
+		return anterior
+	end
+	if not limitador:permitir(player.UserId, "comprar") then
+		return resposta(false, "Muitas tentativas; aguarde.", nil)
+	end
+	if emCompra[player] then
+		return resposta(false, "Outra compra está em andamento.", nil)
+	end
+
+	local item = CATALOGO[itemId]
+	local moedas = moedasDo(player)
+	local character = player.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	local raiz = character and character:FindFirstChild("HumanoidRootPart")
+	local backpack = player:FindFirstChild("Backpack")
+	local starterGear = player:FindFirstChild("StarterGear")
+	if not item or not moedas then
+		return guardarResultado(player, requestId,
+			resposta(false, "Item ou saldo indisponível.", moedas and moedas.Value))
+	end
+	if not humanoid or humanoid.Health &lt;= 0 or not raiz
+		or not backpack or not starterGear
+		or (raiz.Position - balcao.Position).Magnitude > DISTANCIA_MAXIMA then
+		return guardarResultado(player, requestId,
+			resposta(false, "Aproxime-se do balcão com o personagem pronto.", moedas.Value))
+	end
+
+	inventarios[player] = inventarios[player] or {}
+	local quantidade = inventarios[player][itemId] or 0
+	if quantidade >= item.limite then
+		return guardarResultado(player, requestId,
+			resposta(false, "Você já possui o limite deste item.", moedas.Value))
+	end
+	if moedas.Value &lt; item.preco then
+		return guardarResultado(player, requestId,
+			resposta(false, "Moedas insuficientes.", moedas.Value))
+	end
+
+	emCompra[player] = true
+	-- Trecho sem yield: o preço e a concessão formam uma única decisão de sessão.
+	local copiaBackpack = item.molde:Clone()
+	local copiaRespawn = item.molde:Clone()
+	moedas.Value -= item.preco
+	inventarios[player][itemId] = quantidade + 1
+	copiaBackpack.Parent = backpack
+	copiaRespawn.Parent = starterGear
+	emCompra[player] = nil
+
+	local final = resposta(true, "Compra concluída pelo servidor.", moedas.Value)
+	return guardarResultado(player, requestId, final)
+end
+
+Players.PlayerRemoving:Connect(function(player)
+	inventarios[player] = nil
+	emCompra[player] = nil
+	resultados[player] = nil
+	ordemDosResultados[player] = nil
+	limitador:limpar(player.UserId)
+end)</code></pre></div>
+            <p><code>CATALOGO</code> decide preço e molde. <code>resultados</code> torna repetições recentes idempotentes; o limite de 20 evita crescimento sem fim. <code>emCompra</code> rejeita concorrência com ids diferentes. Backpack e StarterGear são encontrados antes da trava, então o trecho decisivo não contém <code>WaitForChild()</code>, DataStore ou outra operação que ceda execução.</p><aside class="callout tip"><strong>Revisão de yield</strong><p>Antes de chamar uma sequência “transacional”, procure <code>WaitForChild()</code>, chamadas <code>Async</code> e eventos que possam pausar. Aqui, todas as referências necessárias são confirmadas antes de debitar.</p></aside>
+          </section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · cliente da loja</p><h3>Desabilite a interface enquanto espera</h3><ol class="step-list"><li>Dentro de PainelLoja, crie LocalScript <code>ControleDaLoja</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ControleDaLoja.client.luau</strong><small>LocalScript · StarterGui/HUDRede/PainelLoja · cliente</small></div><button class="copy-button" type="button" data-copy-target="codigo-505-cliente" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-505-cliente"><code>local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+local comprarItem = ReplicatedStorage.Remotes:WaitForChild("ComprarItem")
+local botao = script.Parent:WaitForChild("BotaoComprar")
+local resultado = script.Parent:WaitForChild("ResultadoCompra")
+local aguardando = false
+
+local function novoRequestId()
+	return HttpService:GenerateGUID(false)
+end
+
+botao.Activated:Connect(function()
+	if aguardando then
+		return
+	end
+	aguardando = true
+	botao.Active = false
+	resultado.Text = "Processando..."
+
+	local sucessoDaChamada, resposta = pcall(function()
+		return comprarItem:InvokeServer("lanterna_dourada", novoRequestId())
+	end)
+
+	if not sucessoDaChamada then
+		warn("Falha ao chamar a loja:", resposta)
+		resultado.Text = "Não foi possível consultar a loja."
+	elseif typeof(resposta) ~= "table" or typeof(resposta.ok) ~= "boolean" then
+		resultado.Text = "Resposta inesperada do servidor."
+	else
+		resultado.Text = resposta.mensagem
+	end
+
+	aguardando = false
+	botao.Active = true
+end)</code></pre></div>
+            <p><code>GenerateGUID(false)</code> cria um identificador novo mesmo se a GUI for recriada no respawn; ele é uma utilidade do HttpService e não faz requisição web. O <code>pcall</code> protege a interface contra falha da chamada remota e registra o erro; ele não transforma bug em sucesso. O servidor retorna rápido e nunca chama <code>InvokeClient()</code>. Para trabalhos demorados, prefira eventos e feedback assíncrono.</p><ol class="step-list" start="2"><li>Colete pelo menos 25 moedas, aproxime-se do balcão e compre. O saldo cai exatamente 25 e a Tool aparece em Backpack e StarterGear.</li><li>Use Reset Character: a Tool volta pelo StarterGear, mas sair do servidor apaga compra e saldo.</li><li>Teste saldo 24, saldo 25, itemId desconhecido, distância maior que 12, personagem morto, clique repetido e dois clientes.</li><li>Para testar idempotência, guarde um requestId fixo temporariamente e invoque duas vezes: a segunda resposta é a mesma, sem novo débito.</li><li>Se debita sem item, confira molde e mantenha a correção sem yield. Se compra duas vezes, confirme limite, requestId e apenas uma cópia do script.</li></ol><p><strong>Para reiniciar:</strong> Stop restaura saldo, mundo e inventário de sessão. Remova requestId fixo após o teste.</p>
+          </section>
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Altere somente o preço no catálogo do servidor e explique por que editar o texto da GUI não muda a cobrança.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Adicione um segundo item de limite 2 com molde próprio e teste saldo exato.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Produza uma matriz hostil com repetição de requestId, ids concorrentes, spam, distância, morte e inventário cheio.</p></article></div><p><strong>Projeto 7 iniciado:</strong> catálogo autoritativo, compra curta, idempotência recente, lock, limite de item, distância e resposta de UI. O Módulo 6 separará catálogo, inventário e serviço em módulos; o Módulo 7 adicionará persistência.</p><ul class="check-list"><li>Cliente nunca envia preço ou novo saldo.</li><li>RequestId repetido não concede novamente.</li><li>Lock protege contra ids concorrentes.</li><li>Compra valida personagem, distância, saldo e limite.</li><li>Nenhum estado é prometido como persistente.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> somente <code>CATALOGO[itemId].preco</code> participa da decisão; o TextLabel pode mentir sem alterar o débito.</p><p><strong>Intermediário:</strong> adicione entrada ao catálogo e molde em ServerStorage. A quantidade do inventário é comparada ao limite; o cliente envia apenas o novo id.</p><p><strong>Desafiador:</strong> cada linha registra entrada, estado inicial, resposta, saldo e quantidade final. Apenas pedido válido, próximo, vivo, com saldo e abaixo do limite concede uma vez.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: 26/08/2026.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>RemoteFunction.InvokeServer/OnServerInvoke</td><td><a href="https://create.roblox.com/docs/scripting/events/remote" target="_blank" rel="noopener noreferrer">Remote events and callbacks</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/RemoteFunction" target="_blank" rel="noopener noreferrer">RemoteFunction API</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Resposta curta, UI bloqueada e nenhum InvokeClient crítico.</td></tr><tr><td>Validação e rate limiting de loja</td><td><a href="https://create.roblox.com/docs/scripting/security/client-server-boundary" target="_blank" rel="noopener noreferrer">Client-server boundary</a> e <a href="https://create.roblox.com/docs/scripting/security/defensive-design" target="_blank" rel="noopener noreferrer">Defensive design</a></td><td><a href="https://youtube.com/playlist?list=PLl1Tso3TyF55UEnXsYkmsamFqKUBdgo1S" target="_blank" rel="noopener noreferrer">Simulator — MonzterDEV</a></td><td>Insegura sem validação</td><td>Preço, distância, saldo, limite, frequência, lock e idempotência no servidor.</td></tr><tr><td>ServerStorage para molde não replicado</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/ServerStorage" target="_blank" rel="noopener noreferrer">ServerStorage API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Cliente conhece id público, não controla o molde.</td></tr><tr><td>HttpService:GenerateGUID()</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/HttpService#GenerateGUID" target="_blank" rel="noopener noreferrer">GenerateGUID API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>ID não depende do ciclo de vida da GUI e não realiza requisição HTTP.</td></tr></tbody></table></div><div class="callout tip"><strong>Complemento opcional · Simulator — MonzterDEV</strong><p>Somente depois desta prática, escolha uma aula de loja/economia. Observe o fluxo visual e reconstrua o sistema com preço no servidor, payload estreito, idempotência e testes hostis. <strong>Desafio:</strong> repita a mesma solicitação sem segunda concessão. A playlist não foi validada integralmente.</p></div></section><div class="chapter-pager"><a class="button" href="#capitulo-04" data-previous-chapter>← 5.4</a><a class="button primary" href="#avaliacao" data-next-chapter>Avaliação →</a></div>
+        </div>
+      </article>
+
+      <section class="chapter reference-section" id="avaliacao" aria-labelledby="titulo-avaliacao"><div class="reading-flow"><p class="chapter-kicker">Avaliação de domínio · não contabilizada como capítulo</p><h2 id="titulo-avaliacao">Você consegue defender uma solicitação sem seguir receita?</h2><p>Avance ao Módulo 6 quando conseguir produzir as evidências abaixo. Consulte capítulos durante a primeira tentativa; depois repita sem olhar.</p><ol class="step-list"><li>Desenhe cliente, servidor, direção da replicação e fronteira de confiança de uma compra.</li><li>Escolha o remote adequado para: compra, consulta curta e efeito visual contínuo.</li><li>Escreva um contrato com emissor, payload, tipos, limites, contexto, frequência, resposta e efeito.</li><li>Implemente uma solicitação que valide table, strings, número finito, inteiro, allowlist, personagem vivo e distância.</li><li>Demonstre token bucket separado para dois jogadores.</li><li>Prove que duas ativações sobre um coletável ou requestId repetido concedem no máximo uma vez.</li><li>Execute cinco testes hostis e registre que estado do servidor permaneceu correto.</li></ol><div class="callout attention"><strong>Critério de passagem</strong><p>Não basta o caso feliz funcionar. Você deve explicar por que cada validação fica no servidor e mostrar no Output ou Explorer que entradas inválidas não alteram saldo, item ou mundo.</p></div><details class="answer"><summary>Roteiro de correção e evidências esperadas</summary><div class="answer-body"><p>Uma resposta suficiente mantém preço, saldo e recompensa no servidor; usa RemoteEvent para fluxo assíncrono confiável, RemoteFunction apenas para retorno curto e UnreliableRemoteEvent somente para dados descartáveis; rejeita tipo, NaN/infinito, valor fora do limite, alvo desconhecido, personagem inválido, distância e excesso de frequência; separa baldes por jogador; reserva antes de conceder; e repete requestId sem novo débito. Se um teste hostil produz erro vermelho ou altera estado, retorne ao capítulo correspondente.</p></div></details><div class="chapter-pager"><a class="button" href="#capitulo-05" data-previous-chapter>← Rever 5.5</a><a class="button primary" href="#glossario" data-next-chapter>Glossário →</a></div></div></section>
+
+      <section class="chapter reference-section" id="glossario" aria-labelledby="titulo-glossario"><div class="reading-flow"><h2 id="titulo-glossario">Glossário do módulo</h2><dl class="glossary-grid"><div class="glossary-item"><dt>Autoridade</dt><dd>Lado que decide o estado verdadeiro.</dd></div><div class="glossary-item"><dt>Replicação</dt><dd>Sincronização seletiva entre cópias.</dd></div><div class="glossary-item"><dt>Remote</dt><dd>Ponte explícita entre cliente e servidor.</dd></div><div class="glossary-item"><dt>Payload</dt><dd>Valores de uma mensagem.</dd></div><div class="glossary-item"><dt>Contrato</dt><dd>Formato e regras da mensagem.</dd></div><div class="glossary-item"><dt>Allowlist</dt><dd>Conjunto explícito do permitido.</dd></div><div class="glossary-item"><dt>Rate limit</dt><dd>Limite de frequência no servidor.</dd></div><div class="glossary-item"><dt>Token bucket</dt><dd>Limitador com fichas recuperáveis.</dd></div><div class="glossary-item"><dt>Idempotência</dt><dd>Repetição sem duplicar efeito.</dd></div><div class="glossary-item"><dt>Transação</dt><dd>Mudanças que formam uma operação lógica.</dd></div><div class="glossary-item"><dt>Request ID</dt><dd>Identificador de uma intenção lógica.</dd></div><div class="glossary-item"><dt>GUID</dt><dd>Identificador praticamente único usado aqui como request ID.</dd></div><div class="glossary-item"><dt>Teste hostil</dt><dd>Entrada deliberadamente inválida.</dd></div></dl><div class="callout success"><strong>Módulo 5 concluído</strong><p>Você completou moedas seguras e iniciou uma loja autoritativa. A avaliação de domínio confirma a base necessária para arquitetura, testes e colaboração do Módulo 6.</p></div></div></section>
+
+      <section class="chapter reference-section" id="fontes" aria-labelledby="titulo-fontes"><div class="reading-flow"><h2 id="titulo-fontes">Fontes oficiais consolidadas</h2><p>Consultadas em 26 de agosto de 2026. A documentação oficial determinou as decisões; playlists aparecem apenas como comparação opcional.</p><ul><li><a href="https://create.roblox.com/docs/projects/client-server" target="_blank" rel="noopener noreferrer">Client-server runtime</a>, <a href="https://create.roblox.com/docs/scripting/security/client-server-boundary" target="_blank" rel="noopener noreferrer">Client-server boundary</a>, <a href="https://create.roblox.com/docs/scripting/security/security-tactics" target="_blank" rel="noopener noreferrer">Security tactics</a> e <a href="https://create.roblox.com/docs/scripting/security/defensive-design" target="_blank" rel="noopener noreferrer">Defensive design</a></li><li><a href="https://create.roblox.com/docs/scripting/events/remote" target="_blank" rel="noopener noreferrer">Remote events and callbacks</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/RemoteEvent" target="_blank" rel="noopener noreferrer">RemoteEvent</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/RemoteFunction" target="_blank" rel="noopener noreferrer">RemoteFunction</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/UnreliableRemoteEvent" target="_blank" rel="noopener noreferrer">UnreliableRemoteEvent</a></li><li><a href="https://create.roblox.com/docs/reference/engine/classes/CollectionService" target="_blank" rel="noopener noreferrer">CollectionService</a>, <a href="https://create.roblox.com/docs/ui/proximity-prompts" target="_blank" rel="noopener noreferrer">Proximity prompts</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/ProximityPromptService" target="_blank" rel="noopener noreferrer">ProximityPromptService</a> e <a href="https://create.roblox.com/docs/players/leaderboards" target="_blank" rel="noopener noreferrer">leaderboards</a></li><li><a href="https://create.roblox.com/docs/studio/testing-modes" target="_blank" rel="noopener noreferrer">Studio testing modes</a>, <a href="https://luau.org/library" target="_blank" rel="noopener noreferrer">biblioteca padrão Luau</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/ServerStorage" target="_blank" rel="noopener noreferrer">ServerStorage</a>, e <a href="https://create.roblox.com/docs/reference/engine/classes/HttpService#GenerateGUID" target="_blank" rel="noopener noreferrer">HttpService:GenerateGUID()</a></li></ul><div class="button-row"><a class="button" href="modulo-04.html">Módulo 4</a><a class="button primary" href="../index.html#modulos">Voltar ao sumário</a></div></div></section>
+    </div>
+  </main>
+  <footer class="site-footer"><p>Módulo 5 completo · conteúdo técnico consultado em 26 de agosto de 2026.</p></footer>
+</body>
+</html>
+
+

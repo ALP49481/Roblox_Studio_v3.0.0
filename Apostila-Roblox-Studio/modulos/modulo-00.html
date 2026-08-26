@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Módulo 0 da Apostila Roblox Studio: conceitos iniciais, instalação, primeiro projeto, salvamento e testes.">
+  <title>Módulo 0 — Preparação para aprender e criar</title>
+  <link rel="stylesheet" href="../assets/styles.css?v=20260826-11">
+  <script src="../assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="../index.html" aria-label="Página inicial da Apostila Roblox Studio"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a>
+      <div class="header-actions"><a class="button" href="../index.html#modulos">Todos os módulos</a><a class="button" href="../conta.html" data-account-label>Conta</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div>
+    </div>
+  </header>
+
+  <main class="module-shell" id="conteudo">
+    <aside class="module-sidebar" data-module-sidebar data-collapsed="false">
+      <button class="button mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="true">Ocultar capítulos</button>
+      <h2>Módulo 0</h2><p>Preparação para aprender e criar</p>
+      <nav class="chapter-nav" aria-label="Capítulos do Módulo 0">
+        <a href="#capitulo-01">0.1 O que é desenvolver</a><a href="#capitulo-02">0.2 Studio e primeiro projeto</a><a href="#glossario">Glossário inicial</a><a href="#fontes">Fontes do módulo</a>
+      </nav>
+      <div class="sidebar-extra">
+        <div class="progress-track" role="progressbar" aria-label="Progresso do módulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" data-progress-fill data-progress-scope="0"></div></div>
+        <p class="progress-label" data-progress-label data-progress-scope="0">0 de 2 capítulos disponíveis concluídos · 0%</p><p><small>Atalhos: Alt + ← e Alt + → alternam entre os capítulos.</small></p>
+      </div>
+    </aside>
+
+    <div class="module-content">
+      <section class="module-intro" aria-labelledby="titulo-modulo">
+        <span class="eyebrow">Dificuldade 1/5 · introdutória</span>
+        <h1 id="titulo-modulo">Módulo 0 — Preparação para aprender e criar</h1>
+        <p class="lead">Antes do primeiro código, você vai entender o vocabulário da plataforma e preparar um projeto que consegue salvar, testar, encerrar e recuperar com segurança.</p>
+        <ul class="lesson-map" aria-label="Mapa do módulo"><li>2 capítulos completos</li><li>Nenhum conhecimento prévio</li><li>Sem programação neste módulo</li></ul>
+        <div class="callout tip"><strong>Ao terminar</strong><p>Você terá o Studio instalado, uma experiência privada chamada <strong>LaboratorioRoblox</strong>, uma cópia local e confiança para iniciar e encerrar testes sem perder trabalho.</p></div>
+      </section>
+
+      <article class="chapter" id="capitulo-01" data-chapter>
+        <header class="chapter-header">
+          <div><p class="chapter-kicker">Capítulo 0.1</p><h2>O que é desenvolver uma experiência Roblox</h2><p>Vamos dar nomes claros às partes da plataforma e acompanhar uma ideia pequena pelo ciclo de criação.</p></div>
+          <label class="completion-control"><input type="checkbox" data-progress-id="modulo-00-capitulo-01"> Concluído</label>
+        </header>
+        <div class="reading-flow">
+          <section aria-labelledby="objetivos-01">
+            <h3 id="objetivos-01">O que você vai aprender</h3><p>Este capítulo começa do zero. Você não precisa conhecer jogos, arquivos ou programação.</p>
+            <ul><li>distinguir experiência, <em>place</em> e sessão;</li><li>explicar o papel de servidor, cliente, Studio, Creator Hub e Engine;</li><li>descrever o ciclo ideia → protótipo → teste → publicação → manutenção;</li><li>formular o conceito de uma experiência pequena e possível de testar.</li></ul>
+          </section>
+
+          <section aria-labelledby="produto-lugar">
+            <h3 id="produto-lugar">O produto inteiro e os lugares dentro dele</h3>
+            <p>Uma <strong>experiência</strong> é o produto completo que uma pessoa encontra e abre no Roblox. Ela reúne nome, descrição, configurações e um ou mais ambientes jogáveis.</p>
+            <p>Cada ambiente jogável é chamado oficialmente de <strong>place</strong>. Um place guarda uma parte do mundo. Uma experiência simples pode ter apenas o place inicial. Uma experiência maior pode ter um lobby, uma floresta e uma arena em places separados.</p>
+            <div class="callout attention"><strong>Uma diferença importante</strong><p>Na conversa cotidiana, muita gente diz “jogo” para tudo. Na documentação, <em>experiência</em> é o conjunto e <em>place</em> é uma parte jogável desse conjunto. Usaremos os termos oficiais para evitar confusão.</p></div>
+            <div class="concept-diagram" role="img" aria-label="Uma experiência contém places; um place em execução possui um servidor conectado a clientes"><div class="concept-node">Experiência</div><div class="concept-arrow" aria-hidden="true">→</div><div class="concept-node">Place em execução</div><div class="concept-arrow" aria-hidden="true">→</div><div class="concept-node">Servidor + clientes</div></div>
+            <p>Uma <strong>sessão</strong> é uma ocorrência em andamento: o período em que alguém entra, joga e sai. Ao iniciar um teste no Studio, você também cria uma sessão de teste. Ela termina quando você usa o comando de parar.</p>
+          </section>
+
+          <section aria-labelledby="bastidores">
+            <h3 id="bastidores">O que acontece nos bastidores</h3>
+            <p>Quando uma experiência está em execução, duas partes cooperam:</p>
+            <ul><li>o <strong>servidor</strong> mantém o estado compartilhado da sessão e coordena as pessoas conectadas;</li><li>o <strong>cliente</strong> é o aplicativo Roblox no dispositivo de cada pessoa. Ele recebe entradas, mostra o mundo, toca sons e apresenta a interface.</li></ul>
+            <p>Se três pessoas entram na mesma sessão, existe um servidor coordenando três clientes. Cada cliente pode ter uma tela, conexão e desempenho diferentes.</p>
+            <div class="callout tip"><strong>Primeira ideia de segurança</strong><p>O dispositivo de uma pessoa pode enviar informações erradas ou alteradas. Mais adiante, você aprenderá que resultados importantes precisam ser decididos e verificados pelo servidor. Por enquanto, basta guardar esta frase: <strong>o cliente pede; o servidor confirma</strong>.</p></div>
+          </section>
+
+          <section aria-labelledby="ferramentas-plataforma">
+            <h3 id="ferramentas-plataforma">Studio, Creator Hub e Engine não são a mesma coisa</h3>
+            <div class="table-wrap"><table><thead><tr><th>Termo</th><th>Explicação simples</th><th>Quando você o usa</th></tr></thead><tbody>
+              <tr><td><strong>Roblox Studio</strong></td><td>Aplicativo de criação instalado no Windows ou macOS.</td><td>Para montar o mundo, configurar objetos, testar e publicar.</td></tr>
+              <tr><td><strong>Creator Hub</strong></td><td>Portal web de criação da Roblox.</td><td>Para consultar documentação e administrar experiências, assets, permissões e dados de produção.</td></tr>
+              <tr><td><strong>Roblox Engine</strong></td><td>Conjunto de sistemas que interpreta e executa a experiência.</td><td>Quando o Studio testa ou quando os servidores e clientes executam um place publicado.</td></tr>
+            </tbody></table></div>
+            <p>O Studio é a oficina. A Engine é o conjunto de mecanismos que faz o trabalho funcionar. O Creator Hub é a central web de documentação e administração. Essa analogia ajuda a lembrar, mas os três nomes continuam representando produtos e funções técnicas diferentes.</p>
+          </section>
+
+          <section aria-labelledby="ciclo-criacao">
+            <h3 id="ciclo-criacao">Desenvolver é um ciclo, não uma linha reta</h3><p>Um projeto saudável avança em voltas pequenas:</p>
+            <ol class="step-list"><li><strong>Ideia:</strong> escolha uma ação principal e uma condição clara de sucesso.</li><li><strong>Protótipo:</strong> construa a menor versão que permite experimentar a ideia.</li><li><strong>Teste:</strong> execute, observe e compare o resultado com o esperado.</li><li><strong>Ajuste:</strong> corrija o que confundiu, falhou ou não ficou agradável.</li><li><strong>Publicação:</strong> envie uma versão controlada para a Roblox, inicialmente privada.</li><li><strong>Manutenção:</strong> acompanhe problemas, preserve compatibilidade e publique melhorias.</li></ol>
+            <p>Depois de ajustar, você volta a testar. Depois de publicar, continua mantendo. Essa repetição é normal e desejável.</p>
+            <div class="callout error"><strong>Erro comum: começar grande demais</strong><p>“Um mundo aberto com centenas de poderes” não é uma primeira versão testável. Reduza até conseguir descrever uma ação, um espaço e um objetivo. Projetos pequenos terminados ensinam mais do que projetos enormes abandonados.</p></div>
+          </section>
+
+          <section aria-labelledby="demonstracao-01">
+            <h3 id="demonstracao-01">Demonstração: diminuindo uma ideia</h3>
+            <p>Ideia ampla: “quero criar uma aventura de exploração”. Ainda não sabemos o que construir primeiro.</p><p>Primeira redução: “o jogador explora uma sala e encontra um cristal”. Agora existe um espaço e uma ação.</p><p>Versão mínima testável: “em uma sala, o jogador atravessa um obstáculo, alcança um cristal e recebe uma mensagem de conclusão”. Há começo, ação principal e fim observável.</p><p>Os módulos seguintes transformarão ideias desse tamanho em projetos reais. Neste módulo, você vai apenas definir e preparar o laboratório.</p>
+          </section>
+
+          <section aria-labelledby="pratica-01">
+            <h3 id="pratica-01">Prática guiada: ficha da primeira experiência</h3>
+            <div class="practice-card"><div class="practice-header"><h3>Ambiente da prática</h3></div><div class="practice-body"><ul><li><strong>Projeto aberto:</strong> nenhum; esta prática é de planejamento.</li><li><strong>Objeto no Explorer:</strong> nenhum.</li><li><strong>Propriedade alterada:</strong> nenhuma.</li><li><strong>Programação:</strong> nenhuma; ela começará somente no Módulo 2.</li><li><strong>Resultado:</strong> uma ideia pequena com ação e sucesso verificáveis.</li></ul></div></div>
+            <ol class="step-list"><li>Escolha um verbo que descreva o que a pessoa fará: atravessar, encontrar, empilhar, entregar ou escapar.</li><li>Escolha um espaço pequeno: uma sala, um corredor, uma ilha curta ou uma arena.</li><li>Defina uma condição observável de sucesso: tocar o cristal, chegar à saída ou entregar um objeto.</li><li>Defina uma única dificuldade: um obstáculo, um caminho incorreto ou um limite simples.</li><li>Leia a ficha em voz alta. Se ela exigir muitos “e também”, reduza a ideia.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><strong>Modelo da ficha</strong><button class="copy-button" type="button" data-copy-target="modelo-ficha" data-copy-label="Copiar modelo">Copiar modelo</button></div><pre id="modelo-ficha">Nome provisório:
+Espaço pequeno:
+Ação principal:
+Condição de sucesso:
+Uma dificuldade:
+O que ficará para depois:</pre></div>
+            <h4>Resultado esperado</h4><p>Uma ficha que outra pessoa consiga resumir em uma frase. Exemplo: “Atravesse uma sala com um obstáculo e alcance o cristal.”</p>
+            <h4>Se o resultado ficar diferente</h4><ul><li>Se houver várias ações principais, escolha apenas uma.</li><li>Se não houver final visível, acrescente uma condição de sucesso.</li><li>Se a ideia exigir muitos ambientes, mantenha só o primeiro.</li></ul>
+            <h4>Como reiniciar</h4><p>Guarde a tentativa antiga e preencha uma nova ficha. Planejamento não destrói nada no Studio.</p>
+          </section>
+
+          <section aria-labelledby="exercicios-01">
+            <h3 id="exercicios-01">Agora é sua vez</h3>
+            <div class="exercise-grid"><article class="exercise-card"><h4>Fácil · Classifique</h4><p>Você abre uma criação chamada “Ilha dos Cristais”. Dentro dela há um lobby e uma caverna separados. Identifique a experiência e os places.</p></article><article class="exercise-card"><h4>Intermediário · Explique</h4><p>Uma pessoa joga no celular e outra no computador, na mesma sessão. Explique quantos clientes existem e qual parte coordena o estado compartilhado.</p></article><article class="exercise-card"><h4>Desafiador · Reduza</h4><p>Transforme “um simulador enorme com dez mundos, mascotes e trocas” em uma primeira versão com uma ação e uma condição de sucesso.</p></article><article class="exercise-card"><h4>Incremento do projeto</h4><p>Finalize a ficha da sua primeira experiência. Ela será a semente do Projeto 1, que começará de verdade no capítulo 1.3.</p></article></div>
+            <details class="answer"><summary>Ver gabarito comentado</summary><div class="answer-body"><h4>Fácil</h4><p>“Ilha dos Cristais” é a experiência. Lobby e caverna são dois places dentro dela. Uma experiência pode ter um único place ou vários.</p><h4>Intermediário</h4><p>Há dois clientes: o aplicativo do celular e o aplicativo do computador. Um servidor coordena o estado compartilhado daquela sessão. Em outra sessão, existiria outro servidor.</p><h4>Desafiador</h4><p>Uma solução possível: “Em uma área curta, colete cinco cristais e leve-os até a zona de venda.” Não há mascotes, trocas nem dez mundos ainda. Outras respostas são válidas se forem pequenas e testáveis.</p><h4>Erros prováveis</h4><p>Confundir place com servidor é comum. O place é o conteúdo do ambiente; o servidor é uma execução desse conteúdo durante uma sessão.</p></div></details>
+          </section>
+
+          <section aria-labelledby="revisao-01">
+            <h3 id="revisao-01">Revisão do capítulo</h3>
+            <div class="check-grid"><div class="card"><strong>Eu consigo explicar</strong><p>experiência, place, sessão, servidor e cliente sem misturar os termos.</p></div><div class="card"><strong>Eu consigo distinguir</strong><p>Studio, Creator Hub e Engine pelo papel de cada um.</p></div><div class="card"><strong>Eu consigo ordenar</strong><p>ideia, protótipo, teste, ajuste, publicação e manutenção.</p></div><div class="card"><strong>Eu tenho uma ficha</strong><p>com espaço, ação, dificuldade e condição de sucesso.</p></div></div>
+            <p><strong>Resumo:</strong> a experiência é o produto completo; cada place guarda uma parte jogável; uma sessão executa um place em um servidor conectado a clientes. Studio cria, Engine executa e Creator Hub documenta e administra.</p>
+          </section>
+
+          <section aria-labelledby="validacao-01">
+            <h3 id="validacao-01">Validação técnica</h3><p>Consulta realizada em <strong>25 de agosto de 2026</strong>. Nenhuma playlist foi usada neste capítulo.</p>
+            <div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody>
+              <tr><td>Experiência e places</td><td><a href="https://create.roblox.com/docs/experiences" target="_blank" rel="noopener noreferrer">Experiences</a> e <a href="https://create.roblox.com/docs/production/publishing/publish-experiences-and-places" target="_blank" rel="noopener noreferrer">Publish experiences and places</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>“Jogo” foi mantido apenas como linguagem informal; os termos oficiais foram diferenciados.</td></tr>
+              <tr><td>Modelo cliente-servidor</td><td><a href="https://create.roblox.com/docs/projects/client-server" target="_blank" rel="noopener noreferrer">Client-server runtime</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Foi apresentada apenas a visão conceitual, sem antecipar rede ou implementação.</td></tr>
+              <tr><td>Studio e Engine</td><td><a href="https://create.roblox.com/docs/studio" target="_blank" rel="noopener noreferrer">Roblox Studio</a> e <a href="https://create.roblox.com/docs/creation" target="_blank" rel="noopener noreferrer">Creation overview</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>As funções do aplicativo, da Engine e do portal web foram separadas.</td></tr>
+            </tbody></table></div>
+          </section>
+          <div class="chapter-pager"><span></span><a class="button primary" href="#capitulo-02" data-next-chapter>Ir para o capítulo 0.2 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-02" data-chapter>
+        <header class="chapter-header">
+          <div><p class="chapter-kicker">Capítulo 0.2</p><h2>Instalação, conta, primeiro projeto, salvamento e teste</h2><p>Você vai preparar um laboratório seguro e aprender a diferença entre editar e executar.</p></div>
+          <label class="completion-control"><input type="checkbox" data-progress-id="modulo-00-capitulo-02"> Concluído</label>
+        </header>
+        <div class="reading-flow">
+          <section aria-labelledby="objetivos-02">
+            <h3 id="objetivos-02">Partida e destino</h3><p><strong>Pré-requisito:</strong> compreender o vocabulário do capítulo 0.1 e possuir uma conta Roblox à qual você tenha acesso.</p><p>Ao final, você saberá:</p>
+            <ul><li>instalar, abrir e entrar no Roblox Studio;</li><li>criar um projeto com o template Baseplate;</li><li>distinguir cópia local e versão na nuvem;</li><li>usar Play/Test, Run e Stop;</li><li>recuperar o trabalho a partir de arquivo, nuvem ou recuperação automática.</li></ul>
+          </section>
+
+          <section aria-labelledby="antes-instalar">
+            <h3 id="antes-instalar">Antes de instalar</h3>
+            <p>O Roblox Studio é gratuito e está disponível oficialmente para Windows e macOS. Na data desta aula, a documentação lista Windows 10 ou macOS 10.14 como mínimos e recomenda Windows 11 ou macOS 14+, 8 GB de memória e resolução de 1600 × 900 ou maior.</p>
+            <p>Um computador abaixo da recomendação ainda pode abrir o Studio se atender ao mínimo, mas projetos 3D podem ficar mais lentos. O objetivo agora é apenas criar e testar um Baseplate vazio.</p>
+            <div class="callout attention"><strong>Use o instalador oficial</strong><p>Baixe o Studio pelo Creator Hub. Não use sites de terceiros. Nunca compartilhe senha, código de verificação ou cookie da conta.</p></div>
+          </section>
+
+          <section aria-labelledby="instalacao">
+            <h3 id="instalacao">Instalação e primeiro acesso</h3>
+            <ol class="step-list"><li>Abra a página oficial <a href="https://create.roblox.com/docs/studio/setup" target="_blank" rel="noopener noreferrer">Roblox Studio setup</a> e escolha a opção de baixar o Studio.</li><li>No Windows, abra o arquivo <strong>RobloxStudio.exe</strong>. No macOS, abra <strong>RobloxStudio.dmg</strong>.</li><li>Aguarde a instalação terminar e use <strong>Launch Studio</strong> ou abra o aplicativo Roblox Studio pelo sistema.</li><li>Entre com sua conta Roblox. Se o site ou aplicativo pedir verificação, conclua-a no canal oficial associado à sua conta.</li><li>Se aparecer um tour de boas-vindas, você pode concluí-lo. Nomes e posições de botões podem mudar com atualizações; este capítulo usa a finalidade de cada comando e registra os nomes oficiais consultados.</li></ol>
+            <div class="callout error"><strong>O Studio não abre</strong><p>Confirme que o sistema atende ao mínimo, reinicie o computador e tente novamente pelo instalador oficial. Se o aplicativo solicitar atualização, salve qualquer projeto aberto antes de permitir que ele reinicie.</p></div>
+          </section>
+
+          <section aria-labelledby="modelo-salvamento">
+            <h3 id="modelo-salvamento">Dois lugares para guardar o trabalho</h3>
+            <p>Um <strong>arquivo local</strong> fica em uma pasta do seu computador. O formato comum é <strong>.rbxl</strong>. Ele pode ser aberto mesmo sem acessar uma versão publicada.</p><p>Uma <strong>versão na nuvem</strong> fica associada à sua experiência na Roblox. O Studio envia dados do place quando você salva ou publica no Roblox. Manter os dois não é excesso: eles protegem contra problemas diferentes.</p>
+            <div class="table-wrap"><table><thead><tr><th>Forma</th><th>Vantagem</th><th>Cuidado</th></tr></thead><tbody><tr><td>Cópia local</td><td>Você controla a pasta e pode duplicar o arquivo antes de uma mudança arriscada.</td><td>O disco pode falhar e um arquivo pode ser movido ou apagado.</td></tr><tr><td>Versão na nuvem</td><td>Fica associada à experiência e pode ter histórico de versões.</td><td>Depende de conta, conexão e permissões corretas.</td></tr><tr><td>Recuperação automática</td><td>Pode ajudar após travamento ou falha de salvamento.</td><td>É uma rede de segurança, não substitui salvar conscientemente.</td></tr></tbody></table></div>
+          </section>
+
+          <section aria-labelledby="play-run">
+            <h3 id="play-run">Editar não é o mesmo que executar</h3><p>No modo de edição, você prepara o place. Em um teste, a Engine executa uma cópia temporária dele.</p>
+            <ul><li><strong>Play/Test (F5):</strong> inicia a simulação e insere seu avatar em um ponto de nascimento ou próximo da posição padrão.</li><li><strong>Run (F8):</strong> inicia a simulação sem inserir seu avatar. É útil para observar o mundo funcionando sem jogar como personagem.</li><li><strong>Stop (Shift + F5):</strong> encerra a simulação e restaura os objetos ao estado anterior ao teste.</li></ul>
+            <p>A documentação atual chama o primeiro modo de <strong>Test</strong>; algumas áreas do Studio ou traduções podem exibir <strong>Play</strong>. O atalho F5 e a presença do avatar ajudam a reconhecer o comando.</p>
+            <div class="callout attention"><strong>Mudança feita durante o teste é temporária</strong><p>Ao usar Stop, o Studio restaura o estado anterior à simulação. Nos próximos módulos, pare o teste antes de editar algo que pretende conservar.</p></div>
+          </section>
+
+          <section aria-labelledby="pratica-02">
+            <h3 id="pratica-02">Prática guiada: crie e proteja o LaboratorioRoblox</h3>
+            <div class="practice-card"><div class="practice-header"><h3>Ficha exata da prática</h3></div><div class="practice-body"><ul><li><strong>Projeto aberto no início:</strong> nenhum; comece na tela inicial do Studio.</li><li><strong>Template:</strong> Baseplate.</li><li><strong>Nome:</strong> LaboratorioRoblox.</li><li><strong>Objeto a criar:</strong> nenhum neste módulo.</li><li><strong>Caminho no Explorer:</strong> nenhum; o Explorer será estudado no capítulo 1.1.</li><li><strong>Propriedades:</strong> nenhuma será alterada.</li><li><strong>Programação:</strong> nenhuma.</li><li><strong>Contexto:</strong> edição, seguida por dois testes locais.</li></ul></div></div>
+            <h4>Parte A — criar e salvar localmente</h4>
+            <ol class="step-list"><li>Na tela inicial do Studio, localize os templates e escolha <strong>Baseplate</strong>. Aguarde o editor 3D abrir.</li><li>Abra o menu <strong>File</strong>. Escolha <strong>Save to File</strong> (ou a tradução equivalente “Salvar em arquivo”).</li><li>Crie ou escolha uma pasta que você reconheça, como <strong>Documentos → Roblox → Laboratorios</strong>. Não salve em uma pasta temporária.</li><li>Use o nome <strong>LaboratorioRoblox.rbxl</strong> e conclua o salvamento.</li><li>Abra o menu File novamente e confirme que o projeto pode ser salvo sem pedir outro nome. Isso comprova que o arquivo tem um local definido.</li></ol>
+            <h4>Parte B — criar a versão privada na nuvem</h4>
+            <ol class="step-list"><li>Com o mesmo projeto aberto, escolha <strong>File → Publish to Roblox</strong>. Se o Studio mostrar “Publish to Roblox As…”, use esse fluxo para criar uma nova experiência.</li><li>Informe <strong>LaboratorioRoblox</strong> como nome. Uma descrição curta possível é “Laboratório privado da apostila”.</li><li>Conclua a publicação e aguarde a confirmação. Se houver escolha de proprietário, use sua conta ou o grupo correto; não escolha um grupo por engano.</li><li>Abra o <a href="https://create.roblox.com/dashboard/creations" target="_blank" rel="noopener noreferrer">Creator Dashboard</a>, localize a experiência e confirme que ela está <strong>privada</strong>. Não é necessário liberá-la ao público.</li><li>Volte ao Studio e salve novamente no Roblox. Você agora tem uma versão na nuvem e a cópia local criada na Parte A.</li></ol>
+            <h4>Parte C — comparar Play/Test e Run</h4>
+            <ol class="step-list"><li>Na área de testes do Studio, escolha <strong>Test/Play</strong> e pressione o botão de iniciar ou a tecla <strong>F5</strong>.</li><li>Confirme que um avatar apareceu e que você consegue se mover sobre a base.</li><li>Encerre com <strong>Stop</strong> ou <strong>Shift + F5</strong>. Espere o Studio voltar ao modo de edição.</li><li>Escolha <strong>Run</strong> e pressione o botão de iniciar ou <strong>F8</strong>.</li><li>Confirme que a simulação começou sem inserir seu avatar.</li><li>Use Stop outra vez. Não feche a janela inteira para encerrar um teste comum.</li></ol>
+            <h4>Parte D — comprovar a recuperação</h4>
+            <ol class="step-list"><li>Salve, feche o projeto e volte à tela inicial do Studio.</li><li>Abra primeiro a versão na nuvem pela lista de criações recentes ou pela sua experiência no Creator Dashboard.</li><li>Feche-a depois de confirmar o nome. Em seguida, use <strong>File → Open from File</strong> e abra <strong>LaboratorioRoblox.rbxl</strong>.</li><li>Se um dia ocorrer travamento, consulte os arquivos de recuperação automática. No Windows, a pasta padrão documentada fica dentro de <span class="path-chip">%LOCALAPPDATA% → Roblox → RobloxStudio → AutoSaves</span>. No macOS, fica em <span class="path-chip">Library → Application Support → Roblox → RobloxStudio → AutoSaves</span>.</li><li>Em <strong>File → Studio Settings</strong>, localize as opções de Auto-Recovery e confirme que a recuperação automática está habilitada. Não reduza o intervalo sem necessidade.</li></ol>
+            <h4>Resultado esperado</h4><ul><li>o Studio abre com sua conta;</li><li>o projeto Baseplate se chama LaboratorioRoblox;</li><li>existe um arquivo local .rbxl em uma pasta conhecida;</li><li>existe uma experiência privada na nuvem;</li><li>Play/Test insere o avatar; Run não insere;</li><li>Stop encerra ambos e devolve o Studio à edição.</li></ul>
+            <h4>Como desfazer ou reiniciar</h4><p>Feche o teste com Stop. Para repetir sem afetar a versão na nuvem, abra a cópia local e use <strong>Save to File</strong> com outro nome, como <strong>LaboratorioRoblox-Tentativa2.rbxl</strong>. Não apague a experiência na nuvem: ela será reutilizada.</p>
+          </section>
+
+          <section aria-labelledby="diagnostico-02">
+            <h3 id="diagnostico-02">Quando o resultado não é o esperado</h3>
+            <div class="exercise-grid"><article class="exercise-card"><h4>Não encontro Baseplate</h4><p>Procure a categoria de templates básicos ou use a busca da tela inicial. A posição dos cartões pode mudar entre versões.</p></article><article class="exercise-card"><h4>F5 não inicia</h4><p>Alguns teclados exigem a tecla Fn. Use o botão de Test/Play na barra do Studio e confirme se o editor 3D está ativo.</p></article><article class="exercise-card"><h4>Meu avatar não aparece em Run</h4><p>Esse é o comportamento esperado. Run executa a simulação sem inserir seu avatar.</p></article><article class="exercise-card"><h4>Não consigo publicar</h4><p>Confirme login e conexão. Verifique se a conta ou o grupo escolhido tem permissão. Preserve a cópia local e tente novamente mais tarde.</p></article><article class="exercise-card"><h4>Editei durante o teste e perdi a mudança</h4><p>Stop restaura o estado anterior ao teste. Faça mudanças permanentes somente no modo de edição.</p></article><article class="exercise-card"><h4>Não sei qual versão é a correta</h4><p>Compare nome, data e origem. Abra uma versão por vez sem sobrescrever a outra e salve uma cópia antes de decidir.</p></article></div>
+          </section>
+
+          <section aria-labelledby="experiencia-pequena">
+            <h3 id="experiencia-pequena">Seu primeiro conceito de experiência pequena</h3><p>Use a ficha do capítulo anterior para descrever o que futuramente será construído dentro do LaboratorioRoblox. Neste ponto, você ainda não criará sala, obstáculo ou interface.</p>
+            <div class="callout tip"><strong>Exemplo apropriado</strong><p>“Primeira Sala: atravesse um espaço curto, contorne um obstáculo e alcance a plataforma final.” A construção começa no Módulo 1; a primeira interação começa no Módulo 2.</p></div>
+          </section>
+
+          <section aria-labelledby="exercicios-02">
+            <h3 id="exercicios-02">Exercícios e pequeno projeto</h3>
+            <div class="exercise-grid"><article class="exercise-card"><h4>Fácil · Reconheça o modo</h4><p>Você iniciou uma simulação e nenhum avatar apareceu. Qual modo provavelmente está ativo? Como encerrá-lo?</p></article><article class="exercise-card"><h4>Intermediário · Planeje a proteção</h4><p>Liste duas situações em que a cópia local ajuda e duas em que a versão na nuvem ajuda.</p></article><article class="exercise-card"><h4>Desafiador · Teste de recuperação</h4><p>Sem sobrescrever nada, abra a versão na nuvem e a cópia local em momentos separados. Registre como reconheceu cada origem.</p></article><article class="exercise-card"><h4>Pequeno projeto · Kit de partida</h4><p>Entregue três evidências: a ficha da ideia, o arquivo LaboratorioRoblox.rbxl e a experiência privada visível no Creator Dashboard.</p></article></div>
+            <details class="answer"><summary>Ver gabarito comentado</summary><div class="answer-body"><h4>Fácil</h4><p>Provavelmente é Run. Encerre com Stop ou Shift + F5. A ausência de avatar é esperada nesse modo.</p><h4>Intermediário</h4><p>Cópia local: abrir sem depender da versão remota e duplicar antes de experimentar. Nuvem: acessar a experiência associada à conta e recuperar versões publicadas. Outras respostas coerentes são válidas.</p><h4>Desafiador</h4><p>A versão local é aberta por um caminho de arquivo e termina normalmente em .rbxl. A versão na nuvem é aberta pela lista de criações da conta ou pelo Creator Dashboard. Nome, data e origem devem ser registrados antes de salvar.</p><h4>Pequeno projeto</h4><p>A conclusão não exige nenhuma construção ainda. O objetivo é provar que ideia, arquivo e experiência privada existem e podem ser reencontrados.</p><h4>Erros prováveis</h4><p>Publicar não torna automaticamente o projeto um exercício público: confirme a privacidade. Uma recuperação automática não é uma estratégia de salvamento; mantenha arquivo e nuvem.</p></div></details>
+          </section>
+
+          <section aria-labelledby="revisao-02">
+            <h3 id="revisao-02">Revisão do capítulo</h3>
+            <div class="check-grid"><div class="card"><strong>Instalação</strong><p>Consigo abrir o Studio pelo aplicativo oficial e entrar na conta correta.</p></div><div class="card"><strong>Projeto</strong><p>Consigo criar um Baseplate e reconhecer o LaboratorioRoblox.</p></div><div class="card"><strong>Salvamento</strong><p>Sei localizar a cópia .rbxl e a versão privada na nuvem.</p></div><div class="card"><strong>Teste</strong><p>Sei iniciar Play/Test e Run, explicar a diferença e usar Stop.</p></div><div class="card"><strong>Recuperação</strong><p>Sei onde procurar arquivo, nuvem e recuperação automática.</p></div><div class="card"><strong>Limite do módulo</strong><p>Não criei objetos nem iniciei programação antes da base necessária.</p></div></div>
+            <p><strong>Resumo:</strong> o Studio é instalado pelo canal oficial. Baseplate oferece um começo limpo. Arquivo local e versão na nuvem se complementam. Play/Test inclui avatar, Run não; Stop encerra e restaura o estado anterior à simulação.</p>
+          </section>
+
+          <section aria-labelledby="validacao-02">
+            <h3 id="validacao-02">Validação técnica</h3><p>Consulta realizada em <strong>25 de agosto de 2026</strong>. Nomes de menu podem mudar em futuras atualizações; a aula será conferida novamente se isso ocorrer. Nenhuma playlist foi usada.</p>
+            <div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody>
+              <tr><td>Instalação, login e requisitos</td><td><a href="https://create.roblox.com/docs/studio/setup" target="_blank" rel="noopener noreferrer">Studio setup</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Passos separados por sistema; instalação restrita ao canal oficial.</td></tr>
+              <tr><td>Test/Play, Run e Stop</td><td><a href="https://create.roblox.com/docs/studio/testing-modes" target="_blank" rel="noopener noreferrer">Studio testing modes</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Incluídos F5, F8, Shift + F5 e a diferença da presença do avatar.</td></tr>
+              <tr><td>Arquivo .rbxl e cópia local</td><td><a href="https://create.roblox.com/docs/projects/place-files" target="_blank" rel="noopener noreferrer">Place files</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Cópia local foi apresentada como complemento, não substituto da nuvem.</td></tr>
+              <tr><td>Auto-Recovery</td><td><a href="https://create.roblox.com/docs/projects/place-files#auto-recovery-files" target="_blank" rel="noopener noreferrer">Auto-recovery files</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Caminhos foram apresentados com a pasta do usuário, sem assumir um nome fixo.</td></tr>
+              <tr><td>Publicação e places</td><td><a href="https://create.roblox.com/docs/production/publishing/publish-experiences-and-places" target="_blank" rel="noopener noreferrer">Publish experiences and places</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Fluxo inicial privado; rótulos de interface devem ser reconfirmados após atualizações do Studio.</td></tr>
+            </tbody></table></div>
+          </section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-01" data-previous-chapter>← Voltar para o capítulo 0.1</a><a class="button primary" href="../index.html#modulos">Concluir e voltar ao sumário</a></div>
+        </div>
+      </article>
+
+      <section class="chapter" id="glossario" aria-labelledby="glossario-titulo">
+        <header class="chapter-header"><div><p class="chapter-kicker">Referência rápida</p><h2 id="glossario-titulo">Glossário inicial</h2><p>Volte aqui quando um termo parecer novo.</p></div></header>
+        <div class="reading-flow"><dl class="glossary-grid">
+          <div class="glossary-item"><dt>Arquivo</dt><dd>Conjunto de dados guardado com um nome em uma pasta. O place local costuma usar .rbxl.</dd></div><div class="glossary-item"><dt>Cliente</dt><dd>Aplicativo Roblox executado no dispositivo de uma pessoa conectada.</dd></div><div class="glossary-item"><dt>Creator Hub</dt><dd>Portal web oficial para documentação e administração de criações.</dd></div><div class="glossary-item"><dt>Engine</dt><dd>Sistemas que interpretam, simulam e exibem uma experiência Roblox.</dd></div><div class="glossary-item"><dt>Experiência</dt><dd>Produto completo publicado na plataforma, contendo um ou mais places.</dd></div><div class="glossary-item"><dt>Local</dt><dd>Armazenado no próprio computador, em vez de apenas na nuvem.</dd></div><div class="glossary-item"><dt>Nuvem</dt><dd>Infraestrutura remota da Roblox onde experiências e outros dados podem ser guardados.</dd></div><div class="glossary-item"><dt>Place</dt><dd>Ambiente jogável que contém uma parte do mundo de uma experiência.</dd></div><div class="glossary-item"><dt>Play/Test</dt><dd>Modo de teste que inicia a simulação e insere o avatar.</dd></div><div class="glossary-item"><dt>Privado</dt><dd>Não disponível para o público geral; apropriado para desenvolvimento e testes iniciais.</dd></div><div class="glossary-item"><dt>Protótipo</dt><dd>Versão pequena criada para verificar uma ideia rapidamente.</dd></div><div class="glossary-item"><dt>Publicar</dt><dd>Enviar uma versão do place ou da experiência para a Roblox.</dd></div><div class="glossary-item"><dt>Run</dt><dd>Modo que executa a simulação sem inserir o avatar.</dd></div><div class="glossary-item"><dt>Servidor</dt><dd>Execução que mantém e coordena o estado compartilhado de uma sessão.</dd></div><div class="glossary-item"><dt>Sessão</dt><dd>Ocorrência em andamento entre a entrada e a saída ou o encerramento do teste.</dd></div><div class="glossary-item"><dt>Studio</dt><dd>Aplicativo oficial usado para criar, testar e publicar experiências.</dd></div><div class="glossary-item"><dt>Template</dt><dd>Projeto inicial pronto que oferece uma base para começar.</dd></div>
+        </dl></div>
+      </section>
+
+      <section class="chapter" id="fontes" aria-labelledby="fontes-titulo">
+        <header class="chapter-header"><div><p class="chapter-kicker">Fontes oficiais</p><h2 id="fontes-titulo">Leitura consultada no Módulo 0</h2><p>Links externos exigem internet; todo o conteúdo principal deste módulo funciona offline.</p></div></header>
+        <div class="reading-flow"><ul><li><a href="https://create.roblox.com/docs/experiences" target="_blank" rel="noopener noreferrer">Get started with experiences on Roblox</a></li><li><a href="https://create.roblox.com/docs/creation" target="_blank" rel="noopener noreferrer">Creation overview</a></li><li><a href="https://create.roblox.com/docs/projects/client-server" target="_blank" rel="noopener noreferrer">Client-server runtime</a></li><li><a href="https://create.roblox.com/docs/studio" target="_blank" rel="noopener noreferrer">Roblox Studio</a></li><li><a href="https://create.roblox.com/docs/studio/setup" target="_blank" rel="noopener noreferrer">Roblox Studio setup</a></li><li><a href="https://create.roblox.com/docs/studio/testing-modes" target="_blank" rel="noopener noreferrer">Studio testing modes</a></li><li><a href="https://create.roblox.com/docs/projects/place-files" target="_blank" rel="noopener noreferrer">Place files</a></li><li><a href="https://create.roblox.com/docs/production/publishing/publish-experiences-and-places" target="_blank" rel="noopener noreferrer">Publish experiences and places</a></li></ul><div class="callout tip"><strong>Próximo passo</strong><p>O Módulo 1 já está disponível. Nele você conhecerá Explorer, Properties e Output antes de construir a Primeira sala.</p><a class="button primary" href="modulo-01.html">Abrir o Módulo 1</a></div></div>
+      </section>
+    </div>
+  </main>
+  <footer class="site-footer"><p>Módulo 0 completo · conteúdo técnico consultado em 25 de agosto de 2026.</p></footer>
+</body>
+</html>
+
+

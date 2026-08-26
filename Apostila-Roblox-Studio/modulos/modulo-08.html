@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Módulo 8 da Apostila Roblox Studio: scheduler, física, streaming, animação, áudio, NPCs e combate seguro.">
+  <title>Módulo 8 — Sistemas avançados de gameplay</title>
+  <link rel="stylesheet" href="../assets/styles.css?v=20260826-11">
+  <script src="../assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a><div class="header-actions"><a class="button" href="../index.html#modulos">Todos os módulos</a><a class="button" href="../conta.html" data-account-label>Conta</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div></div></header>
+
+  <main class="module-shell" id="conteudo">
+    <aside class="module-sidebar" data-module-sidebar data-collapsed="false">
+      <button class="button mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="true">Ocultar capítulos</button>
+      <nav aria-label="Capítulos do Módulo 8"><p class="eyebrow">Módulo 8</p><h2>Sistemas avançados de gameplay</h2><ol class="chapter-nav">
+        <li><a href="#capitulo-01" data-chapter-link><span>8.1</span> Tempo e scheduler</a></li>
+        <li><a href="#capitulo-02" data-chapter-link><span>8.2</span> Física e streaming</a></li>
+        <li><a href="#capitulo-03" data-chapter-link><span>8.3</span> Feedback audiovisual</a></li>
+        <li><a href="#capitulo-04" data-chapter-link><span>8.4</span> NPCs e caminhos</a></li>
+        <li><a href="#capitulo-05" data-chapter-link><span>8.5</span> Combate seguro</a></li>
+      </ol></nav>
+      <section class="module-progress" aria-labelledby="progresso-modulo"><h3 id="progresso-modulo">Progresso do módulo</h3><div class="progress-track" role="progressbar" aria-label="Progresso do módulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" data-progress-fill data-progress-scope="8"></div></div><p class="progress-label" data-progress-label data-progress-scope="8">0 de 5 capítulos disponíveis concluídos · 0%</p><p><small>Alt + ← e Alt + → alternam capítulos.</small></p></section>
+      <a class="button" href="modulo-07.html">← Módulo 7</a>
+    </aside>
+
+    <section class="module-content">
+      <header class="module-hero"><p class="eyebrow">Dificuldade 4/5 · avançada</p><h1>Módulo 8 — Sistemas avançados de gameplay</h1><p>Você fará sistemas que continuam corretos quando a taxa de quadros muda, a física é distribuída, partes do mapa ainda não chegaram ao cliente e pedidos hostis atravessam a rede.</p><div class="callout security"><strong>Regra central</strong><p>Feedback pode ser previsto no cliente. Dano, estado competitivo e recompensas continuam sob decisão do servidor.</p></div><div class="concept-diagram" aria-label="Fluxo do módulo"><div class="concept-node"><strong>Tempo</strong><br>trabalho na frequência certa</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Mundo</strong><br>física, streaming e NPCs</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Combate</strong><br>resposta rápida, resultado validado</div></div></header>
+
+      <article class="chapter" id="capitulo-01" aria-labelledby="titulo-01">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 8.1</p><h2 id="titulo-01">Scheduler, <code>task</code>, RunService e independência de FPS</h2><p>Controle quando o trabalho acontece sem transformar cada quadro em uma obrigação.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-08-capitulo-01"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos, pré-requisitos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 2.5, 3.1 e 6.3. Ao terminar, você distinguirá atraso de relógio, fase do frame e frequência lógica; usará <code>deltaTime</code>; evitará polling desnecessário e reconhecerá uma condição de corrida.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Scheduler</dt><dd>Mecanismo da Engine que decide quando cada tarefa pode continuar.</dd></div><div class="glossary-item"><dt>Yield</dt><dd>Pausa cooperativa da tarefa atual; outras tarefas podem executar.</dd></div><div class="glossary-item"><dt>Frame</dt><dd>Uma atualização visual/simulada do jogo.</dd></div><div class="glossary-item"><dt>deltaTime</dt><dd>Tempo real, em segundos, desde a atualização anterior.</dd></div><div class="glossary-item"><dt>Polling</dt><dd>Perguntar repetidamente se algo mudou.</dd></div><div class="glossary-item"><dt>Condição de corrida</dt><dd>Resultado que depende de qual tarefa chega primeiro a um estado compartilhado.</dd></div></dl></section>
+
+          <section><h3>Tempo não é quantidade de frames</h3><p>Um computador pode desenhar 30 quadros em um segundo e outro, 120. Somar <code>1</code> por frame faz o segundo jogador avançar quatro vezes mais. Somar <code>velocidade * deltaTime</code> representa uma taxa por segundo e reduz essa dependência.</p><div class="table-wrap"><table><thead><tr><th>Necessidade</th><th>Escolha</th><th>Motivo</th></tr></thead><tbody><tr><td>reagir a uma mudança</td><td>evento/sinal</td><td>não verifica sem necessidade</td></tr><tr><td>atualizar câmera visual</td><td><code>PreRender</code> ou binding de render</td><td>acontece antes de desenhar</td></tr><tr><td>observar resultado da física</td><td><code>Heartbeat</code></td><td>executa depois da simulação</td></tr><tr><td>lógica periódica de 5 Hz</td><td>acumulador ou <code>task.wait(0.2)</code></td><td>não precisa de 60 verificações/s</td></tr><tr><td>continuar depois</td><td><code>task.defer</code>/<code>task.delay</code></td><td>agenda sem usar globais legadas</td></tr></tbody></table></div><aside class="callout warning"><strong>Não conte com atraso exato</strong><p><code>task.wait(0.2)</code> retoma na primeira oportunidade adequada depois do intervalo. Trabalho acumulado e duração do frame podem aumentar o tempo real.</p></aside><p><code>wait()</code>, <code>spawn()</code> e <code>delay()</code> globais são legados. Em código novo, use a biblioteca <code>task</code>. Paralelismo com Actors existe, mas não acelera automaticamente código mal dividido; é extensão, não requisito desta prática.</p></section>
+
+          <section><h3>Prática guiada — cronômetro e verificação a 5 Hz</h3><p><strong>Projeto aberto:</strong> uma cópia local de <em>SimuladorEnxuto</em>, salva como <em>LaboratorioTempo</em>. A prática não altera dados persistentes.</p><ol class="step-list"><li>No Explorer, abra <code>StarterPlayer → StarterPlayerScripts</code>.</li><li>Crie um <code>LocalScript</code> chamado <code>LaboratorioTempo</code>. Caminho: <code>game → StarterPlayer → StarterPlayerScripts → LaboratorioTempo</code>.</li><li>Abra View → Output e View → Stats. Cole o código.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>LaboratorioTempo.client.luau</strong><small>LocalScript · StarterPlayer/StarterPlayerScripts · cliente · inicia quando o jogador entra</small></div><button class="copy-button" type="button" data-copy-target="codigo-801-tempo" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-801-tempo"><code>--!strict
+local RunService = game:GetService("RunService")
+
+local CHECK_INTERVAL = 0.2 -- 5 vezes por segundo
+local elapsedTotal = 0
+local checkAccumulator = 0
+local checks = 0
+
+task.defer(print, "[ordem] B: tarefa adiada")
+print("[ordem] A: tarefa atual")
+
+local connection: RBXScriptConnection
+connection = RunService.Heartbeat:Connect(function(deltaTime: number)
+	elapsedTotal += deltaTime
+	checkAccumulator += deltaTime
+
+	-- while preserva verificações se um frame demorar mais que o intervalo.
+	while checkAccumulator >= CHECK_INTERVAL do
+		checkAccumulator -= CHECK_INTERVAL
+		checks += 1
+		print(string.format("[5 Hz] verificação %d em %.2f s", checks, elapsedTotal))
+	end
+
+	if elapsedTotal >= 5 then
+		connection:Disconnect()
+		print(string.format("[fim] %.2f s reais; %d verificações", elapsedTotal, checks))
+	end
+end)</code></pre></div>
+            <p><strong>Leitura do código:</strong> <code>Heartbeat</code> fornece o intervalo real. Um acumulador guarda frações; cada bloco de 0,2 s gera uma verificação. A conexão é encerrada, portanto não fica abandonada.</p><ol class="step-list" start="4"><li>Use Play, não Run, porque é um LocalScript. Observe primeiro “A” e depois “B”.</li><li>Espere cinco segundos. O resultado deve ficar próximo de 25 verificações mesmo se o FPS variar.</li><li>Em File → Studio Settings → Rendering, se disponível, altere temporariamente a qualidade ou use o emulador de dispositivo. O tempo deve continuar próximo de cinco segundos.</li><li>Para reiniciar, pressione Stop e Play. Para desfazer, apague somente <code>LaboratorioTempo</code>.</li></ol><p><strong>Diagnóstico:</strong> nenhum log indica script no contêiner errado ou teste Run; contagem muito diferente indica intervalo alterado; logs após o fim indicam conexão não desconectada. Use Script Performance e MicroProfiler somente depois de reproduzir um custo real.</p>
+          </section>
+
+          <section><h3>Condições de corrida e trabalho evitável</h3><p>Se duas tarefas leem o mesmo saldo, cedem a execução e depois gravam, uma pode apagar a mudança da outra. A solução não é “colocar <code>task.wait()</code> para dar tempo”; é definir dono do estado, serializar operações ou tornar a alteração atômica. Nunca faça yield dentro de transformações que proíbem isso, como já visto em <code>UpdateAsync</code>.</p><aside class="callout tip"><strong>Exercício de medição</strong><p>Troque o <code>while</code> por <code>if</code>, simule um frame longo com o depurador e explique qual verificação se perde. Depois restaure o <code>while</code>.</p></aside></section>
+
+          <section><h3>Exercícios e pequeno projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Faça o laboratório encerrar após dez segundos sem usar contagem de frames.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Crie verificações distintas a 2 Hz e 5 Hz na mesma conexão, com acumuladores separados.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Encontre um loop por frame no simulador, substitua por evento ou frequência menor e registre antes/depois no Script Performance.</p></article></div><p><strong>Incremento prático:</strong> crie uma folha de decisão com cada atualização do simulador, sua frequência necessária, lado de execução e forma de desligamento.</p><ul class="check-list"><li>Sei explicar por que FPS não é relógio.</li><li>Uso <code>deltaTime</code> para taxas.</li><li>Prefiro evento quando existe sinal correspondente.</li><li>Desconecto trabalho que terminou.</li><li>Não uso espera para “corrigir” concorrência.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> substitua <code>5</code> por uma constante <code>DURATION = 10</code>. A unidade continua segundos.</p><p><strong>Intermediário:</strong> mantenha <code>accumulator2Hz</code> e <code>accumulator5Hz</code>; reduza 0,5 e 0,2 respectivamente. Uma única conexão é suficiente.</p><p><strong>Desafiador:</strong> bons candidatos são textos de HUD que podem reagir a Attributes ou checagens de alvo que aceitam 5–10 Hz. Compare tempo de atividade e número de chamadas, não apenas “parece mais rápido”. Há várias soluções válidas.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td><code>task.spawn/defer/delay/wait</code></td><td><a href="https://create.roblox.com/docs/scripting/scheduler" target="_blank" rel="noopener noreferrer">Schedule code</a></td><td>BrawlDev Task Functions #4, não revalidado integralmente</td><td>Atual e recomendada</td><td>Globais legadas não são usadas.</td></tr><tr><td><code>Heartbeat</code> e <code>deltaTime</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/RunService" target="_blank" rel="noopener noreferrer">RunService API</a></td><td>BrawlDev RunService #24, não revalidado integralmente</td><td>Atual, mas depende do contexto</td><td>Fase escolhida pela necessidade.</td></tr><tr><td>Task scheduler/MicroProfiler</td><td><a href="https://create.roblox.com/docs/performance-optimization/microprofiler/task-scheduler" target="_blank" rel="noopener noreferrer">Task scheduler</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Medição vem antes da otimização.</td></tr><tr><td>Parallel Luau</td><td><a href="https://create.roblox.com/docs/scripting/multithreading" target="_blank" rel="noopener noreferrer">Parallel Luau</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Marcado como extensão, não atalho.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="modulo-07.html">← Módulo 7</a><a class="button primary" href="#capitulo-02" data-next-chapter>8.2 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-02" aria-labelledby="titulo-02">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 8.2</p><h2 id="titulo-02">Física, constraints, propriedade de rede e streaming</h2><p>Trate o mundo físico como uma simulação distribuída, não como prova de autorização.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-08-capitulo-02"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 3.3, 3.4, 5.1 e 5.3. Você construirá uma porta articulada, observará ownership e testará código que tolera objetos ausentes por streaming.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Assembly</dt><dd>Uma ou mais Parts conectadas que a física trata como um corpo rígido.</dd></div><div class="glossary-item"><dt>Constraint</dt><dd>Regra física entre Attachments, como dobradiça, mola ou corda.</dd></div><div class="glossary-item"><dt>Network ownership</dt><dd>Responsabilidade de simular uma assembly não ancorada no servidor ou cliente.</dd></div><div class="glossary-item"><dt>Streaming</dt><dd>Entrada e saída dinâmica de conteúdo 3D no cliente.</dd></div><div class="glossary-item"><dt>Consulta espacial</dt><dd>Raycast ou volume usado para verificar o mundo.</dd></div></dl></section>
+          <section><h3>Modelo mental: aparência física não é verdade de negócio</h3><p>A Engine distribui física para melhorar responsividade. Um cliente que possui uma assembly pode enviar estados físicos incorretos. Além disso, <code>Touched</code> está ligado a ownership: ele é um sinal útil, mas não comprova sozinho alcance, permissão ou dano.</p><div class="concept-diagram"><div class="concept-node"><strong>Cliente</strong><br>simula algo próximo</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Servidor</strong><br>recebe estado físico</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Validação</strong><br>contexto + consulta própria</div></div><p>Para objetos críticos, o servidor pode chamar <code>SetNetworkOwner(nil)</code>. Faça isso com critério: ownership no servidor pode aumentar atraso aparente e custo. A alternativa emergente de autoridade integral do servidor está documentada, mas ainda é classificada como beta em parte da documentação oficial; este curso não a torna pré-requisito.</p></section>
+          <section><h3>Prática guiada — porta articulada e bola observável</h3><p><strong>Projeto aberto:</strong> <em>LaboratorioTempo</em>, salvo como <em>LaboratorioFisica</em>.</p><ol class="step-list"><li>Em Workspace, crie Model <code>FisicaLab</code>.</li><li>Dentro, crie Parts <code>Batente</code> (Anchored true, Size 1,8,1) e <code>Porta</code> (Anchored false, Size 6,8,1). Posicione lado a lado.</li><li>Crie um <code>Attachment</code> em cada Part, ambos no eixo da borda. Renomeie <code>EixoBatente</code> e <code>EixoPorta</code>; ative Model → Constraint Details para alinhar os eixos.</li><li>Dentro de <code>Batente</code>, crie <code>HingeConstraint</code> chamado <code>Dobradica</code>. Defina Attachment0/1, ActuatorType Servo, LimitsEnabled true, LowerAngle 0, UpperAngle 90, AngularSpeed 2 e ServoMaxTorque 100000.</li><li>Crie Part esférica <code>BolaCritica</code>, Anchored false, Size 3,3,3 e posição alguns studs acima do chão.</li><li>Em <code>ServerScriptService</code>, crie Script <code>ControleFisica</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ControleFisica.server.luau</strong><small>Script · ServerScriptService · servidor · inicia com a sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-802-fisica" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-802-fisica"><code>--!strict
+local Players = game:GetService("Players")
+
+local lab = workspace:WaitForChild("FisicaLab")
+local door = lab:WaitForChild("Batente"):WaitForChild("Dobradica") :: HingeConstraint
+local criticalBall = lab:WaitForChild("BolaCritica") :: BasePart
+
+local canSet, reason = criticalBall:CanSetNetworkOwnership()
+if canSet then
+	criticalBall:SetNetworkOwner(nil) -- servidor mantém a simulação crítica
+else
+	warn(`[ownership] não alterado: {reason}`)
+end
+
+local opened = false
+local function toggleDoor()
+	opened = not opened
+	door.TargetAngle = if opened then 90 else 0
+end
+
+-- Laboratório: abre/fecha quando um jogador entra.
+Players.PlayerAdded:Connect(function()
+	task.delay(2, toggleDoor)
+	task.delay(5, toggleDoor)
+end)
+
+task.spawn(function()
+	while criticalBall.Parent do
+		local owner = criticalBall:GetNetworkOwner()
+		print("[ownership]", if owner then owner.Name else "servidor")
+		task.wait(1)
+	end
+end)</code></pre></div>
+            <p>O Script roda no servidor e muda apenas o alvo do servo. A constraint calcula o movimento. <code>CanSetNetworkOwnership()</code> evita presumir que ownership pode ser alterado.</p><ol class="step-list" start="7"><li>Use Server &amp; Clients com dois clientes. Ative Visualization Options → Network owners.</li><li>A porta deve abrir após dois segundos e fechar aos cinco. A bola deve aparecer como pertencente ao servidor.</li><li>Com o teste parado, duplique a bola como <code>BolaAutomatica</code> e não altere seu ownership. Compare perto de cada personagem.</li><li>Selecione Workspace e confirme <code>StreamingEnabled</code>. Em um LocalScript temporário, use <code>FindFirstChild</code>/<code>WaitForChild</code> com timeout antes de acessar objetos distantes; nunca suponha que todo Workspace existe no cliente.</li><li>Para reiniciar, Stop/Play. Para desfazer, apague <code>FisicaLab</code> e <code>ControleFisica</code>.</li></ol><p><strong>Resultado e diagnóstico:</strong> se a porta cair, há Attachment desalinhado ou Parte incorretamente ancorada; se não gira, revise Attachment0/1, torque e eixos; se ownership falha, leia a razão. Não aumente o torque às cegas.</p></section>
+          <section><h3>Streaming sem referências frágeis</h3><p><code>Workspace.StreamingEnabled</code> é configurado nas Properties e não por script. No cliente, um objeto distante pode ainda não ter chegado ou pode sair. Mantenha regras críticas no servidor, use IDs/posições quando apropriado e reconecte observadores quando instâncias reaparecerem. Um raycast do cliente pode não acertar algo distante que ainda não foi transmitido; a decisão de combate será refeita no servidor em 8.5.</p><aside class="callout security"><strong>Teste hostil da interação física</strong><p>Mesmo que <code>Touched</code> dispare, valide personagem vivo, distância do ponto esperado, estado da mecânica, frequência e uma consulta espacial do servidor. Uma bola movida pelo cliente não deve conceder prêmio.</p></aside></section>
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Altere a porta para abrir até 60 graus e explique quais propriedades limitam o movimento.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Crie uma bola não crítica com ownership automático e registre as mudanças de dono sem conceder qualquer recompensa.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Projete uma chegada física: <code>Touched</code> inicia a checagem, mas o servidor confirma distância, velocidade finita, região e cooldown.</p></article></div><p><strong>Pequeno projeto:</strong> uma porta de arena com estados Closed/Opening/Open/Closing; o servo realiza o movimento e a FSM rejeita transições ilegais.</p><ul class="check-list"><li>Sei identificar uma assembly.</li><li>Constraints conectam Attachments corretamente.</li><li>Ownership físico não é autorização.</li><li><code>Touched</code> não decide prêmio ou dano sozinho.</li><li>Código cliente tolera streaming.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> use <code>UpperAngle = 60</code> e <code>TargetAngle = 60</code>. O limite define o permitido; o alvo define a intenção do servo.</p><p><strong>Intermediário:</strong> não chame <code>SetNetworkOwner</code> na cópia e consulte <code>GetNetworkOwner()</code> no servidor. A Engine pode trocar o dono conforme proximidade.</p><p><strong>Desafiador:</strong> mantenha uma região ancorada conhecida pelo servidor, use <code>math.isfinite</code> nos vetores/velocidades, confirme magnitude e faça consulta de volume ou raycast. O toque é gatilho, não veredicto.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Assemblies e impulse/velocidade</td><td><a href="https://create.roblox.com/docs/physics/assemblies" target="_blank" rel="noopener noreferrer">Assemblies</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Movimento contínuo não usa Velocity legada.</td></tr><tr><td><code>HingeConstraint</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/HingeConstraint" target="_blank" rel="noopener noreferrer">HingeConstraint API</a></td><td>Vídeos avançados não validados</td><td>Atual e recomendada</td><td>BodyMovers antigos não são usados.</td></tr><tr><td>Network ownership</td><td><a href="https://create.roblox.com/docs/physics/network-ownership" target="_blank" rel="noopener noreferrer">Network ownership</a> e <a href="https://create.roblox.com/docs/scripting/security/network-ownership" target="_blank" rel="noopener noreferrer">segurança</a></td><td>Não utilizada</td><td>Insegura sem validação</td><td>Objeto crítico no servidor e checagens próprias.</td></tr><tr><td>Instance streaming</td><td><a href="https://create.roblox.com/docs/workspace/streaming" target="_blank" rel="noopener noreferrer">Instance streaming</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Ausência no cliente é tratada como normal.</td></tr><tr><td>Server authority</td><td><a href="https://create.roblox.com/docs/projects/server-authority" target="_blank" rel="noopener noreferrer">Server authority model</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Recurso beta/opt-in não é requisito do projeto.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-01" data-previous-chapter>← 8.1</a><a class="button primary" href="#capitulo-03" data-next-chapter>8.3 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-03" aria-labelledby="titulo-03">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 8.3</p><h2 id="titulo-03">Animação, câmera, áudio modular e efeitos</h2><p>Comece o Projeto 10 com resposta imediata que comunica ação, sem conceder dano.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-08-capitulo-03"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 4.1–4.4, 5.1 e 8.1. Você carregará animação por <code>Animator</code>, usará marker para efeito local, montará áudio modular e oferecerá redução de movimento/efeitos.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Rig</dt><dd>Modelo articulado com juntas que pode ser animado.</dd></div><div class="glossary-item"><dt>AnimationTrack</dt><dd>Execução controlável de uma Animation carregada.</dd></div><div class="glossary-item"><dt>Marker</dt><dd>Evento nomeado em um instante da linha do tempo.</dd></div><div class="glossary-item"><dt>Recoil</dt><dd>Resposta visual de recuo; não altera o dano.</dd></div><div class="glossary-item"><dt>Áudio modular</dt><dd>Fluxo formado por player, emitter/listener, output e Wires.</dd></div><div class="glossary-item"><dt>Feedback previsto</dt><dd>Efeito local exibido antes da confirmação do servidor.</dd></div></dl></section>
+          <section><h3>Separe sensação de consequência</h3><p>Ao pressionar disparo, o cliente pode tocar animação, emitir partículas e deslocar levemente a câmera. Isso reduz a sensação de latência. Ele não escolhe alvo, dano, munição verdadeira nem recompensa. Se o servidor rejeitar, a interface reconcilia o estado.</p><div class="table-wrap"><table><thead><tr><th>Camada</th><th>Exemplo</th><th>Autoridade</th></tr></thead><tbody><tr><td>input</td><td>jogador apertou atacar</td><td>cliente relata intenção</td></tr><tr><td>feedback imediato</td><td>flash, animação, câmera</td><td>cliente prevê</td></tr><tr><td>consequência</td><td>dano e munição</td><td>servidor decide</td></tr><tr><td>confirmação</td><td>hit marker e HUD corrigido</td><td>servidor informa</td></tr></tbody></table></div><p><code>Animator:LoadAnimation()</code> é o caminho atual. <code>Humanoid:LoadAnimation()</code> permanece como proxy legado e não é o padrão novo. Animações exigem permissões compatíveis com o proprietário da experiência.</p></section>
+          <section><h3>Prática guiada — ferramenta de feedback sem dano</h3><p><strong>Projeto aberto:</strong> uma cópia de <em>LaboratorioFisica</em> chamada <em>ArenaCombate</em>.</p><ol class="step-list"><li>Em StarterPack, crie Tool <code>Blaster</code> com Part <code>Handle</code>. Dentro de Handle, crie <code>Attachment</code> chamado <code>Muzzle</code> e <code>ParticleEmitter</code> chamado <code>MuzzleFlash</code>; defina Enabled false, Rate 0 e uma textura permitida.</li><li>Em <code>SoundService</code>, defina <code>ListenerLocation</code> como Camera. Dentro de Handle, crie <code>AudioPlayer</code> chamado <code>ShotAudio</code>, <code>AudioEmitter</code> chamado <code>ShotEmitter</code> e <code>Wire</code> chamado <code>ShotWire</code>. Use um AssetId autorizado, conecte Wire.SourceInstance ao player e TargetInstance ao emitter.</li><li>Dentro da Tool, crie <code>Animation</code> chamada <code>FireAnimation</code> com ID de uma animação própria compatível. Para testar o código antes disso, o exemplo usa o ID oficial <code>rbxassetid://2515090838</code>; substitua pelo seu.</li><li>Crie BoolValue <code>ReduceMotion</code> em StarterPlayerScripts com Value false. Depois a preferência poderá vir da tela de configurações.</li><li>Dentro de Blaster, crie LocalScript <code>FeedbackBlaster</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>FeedbackBlaster.client.luau</strong><small>LocalScript · StarterPack/Blaster · cliente · conecta ao equipar/ativar a Tool</small></div><button class="copy-button" type="button" data-copy-target="codigo-803-feedback" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-803-feedback"><code>--!strict
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local tool = script.Parent :: Tool
+local handle = tool:WaitForChild("Handle") :: BasePart
+local muzzle = handle:WaitForChild("Muzzle") :: Attachment
+local flash = handle:WaitForChild("MuzzleFlash") :: ParticleEmitter
+local shotAudio = handle:WaitForChild("ShotAudio") :: AudioPlayer
+local animation = tool:WaitForChild("FireAnimation") :: Animation
+local reduceMotion = player.PlayerScripts:WaitForChild("ReduceMotion") :: BoolValue
+
+local track: AnimationTrack? = nil
+local busy = false
+
+local function prepareAnimation()
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoid = character:WaitForChild("Humanoid") :: Humanoid
+	local animator = humanoid:WaitForChild("Animator") :: Animator
+	track = animator:LoadAnimation(animation)
+	track.Priority = Enum.AnimationPriority.Action
+	track:GetMarkerReachedSignal("Muzzle"):Connect(function()
+		flash:Emit(if reduceMotion.Value then 2 else 8)
+	end)
+end
+
+local function smallRecoil()
+	if reduceMotion.Value then return end
+	local camera = workspace.CurrentCamera
+	if camera then
+		camera.CFrame *= CFrame.Angles(math.rad(-0.6), 0, 0)
+	end
+end
+
+tool.Equipped:Connect(function()
+	if not track then prepareAnimation() end
+end)
+
+tool.Activated:Connect(function()
+	if busy or not track then return end
+	busy = true
+	track:Play(0.05)
+	-- Fallback visual: permite testar mesmo sem marker publicado.
+	flash:Emit(if reduceMotion.Value then 2 else 8)
+	shotAudio:Play()
+	RunService.PreRender:Wait()
+	smallRecoil()
+	task.delay(0.2, function()
+		busy = false
+	end)
+end)</code></pre></div>
+            <p><strong>O que cada bloco faz:</strong> prepara a animação somente no cliente, associa o marker “Muzzle” ao flash, toca o fluxo de áudio já conectado e aplica recuo visual opcional. Não existe RemoteEvent nem <code>TakeDamage</code>.</p><ol class="step-list" start="6"><li>Use Play, equipe Blaster e clique/ative. Veja Output e Developer Console se o asset falhar.</li><li>O flash, áudio e animação devem ocorrer; nenhum Humanoid perde vida.</li><li>Altere <code>ReduceMotion.Value</code> para true na árvore Client durante o teste. O recuo some e a quantidade de partículas diminui.</li><li>Crie o marker “Muzzle” no Animation Editor. Após publicar a animação, remova o fallback <code>flash:Emit</code> da ativação para não emitir duas vezes.</li><li>Para reiniciar, Stop/Play. Para desfazer, remova os objetos criados dentro de Blaster e restaure ListenerLocation.</li></ol><p><strong>Diagnóstico:</strong> animação ausente costuma indicar permissão/rig/ID; áudio ausente indica AssetId ou Wire; partículas duplicadas indicam marker e fallback simultâneos; câmera muito agressiva exige reduzir ângulo, não adicionar tremor contínuo.</p></section>
+          <section><h3>Áudio modular e efeitos com orçamento</h3><p><code>AudioPlayer</code> produz o stream, <code>AudioEmitter</code> o coloca no mundo, <code>AudioListener</code> recebe e <code>AudioDeviceOutput</code> chega ao dispositivo; <code>Wire</code> conecta o fluxo. O sistema <code>Sound</code> ainda existe e pode ser adequado em projetos existentes, mas código novo deste curso aprende a composição modular.</p><p>ParticleEmitter, Beam e Trail comunicam coisas diferentes. Use <code>Emit()</code> para rajadas; um Beam liga dois Attachments; um Trail registra movimento entre Attachments. Redução de efeitos deve baixar contagem, tremor, flashes e densidade sem remover informação indispensável.</p><aside class="callout warning"><strong>Marker não decide dano</strong><p>Markers são ótimos para sincronizar passos e flashes. Em rede, uma animação local pode ser manipulada; o servidor usa seu próprio estado/cadência para aplicar consequências.</p></aside></section>
+          <section><h3>Exercícios e Projeto 10 — início</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Adicione um marker “Eject” que emite duas partículas em outro Attachment, sem código de dano.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Faça ReduceMotion também reduzir volume e desligar qualquer tremor, mantendo sinal visual mínimo.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Desenhe a reconciliação para tiro rejeitado: o que aparece imediatamente e o que o servidor corrige?</p></article></div><p><strong>Projeto progressivo 10 começa:</strong> a arena já possui Blaster com sensação local, preferência de acessibilidade e zero autoridade de dano. Registre o contrato: cliente enviará apenas intenção e ponto de mira; servidor calculará origem, alcance, munição e alvo em 8.5.</p><ul class="check-list"><li>Uso Animator, não o proxy legado como padrão.</li><li>Entendo marker como sincronização visual.</li><li>Feedback local não concede consequência.</li><li>Áudio modular possui fluxo conectado.</li><li>Existe alternativa com movimento/efeitos reduzidos.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> crie outro ParticleEmitter e conecte <code>track:GetMarkerReachedSignal("Eject")</code>; chame <code>Emit(2)</code>. O marker precisa existir no asset publicado.</p><p><strong>Intermediário:</strong> use menor Volume no AudioPlayer enquanto a preferência estiver ativa e restaure ao desativá-la. Evite silêncio total se o som comunica perigo.</p><p><strong>Desafiador:</strong> flash/animação podem aparecer imediatamente. O servidor devolve munição verdadeira e confirmação; rejeição corrige HUD e evita hit marker/dano. Não tente “desfazer” cada partícula já vista.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td><code>Animator:LoadAnimation</code></td><td><a href="https://create.roblox.com/docs/animation/using" target="_blank" rel="noopener noreferrer">Use animations</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/Animator" target="_blank" rel="noopener noreferrer">Animator API</a></td><td>Playlists avançadas não validadas</td><td>Atual e recomendada</td><td>Proxy Humanoid não é padrão novo.</td></tr><tr><td>Animation markers</td><td><a href="https://create.roblox.com/docs/animation/events" target="_blank" rel="noopener noreferrer">Animation events</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Usados só para feedback.</td></tr><tr><td>Câmera local</td><td><a href="https://create.roblox.com/docs/workspace/camera" target="_blank" rel="noopener noreferrer">Customize camera</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Recuo pequeno e reduzível.</td></tr><tr><td>AudioPlayer/Emitter/Listener/Wire</td><td><a href="https://create.roblox.com/docs/audio/objects" target="_blank" rel="noopener noreferrer">Audio objects</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Fluxo modular é a trilha principal.</td></tr><tr><td>Particles, Beams e Trails</td><td><a href="https://create.roblox.com/docs/effects" target="_blank" rel="noopener noreferrer">Effects</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Orçamento e redução de efeitos explícitos.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-02" data-previous-chapter>← 8.2</a><a class="button primary" href="#capitulo-04" data-next-chapter>8.4 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-04" aria-labelledby="titulo-04">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 8.4</p><h2 id="titulo-04">NPCs, pathfinding e máquinas de comportamento</h2><p>Separe perceber, decidir e agir; falha de caminho vira estado esperado.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-08-capitulo-04"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 6.2, 8.1, 3.4 e 4.1. Você criará um NPC <code>Idle → Chase → Attack</code>, tratará caminho bloqueado/alvo removido e limitará recálculo.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Percepção</dt><dd>Coleta limitada de fatos, como alvos próximos e linha de visão.</dd></div><div class="glossary-item"><dt>Memória</dt><dd>Fatos guardados, como último alvo e instante da última rota.</dd></div><div class="glossary-item"><dt>Decisão</dt><dd>Escolha de estado a partir de fatos.</dd></div><div class="glossary-item"><dt>Waypoint</dt><dd>Ponto sequencial de um caminho calculado.</dd></div><div class="glossary-item"><dt>Navigation mesh</dt><dd>Representação das regiões caminháveis.</dd></div><div class="glossary-item"><dt>Replanejamento</dt><dd>Cálculo de outra rota após mudança ou falha.</dd></div></dl></section>
+          <section><h3>FSM antes do pathfinding</h3><p>Pathfinding responde “por onde?”, não “por quê?”. A máquina de estados decide ficar parado, perseguir ou atacar. Percepção não deve varrer todos os jogadores a cada frame; decisão pode operar a 4 Hz; movimento segue waypoints e reage a bloqueio.</p><div class="concept-diagram"><div class="concept-node"><strong>Perceber</strong><br>alvo válido e distância</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Decidir</strong><br>Idle, Chase, Attack</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Agir</strong><br>parar, caminho ou dano</div></div></section>
+          <section><h3>Prática guiada — sentinela controlada</h3><p><strong>Projeto aberto:</strong> <em>ArenaCombate</em>. Em Avatar → Rig Builder, insira um Block Rig R15 e renomeie para <code>Sentinela</code>. Mova para Workspace → NPCs. Confirme Humanoid, HumanoidRootPart, PrimaryPart e Parts não ancoradas.</p><ol class="step-list"><li>Dentro de Sentinela, crie Script <code>NpcBrain</code>.</li><li>Ative Visualization Options → Navigation mesh. Garanta corredores mais largos que o agente.</li><li>Cole o código. Ele roda no servidor quando o NPC entra no Workspace.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>NpcBrain.server.luau</strong><small>Script · Workspace/NPCs/Sentinela · servidor · inicia com o modelo</small></div><button class="copy-button" type="button" data-copy-target="codigo-804-npc" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-804-npc"><code>--!strict
+local PathfindingService = game:GetService("PathfindingService")
+local Players = game:GetService("Players")
+
+local npc = script.Parent
+local humanoid = npc:WaitForChild("Humanoid") :: Humanoid
+local root = npc:WaitForChild("HumanoidRootPart") :: BasePart
+
+local SENSE_RADIUS = 60
+local ATTACK_RADIUS = 5
+local ATTACK_COOLDOWN = 1.2
+local REPATH_INTERVAL = 1
+
+local state = "Idle"
+local target: Player? = nil
+local lastAttack = -math.huge
+local lastPath = -math.huge
+local pathBlocked = false
+
+local function aliveRoot(player: Player): BasePart?
+	local character = player.Character
+	local targetHumanoid = character and character:FindFirstChildOfClass("Humanoid")
+	local targetRoot = character and character:FindFirstChild("HumanoidRootPart")
+	if targetHumanoid and targetHumanoid.Health > 0 and targetRoot and targetRoot:IsA("BasePart") then
+		return targetRoot
+	end
+	return nil
+end
+
+local function acquireTarget(): Player?
+	local best: Player? = nil
+	local bestDistance = SENSE_RADIUS
+	for _, player in Players:GetPlayers() do
+		local targetRoot = aliveRoot(player)
+		if targetRoot then
+			local distance = (targetRoot.Position - root.Position).Magnitude
+			if distance &lt; bestDistance then
+				best = player
+				bestDistance = distance
+			end
+		end
+	end
+	return best
+end
+
+local function followOnce(destination: Vector3)
+	if os.clock() - lastPath &lt; REPATH_INTERVAL then return end
+	lastPath = os.clock()
+	pathBlocked = false
+
+	local path = PathfindingService:CreatePath({
+		AgentRadius = 2,
+		AgentHeight = 5,
+		AgentCanJump = true,
+		WaypointSpacing = 4,
+	})
+	local success, message = pcall(function()
+		path:ComputeAsync(root.Position, destination)
+	end)
+	if not success or path.Status ~= Enum.PathStatus.Success then
+		warn("[NPC] caminho falhou", message)
+		return
+	end
+
+	local blockedConnection = path.Blocked:Connect(function()
+		pathBlocked = true
+	end)
+	for _, waypoint in path:GetWaypoints() do
+		local currentTarget = target
+		if pathBlocked or state ~= "Chase" or not currentTarget or not aliveRoot(currentTarget) then break end
+		if waypoint.Action == Enum.PathWaypointAction.Jump then
+			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+		humanoid:MoveTo(waypoint.Position)
+		if not humanoid.MoveToFinished:Wait() then break end
+	end
+	blockedConnection:Disconnect()
+end
+
+while humanoid.Health > 0 do
+	target = acquireTarget()
+	local targetRoot = if target then aliveRoot(target) else nil
+	if not targetRoot then
+		state = "Idle"
+		humanoid:MoveTo(root.Position)
+	else
+		local distance = (targetRoot.Position - root.Position).Magnitude
+		if distance &lt;= ATTACK_RADIUS then
+			state = "Attack"
+			if os.clock() - lastAttack >= ATTACK_COOLDOWN then
+				lastAttack = os.clock()
+				local targetModel = targetRoot.Parent
+				local targetHumanoid = targetModel and targetModel:FindFirstChildOfClass("Humanoid")
+				if targetHumanoid then targetHumanoid:TakeDamage(8) end
+			end
+		else
+			state = "Chase"
+			followOnce(targetRoot.Position)
+		end
+	end
+	npc:SetAttribute("State", state)
+	task.wait(0.25) -- decisão a 4 Hz, não por frame
+end</code></pre></div>
+            <p><strong>Importante:</strong> <code>ComputeAsync</code> pode falhar e por isso está em <code>pcall</code>; isso não esconde erros comuns fora da chamada. O caminho desconecta <code>Blocked</code> depois do uso e só recalcula após intervalo.</p><ol class="step-list" start="4"><li>Use Server &amp; Clients. Aproxime um personagem: State muda Idle → Chase → Attack.</li><li>Insira uma parede no caminho durante a perseguição. A rota deve terminar e ser recalculada de forma controlada.</li><li>Resete ou elimine o alvo. O NPC deve voltar a Idle sem erro.</li><li>Teste corredores estreitos e veja Navigation mesh. Ajuste cenário antes de culpar o script.</li><li>Para reiniciar, reset do personagem ou Stop/Play. Para desfazer, apague o Script e o rig criado.</li></ol><p><strong>Diagnóstico:</strong> Status sem Success pode significar destino inalcançável, agente incompatível ou distância excessiva; NPC parado pode ter Parts ancoradas; spam de rotas indica intervalo removido; conexão acumulando indica ausência de Disconnect.</p></section>
+          <section><h3>Escala e limites conscientes</h3><p>Vários NPCs não precisam pensar juntos. Distribua suas atualizações usando um deslocamento por ID, reduza percepção para NPCs distantes e mantenha o servidor como dono de decisões de dano. Parallel Luau pode ajudar trabalho comprovadamente pesado e seguro para paralelo, mas primeiro meça, reduza frequência e simplifique consultas.</p><aside class="callout warning"><strong>Streaming e caminhos</strong><p>O servidor vê o mundo completo. No cliente, um destino pode não estar carregado. Para IA autoritativa, calcule rotas no servidor e trate <code>Blocked</code>; não transforme a ausência local em teleporte.</p></aside></section>
+          <section><h3>Exercícios e pequeno projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Adicione estado ReturnHome quando nenhum alvo existir por cinco segundos.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Faça o NPC perder o alvo além de 75 studs e exigir nova aquisição abaixo de 60, evitando troca nervosa.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Crie um scheduler para dez NPCs: próximos decidem a 4 Hz; distantes a 1 Hz; registre custo e comportamento.</p></article></div><p><strong>Pequeno projeto:</strong> transforme Sentinela em ModuleScript de cérebro com <code>start()</code>/<code>destroy()</code>; o destrutor desconecta Blocked e encerra tarefas.</p><ul class="check-list"><li>Pathfinding responde por onde, FSM por quê.</li><li>Falha de ComputeAsync é esperada e visível.</li><li>Blocked causa recálculo limitado.</li><li>Alvo removido não deixa referência inválida.</li><li>Frequência muda conforme relevância.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> guarde <code>lostTargetAt</code>; após cinco segundos em Idle, defina ReturnHome e siga até uma posição inicial salva.</p><p><strong>Intermediário:</strong> use dois limites: retenção 75 e aquisição 60. Essa histerese reduz alternância na fronteira.</p><p><strong>Desafiador:</strong> atribua grupos por <code>UserId</code> do NPC/índice e acumule tempo. Não rode dez loops por frame. Compare chamadas de percepção por segundo e tempo de Script Performance.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td><code>CreatePath/ComputeAsync</code></td><td><a href="https://create.roblox.com/docs/characters/pathfinding" target="_blank" rel="noopener noreferrer">Pathfinding</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/PathfindingService" target="_blank" rel="noopener noreferrer">API</a></td><td>Playlists avançadas não validadas</td><td>Atual e recomendada</td><td>ComputeAsync protegido e Status conferido.</td></tr><tr><td><code>Path.Blocked</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/Path" target="_blank" rel="noopener noreferrer">Path API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Conexão temporária e replanejamento limitado.</td></tr><tr><td>Limites de pathfinding</td><td><a href="https://create.roblox.com/docs/characters/pathfinding#limitations-and-failure-factors" target="_blank" rel="noopener noreferrer">Failure factors</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Falha tratada como estado normal.</td></tr><tr><td>Parallel Luau para NPCs</td><td><a href="https://create.roblox.com/docs/scripting/multithreading" target="_blank" rel="noopener noreferrer">Parallel Luau</a></td><td>BrawlDev/TheDevKing não validados</td><td>Atual, mas depende do contexto</td><td>Somente após perfil de custo.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-03" data-previous-chapter>← 8.3</a><a class="button primary" href="#capitulo-05" data-next-chapter>8.5 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-05" aria-labelledby="titulo-05">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 8.5</p><h2 id="titulo-05">Combate, hitboxes, projéteis e estudo de FPS</h2><p>Conclua uma arena mínima em que o cliente mira e o servidor decide.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-08-capitulo-05"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 3.4, 4.3–4.6, 5.1–5.3, 6.2–6.3 e 8.1–8.3. Você implementará hitscan e melee, estados/cadência/munição no servidor, deduplicação e testes hostis.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Hitscan</dt><dd>Disparo resolvido por consulta instantânea, geralmente raycast.</dd></div><div class="glossary-item"><dt>Hitbox</dt><dd>Forma espacial usada para detectar possíveis alvos.</dd></div><div class="glossary-item"><dt>Deduplicação</dt><dd>Garantia de aplicar um efeito uma vez por alvo/ataque.</dd></div><div class="glossary-item"><dt>Cadência</dt><dd>Intervalo mínimo entre ações.</dd></div><div class="glossary-item"><dt>Origem plausível</dt><dd>Ponto calculado pelo servidor próximo da arma/personagem.</dd></div><div class="glossary-item"><dt>Compensação de lag</dt><dd>Técnicas que consideram atraso sem aceitar qualquer relato do cliente.</dd></div></dl></section>
+          <section><h3>Contrato estreito de combate</h3><p>O cliente não envia “cause 100 de dano naquele jogador”. Ele envia uma intenção pequena: <code>aimPosition</code>. O servidor obtém Tool equipada, Handle, origem, dano, alcance, munição e relógio de sua própria configuração.</p><div class="concept-diagram"><div class="concept-node"><strong>Cliente</strong><br>mira + prevê flash</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Servidor</strong><br>tipo, finito, estado, cadência, origem, parede</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Resultado</strong><br>dano + confirmação segura</div></div><p>Para projétil visual, o cliente pode animar uma representação. O servidor ainda resolve colisão/dano. Compensação histórica é avançada: exige snapshots e limites de tempo; esta arena usa tolerância moderada e raycast atual do servidor.</p></section>
+          <section><h3>Prática guiada — infraestrutura</h3><p><strong>Projeto aberto:</strong> <em>ArenaCombate</em>, com Blaster do 8.3 e pelo menos dois jogadores de teste.</p><ol class="step-list"><li>Em ReplicatedStorage, crie Folder <code>CombatRemotes</code> com RemoteEvents <code>RequestFire</code>, <code>RequestMelee</code> e <code>CombatConfirmed</code>.</li><li>Em ReplicatedStorage, crie Folder <code>CombatShared</code> e ModuleScript <code>WeaponConfig</code>.</li><li>Em ServerScriptService, crie Folder <code>Combat</code> e Script <code>CombatServer</code>.</li><li>Na Tool Blaster, substitua FeedbackBlaster por LocalScript <code>CombatClient</code>. A hierarquia audiovisual permanece.</li><li>Em StarterPack, crie Tool <code>EspadaTreino</code> com Part <code>Handle</code> e LocalScript <code>MeleeClient</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>WeaponConfig.luau</strong><small>ModuleScript · ReplicatedStorage/CombatShared · compartilhado · ao chamar require</small></div><button class="copy-button" type="button" data-copy-target="codigo-805-config" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-805-config"><code>--!strict
+local WeaponConfig = table.freeze({
+	Blaster = table.freeze({ damage = 18, range = 180, cooldown = 0.25, magazine = 12 }),
+	Melee = table.freeze({ damage = 12, range = 7, cooldown = 0.8 }),
+})
+return WeaponConfig</code></pre></div>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>CombatServer.server.luau</strong><small>Script · ServerScriptService/Combat · servidor · conecta remotes na inicialização</small></div><button class="copy-button" type="button" data-copy-target="codigo-805-server" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-805-server"><code>--!strict
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local remotes = ReplicatedStorage:WaitForChild("CombatRemotes")
+local requestFire = remotes:WaitForChild("RequestFire") :: RemoteEvent
+local requestMelee = remotes:WaitForChild("RequestMelee") :: RemoteEvent
+local confirmed = remotes:WaitForChild("CombatConfirmed") :: RemoteEvent
+local Config = require(ReplicatedStorage.CombatShared.WeaponConfig)
+
+type CombatState = { ammo: number, lastFire: number, lastMelee: number }
+local states: {[Player]: CombatState} = {}
+
+local function finiteVector3(value: any): boolean
+	return typeof(value) == "Vector3"
+		and math.isfinite(value.X) and math.isfinite(value.Y) and math.isfinite(value.Z)
+end
+
+local function aliveCharacter(player: Player): (Model?, Humanoid?, BasePart?)
+	local character = player.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+	if character and humanoid and humanoid.Health > 0 and root and root:IsA("BasePart") then
+		return character, humanoid, root
+	end
+	return nil, nil, nil
+end
+
+local function equippedHandle(character: Model, toolName: string): BasePart?
+	local tool = character:FindFirstChild(toolName)
+	local handle = tool and tool:IsA("Tool") and tool:FindFirstChild("Handle")
+	return if handle and handle:IsA("BasePart") then handle else nil
+end
+
+local function targetHumanoid(hit: Instance, attacker: Model): Humanoid?
+	local model = hit:FindFirstAncestorOfClass("Model")
+	if not model or model == attacker then return nil end
+	local humanoid = model:FindFirstChildOfClass("Humanoid")
+	if humanoid and humanoid.Health > 0 then return humanoid end
+	return nil
+end
+
+local function onFire(player: Player, aimPosition: any)
+	if not finiteVector3(aimPosition) then return end
+	local character, _, root = aliveCharacter(player)
+	if not character or not root then return end
+	local handle = equippedHandle(character, "Blaster")
+	if not handle then return end
+
+	local state = states[player]
+	if not state or state.ammo &lt;= 0 then return end
+	local now = os.clock()
+	if now - state.lastFire &lt; Config.Blaster.cooldown then return end
+
+	local rawDirection = aimPosition - handle.Position
+	if rawDirection.Magnitude &lt; 0.01 then return end
+	local direction = rawDirection.Unit * Config.Blaster.range
+	-- Origem da arma deve continuar plausível perto do personagem do servidor.
+	if (handle.Position - root.Position).Magnitude > 8 then return end
+
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = {character}
+	params.IgnoreWater = true
+	local result = workspace:Raycast(handle.Position, direction, params)
+
+	state.lastFire = now
+	state.ammo -= 1
+	player:SetAttribute("Ammo", state.ammo) -- projeção para o HUD
+
+	local hitPosition = handle.Position + direction
+	local didHit = false
+	if result then
+		hitPosition = result.Position
+		local humanoid = targetHumanoid(result.Instance, character)
+		if humanoid then
+			humanoid:TakeDamage(Config.Blaster.damage)
+			didHit = true
+		end
+	end
+	confirmed:FireAllClients(player, handle.Position, hitPosition, didHit)
+end
+
+local function hasLineOfSight(origin: Vector3, targetRoot: BasePart, attacker: Model): boolean
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = {attacker}
+	local result = workspace:Raycast(origin, targetRoot.Position - origin, params)
+	return result ~= nil and result.Instance:IsDescendantOf(targetRoot.Parent)
+end
+
+local function onMelee(player: Player)
+	local character, _, root = aliveCharacter(player)
+	if not character or not root then return end
+	if not equippedHandle(character, "Blaster") and not equippedHandle(character, "EspadaTreino") then return end
+	local state = states[player]
+	if not state then return end
+	local now = os.clock()
+	if now - state.lastMelee &lt; Config.Melee.cooldown then return end
+	state.lastMelee = now
+
+	local params = OverlapParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = {character}
+	local boxCFrame = root.CFrame * CFrame.new(0, 0, -Config.Melee.range / 2)
+	local parts = workspace:GetPartBoundsInBox(boxCFrame, Vector3.new(6, 6, Config.Melee.range), params)
+	local damaged: {[Humanoid]: boolean} = {}
+	for _, part in parts do
+		local humanoid = targetHumanoid(part, character)
+		local targetRoot = humanoid and humanoid.Parent:FindFirstChild("HumanoidRootPart")
+		if humanoid and targetRoot and targetRoot:IsA("BasePart") and not damaged[humanoid]
+			and (targetRoot.Position - root.Position).Magnitude &lt;= Config.Melee.range
+			and hasLineOfSight(root.Position, targetRoot, character) then
+			damaged[humanoid] = true
+			humanoid:TakeDamage(Config.Melee.damage)
+		end
+	end
+end
+
+local function setup(player: Player)
+	states[player] = {ammo = Config.Blaster.magazine, lastFire = -math.huge, lastMelee = -math.huge}
+	player:SetAttribute("Ammo", Config.Blaster.magazine)
+end
+
+requestFire.OnServerEvent:Connect(onFire)
+requestMelee.OnServerEvent:Connect(onMelee)
+Players.PlayerAdded:Connect(setup)
+Players.PlayerRemoving:Connect(function(player) states[player] = nil end)
+for _, player in Players:GetPlayers() do setup(player) end</code></pre></div>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>CombatClient.client.luau</strong><small>LocalScript · StarterPack/Blaster · cliente · input da Tool e confirmações</small></div><button class="copy-button" type="button" data-copy-target="codigo-805-client" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-805-client"><code>--!strict
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local tool = script.Parent :: Tool
+local remotes = ReplicatedStorage:WaitForChild("CombatRemotes")
+local requestFire = remotes:WaitForChild("RequestFire") :: RemoteEvent
+local confirmed = remotes:WaitForChild("CombatConfirmed") :: RemoteEvent
+local flash = tool.Handle:WaitForChild("MuzzleFlash") :: ParticleEmitter
+local audio = tool.Handle:WaitForChild("ShotAudio") :: AudioPlayer
+
+tool.Activated:Connect(function()
+	local camera = workspace.CurrentCamera
+	if not camera then return end
+	-- Feedback previsto: não informa alvo, dano, munição ou origem ao servidor.
+	flash:Emit(6)
+	audio:Play()
+	requestFire:FireServer(camera.CFrame.Position + camera.CFrame.LookVector * 500)
+end)
+
+confirmed.OnClientEvent:Connect(function(shooter: Player, origin: Vector3, hitPosition: Vector3, didHit: boolean)
+	if shooter == player and didHit then
+		print("[combate] acerto confirmado pelo servidor")
+	end
+	-- Aqui você pode desenhar um Beam temporário entre origin e hitPosition.
+end)</code></pre></div>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>MeleeClient.client.luau</strong><small>LocalScript · StarterPack/EspadaTreino · cliente · quando a Tool é ativada</small></div><button class="copy-button" type="button" data-copy-target="codigo-805-melee-client" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-805-melee-client"><code>--!strict
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local tool = script.Parent :: Tool
+local requestMelee = ReplicatedStorage:WaitForChild("CombatRemotes"):WaitForChild("RequestMelee") :: RemoteEvent
+
+tool.Activated:Connect(function()
+	-- O cliente envia somente a intenção; alvo e dano não atravessam a rede.
+	requestMelee:FireServer()
+end)</code></pre></div>
+          </section>
+          <section><h3>Teste e investigação adversarial</h3><ol class="step-list"><li>Use Server &amp; Clients com dois clientes. Equipe Blaster e mire. Um disparo válido consome um Ammo no servidor e pode causar 18 de dano.</li><li>Coloque uma parede entre jogadores. O raycast deve acertar a parede, sem atravessá-la.</li><li>No cliente, altere o Attribute Ammo para 999. O servidor continua usando <code>states</code> e rejeita quando sua munição real acaba.</li><li>Na Command Bar do cliente, tente <code>game.ReplicatedStorage.CombatRemotes.RequestFire:FireServer(Vector3.new(0/0,0,0))</code>. Nada deve quebrar ou causar dano.</li><li>Dispare rapidamente. Cadência do cliente pode falhar ou ser removida; a do servidor continua valendo.</li><li>Tente enviar um ponto atrás do personagem, muito distante ou com a Tool desequipada. Origem continua sendo o Handle do servidor e o pedido sem Tool é rejeitado.</li><li>Equipe <code>EspadaTreino</code> e ative-a. Teste dois membros do mesmo rig dentro da caixa: deduplicação causa um dano, não vários.</li><li>Para reiniciar, Stop/Play repõe estado. Para desfazer, remova CombatRemotes, CombatShared, CombatServer, Blaster e EspadaTreino.</li></ol><p><strong>Limite didático:</strong> este exemplo não implementa equipes, recarga, respawn de estado nem histórico de posições. Antes de publicar, acrescente esses contratos e testes. Não aumente tolerâncias para “resolver lag” sem medir.</p><aside class="callout security"><strong>Servidor gatekeeper</strong><p>Mesmo efeitos retransmitidos a outros clientes só podem sair depois das validações. <code>FireAllClients</code> não deve virar amplificador de spam ou dados inválidos.</p></aside></section>
+          <section><h3>Projeto 10 concluído</h3><p>A arena agora combina feedback local reduzível, configuração compartilhada não secreta, estado competitivo no servidor, hitscan que respeita paredes, melee com volume/deduplicação e matriz hostil.</p><div class="table-wrap"><table><thead><tr><th>Ataque</th><th>Entrada do cliente</th><th>Checagens do servidor</th><th>Resultado</th></tr></thead><tbody><tr><td>tiro normal</td><td>Vector3 finito</td><td>vivo, Tool, origem, cadência, ammo, raycast</td><td>um dano/consumo</td></tr><tr><td>spam</td><td>muitos pedidos</td><td>cadência</td><td>excedentes rejeitados</td></tr><tr><td>NaN/Inf</td><td>número inválido</td><td><code>math.isfinite</code></td><td>rejeitado antes da matemática</td></tr><tr><td>parede</td><td>mira além dela</td><td>primeiro hit do raycast</td><td>sem dano atravessando</td></tr><tr><td>origem impossível</td><td>cliente nem envia origem</td><td>Handle próximo do root</td><td>rejeitado se estado divergir</td></tr><tr><td>melee multipartes</td><td>intenção sem alvo</td><td>caixa, distância, linha de visão, set</td><td>um dano por Humanoid</td></tr></tbody></table></div></section>
+          <section><h3>Exercícios</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Implemente recarga no servidor com estados Ready/Reloading e atributo de HUD.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Adicione equipes e impeça dano aliado; crie testes para nil, morto e troca de equipe.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Crie segunda arma com cadência/alcance diferentes e um projétil visual que nunca seja autoridade de colisão.</p></article></div><ul class="check-list"><li>Cliente envia intenção mínima.</li><li>Servidor calcula origem, dano e alcance.</li><li>Vetores finitos são obrigatórios.</li><li>Cadência e munição vivem no servidor.</li><li>Raycast/volume respeitam parede e deduplicação.</li><li>A matriz hostil produz rejeições sem erros.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> acrescente <code>mode</code> ao CombatState. Ao recarregar, mude para Reloading, agende término no servidor e confirme que a mesma sessão/estado ainda existe antes de repor ammo. Fire exige Ready.</p><p><strong>Intermediário:</strong> use <code>Player.Team</code> ou regra própria no servidor. Um NPC sem Player continua inimigo conforme configuração. Teste mudança de equipe entre pedido e resolução.</p><p><strong>Desafiador:</strong> o ID da arma seleciona configuração permitida pelo servidor, nunca uma tabela enviada pelo cliente. O projétil visual interpola entre posições confirmadas; dano continua vindo de raycast/consulta autoritativa.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td><code>Workspace:Raycast</code>/<code>RaycastParams</code></td><td><a href="https://create.roblox.com/docs/workspace/raycasting" target="_blank" rel="noopener noreferrer">Raycasting</a></td><td>FPS — Xera, conteúdo não validado integralmente</td><td>Atual e recomendada</td><td>Raycast do servidor decide o primeiro obstáculo.</td></tr><tr><td>Validação de mira/arma</td><td><a href="https://create.roblox.com/docs/scripting/security/client-server-boundary#weapon-targeting" target="_blank" rel="noopener noreferrer">Weapon targeting</a></td><td>FPS — Xera como estudo, não autoridade</td><td>Atual e recomendada</td><td>Tipo, finito, contexto, estado e frequência.</td></tr><tr><td><code>math.isfinite</code> contra NaN/Inf</td><td><a href="https://create.roblox.com/docs/scripting/security/client-server-boundary#value-validation" target="_blank" rel="noopener noreferrer">Value validation</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Validação ocorre antes de magnitude/Unit.</td></tr><tr><td>Ownership físico no combate</td><td><a href="https://create.roblox.com/docs/scripting/security/network-ownership" target="_blank" rel="noopener noreferrer">Network ownership security</a></td><td>Não utilizada</td><td>Insegura sem validação</td><td>Touched não aplica dano.</td></tr><tr><td>Modelo de autoridade do servidor</td><td><a href="https://create.roblox.com/docs/projects/server-authority" target="_blank" rel="noopener noreferrer">Server authority model</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Baseline usa validação clássica; beta deve ser reavaliado.</td></tr></tbody></table></div></section>
+          <section><h3>Resumo do módulo</h3><p>Você passou de “fazer funcionar” para escolher frequência, fase, dono físico e fonte de verdade. O Projeto 10 demonstra a regra essencial: o cliente oferece sensação imediata; o servidor protege o resultado compartilhado.</p></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-04" data-previous-chapter>← 8.4</a><a class="button primary" href="../index.html#modulos">Voltar aos módulos</a></div>
+        </div>
+      </article>
+
+      <section class="module-finish"><p class="eyebrow">Módulo 8 concluído</p><h2>Projeto 10 — Estudo de combate</h2><p>Você construiu uma arena mínima, observável e hostilmente testada. O Módulo 9 tratará qualidade, políticas, performance, publicação e operação; ele só começa após autorização.</p><a class="button primary" href="../index.html#modulos">Ver mapa da formação</a></section>
+    </section>
+  </main>
+  <div class="toast" data-toast role="status" aria-live="polite"></div>
+</body>
+</html>
+
+

@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Módulo 4 da Apostila Roblox Studio: jogadores, personagens, cliente e servidor, Tools, Input Action System e interfaces adaptáveis.">
+  <title>Módulo 4 — Jogadores, ferramentas, entrada e interface</title>
+  <link rel="stylesheet" href="../assets/styles.css?v=20260826-11"><script src="../assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a><div class="header-actions"><a class="button" href="../index.html#modulos">Todos os módulos</a><a class="button" href="../conta.html" data-account-label>Conta</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div></div></header>
+
+  <main class="module-shell" id="conteudo">
+    <aside class="module-sidebar" data-module-sidebar data-collapsed="false">
+      <button class="button mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="true">Ocultar capítulos</button>
+      <h2>Módulo 4</h2><p>Jogadores, ferramentas, entrada e interface</p>
+      <nav class="chapter-nav" aria-label="Capítulos do Módulo 4"><a href="#capitulo-01">4.1 Player, Character e respawn</a><a href="#capitulo-02">4.2 Tipos e locais de script</a><a href="#capitulo-03">4.3 Tools e inventário</a><a href="#capitulo-04">4.4 Teclado e gamepad</a><a href="#capitulo-05">4.5 Fundamentos de GUI</a><a href="#capitulo-06">4.6 Touch e adaptação</a><a href="#glossario">Glossário</a><a href="#fontes">Fontes</a></nav>
+      <div class="sidebar-extra"><div class="progress-track" role="progressbar" aria-label="Progresso do módulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" data-progress-fill data-progress-scope="4"></div></div><p class="progress-label" data-progress-label data-progress-scope="4">0 de 6 capítulos disponíveis concluídos · 0%</p><p><small>Alt + ← e Alt + → alternam seções.</small></p></div>
+    </aside>
+
+    <div class="module-content">
+      <section class="module-intro" aria-labelledby="titulo-modulo"><span class="eyebrow">Dificuldade 2–3/5 · intermediária inicial</span><h1 id="titulo-modulo">Do personagem na tela a controles que funcionam em qualquer dispositivo.</h1><p class="lead">Você ligará o mundo 3D a jogadores reais, separará responsabilidades entre servidor e cliente, construirá uma lanterna e criará o primeiro HUD adaptável. A ordem é deliberada: touch só aparece depois que botões de interface forem ensinados.</p><ul class="lesson-map"><li><strong>Ponto de partida:</strong> eventos, Instances, atributos, Vector3 e CFrame do Módulo 3</li><li><strong>Projetos:</strong> concluir Obstáculo com eventos; iniciar e concluir Ferramenta utilizável; iniciar e concluir Percurso com checkpoint e interface</li><li><strong>Limite consciente:</strong> o cliente pede e apresenta; moedas, dano, itens e progresso importante serão validados por remotes no Módulo 5</li></ul><div class="callout security"><strong>Uma regra nova, sem mistério</strong><p>O dispositivo do jogador controla sua câmera, sua interface e seus inputs, mas pode ser modificado. Por isso, efeitos apenas visuais podem ficar no cliente; resultados importantes pertencem ao servidor. Neste módulo você aprende a fronteira. A comunicação por remotes vem no próximo.</p></div></section>
+
+      <article class="chapter" id="capitulo-01" aria-labelledby="titulo-01">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 4.1</p><h2 id="titulo-01"><code>Player</code>, <code>Character</code>, <code>Humanoid</code> e respawn</h2><p>Separe a identidade duradoura da sessão do corpo que pode morrer e ser recriado.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-04-capitulo-01"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>O que você vai dominar</h3><p><strong>Pré-requisitos:</strong> 3.1 e 3.2. Ao terminar, você observará entrada, personagem, morte e respawn; encontrará o jogador a partir de uma peça; evitará conexões duplicadas; aplicará dano com cooldown por jogador; e restaurará um checkpoint válido durante a sessão.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Player</dt><dd>A identidade do usuário dentro daquela sessão.</dd></div><div class="glossary-item"><dt>Character</dt><dd>Model que representa o corpo do jogador no mundo 3D.</dd></div><div class="glossary-item"><dt>Humanoid</dt><dd>Objeto do Character que reúne saúde, movimento e estado de morte.</dd></div><div class="glossary-item"><dt>Respawn</dt><dd>Criação de um novo Character depois da morte ou recarga.</dd></div><div class="glossary-item"><dt>HumanoidRootPart</dt><dd>Peça central usada como referência de posição do personagem.</dd></div><div class="glossary-item"><dt>Sessão</dt><dd>Período em que um servidor está executando; termina quando ele fecha.</dd></div></dl></section>
+          <section><h3>Dois ciclos de vida, não um</h3><div class="concept-diagram" aria-label="Ciclo de vida do jogador e do personagem"><div><strong>Player entra</strong><span>identidade da sessão</span></div><span class="concept-arrow">→</span><div><strong>Character nasce</strong><span>corpo recriável</span></div><span class="concept-arrow">→</span><div><strong>Humanoid morre</strong><span>Character é trocado</span></div><span class="concept-arrow">→</span><div><strong>Player continua</strong><span>até sair do servidor</span></div></div><p>Uma conexão em <code>PlayerAdded</code> deve ser criada uma vez. Dentro dela, <code>CharacterAdded</code> prepara cada corpo novo. Conectar <code>CharacterAdded</code> novamente a cada respawn duplicaria trabalho; conectar <code>Humanoid.Died</code> uma vez por Character é correto porque aquele Humanoid será destruído com o corpo.</p></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · diagnóstico de ciclo de vida</p><h3>Observe dez respawns sem duplicar conexões</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Primeira sala interativa</dd></div><div><dt>Script</dt><dd><code>ObservadorDeJogadores</code> · Script</dd></div><div><dt>Caminho</dt><dd><code>game → ServerScriptService → ObservadorDeJogadores</code></dd></div><div><dt>Contexto</dt><dd>Servidor · início da sessão e eventos posteriores</dd></div></dl><ol class="step-list"><li>Com o teste parado, crie o Script em ServerScriptService e mantenha <code>RunContext = Server</code>.</li><li>Abra View → Output. Cole o código e use Play (F5).</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ObservadorDeJogadores.server.luau</strong><small>Script · ServerScriptService · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-401-ciclo" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-401-ciclo"><code>local Players = game:GetService("Players")
+
+local contagemDePersonagens = {}
+local ultimoCharacterPreparado = {}
+
+local function prepararPersonagem(player, character)
+	if ultimoCharacterPreparado[player] == character then
+		return
+	end
+	ultimoCharacterPreparado[player] = character
+
+	contagemDePersonagens[player] = (contagemDePersonagens[player] or 0) + 1
+	local numero = contagemDePersonagens[player]
+	local humanoid = character:WaitForChild("Humanoid")
+
+	print(player.Name, "recebeu o Character número", numero)
+
+	humanoid.Died:Connect(function()
+		print(player.Name, "morreu com o Character número", numero)
+	end)
+end
+
+local function prepararPlayer(player)
+	contagemDePersonagens[player] = 0
+
+	player.CharacterAdded:Connect(function(character)
+		prepararPersonagem(player, character)
+	end)
+
+	if player.Character then
+		prepararPersonagem(player, player.Character)
+	end
+end
+
+Players.PlayerRemoving:Connect(function(player)
+	contagemDePersonagens[player] = nil
+	ultimoCharacterPreparado[player] = nil
+	print(player.Name, "saiu; estado de sessão removido.")
+end)
+
+for _, player in Players:GetPlayers() do
+	prepararPlayer(player)
+end
+
+Players.PlayerAdded:Connect(prepararPlayer)</code></pre></div>
+            <p><code>contagemDePersonagens</code> usa o Player como chave. O laço inicial cobre jogadores que já existiam quando o Script começou; <code>PlayerAdded</code> cobre os próximos. A verificação de <code>player.Character</code> cobre um corpo já criado. Nenhuma dessas três proteções deve chamar a preparação duas vezes em um início normal.</p><ol class="step-list" start="3"><li>No menu do teste, use Reset Character dez vezes, aguardando o novo corpo entre tentativas.</li><li>Espere números 1 a 11, uma linha de nascimento e uma de morte por corpo anterior. Se um número pular ou repetir, procure outra cópia do Script.</li><li>Use Stop. A tabela desaparece com o servidor; isso é estado de sessão, não salvamento.</li></ol><p><strong>Para reiniciar:</strong> Stop, apague cópias acidentais do Script e execute novamente. Se <code>Humanoid</code> nunca aparecer, confirme que o template de personagem padrão está ativo.</p>
+          </section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · Projetos 3 e 5</p><h3>Finalize o obstáculo e crie um checkpoint de sessão</h3><ol class="step-list"><li>Em <code>game → Workspace → Ambiente → PrimeiraSala → Interacoes</code>, confirme a Part <code>ObstaculoEvento</code>. Defina Anchored true, CanTouch true e uma cor de perigo.</li><li>Na mesma pasta, crie as Parts <code>InicioPercurso</code> e <code>Checkpoint1</code>, ambas Anchored. Posicione InicioPercurso no começo e Checkpoint1 depois do obstáculo.</li><li>Crie <code>SistemaDePercurso</code> em ServerScriptService, RunContext Server.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>SistemaDePercurso.server.luau</strong><small>Script · ServerScriptService · servidor</small></div><button class="copy-button" type="button" data-copy-target="codigo-401-percurso" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-401-percurso"><code>local Players = game:GetService("Players")
+local interacoes = workspace.Ambiente.PrimeiraSala.Interacoes
+local obstaculo = interacoes.ObstaculoEvento
+local inicio = interacoes.InicioPercurso
+local checkpoint1 = interacoes.Checkpoint1
+
+local DANO = 20
+local TEMPO_ENTRE_DANOS = 1
+local checkpointsPorPlayer = {}
+local emCooldown = {}
+local ultimoCharacterRestaurado = {}
+
+local function encontrarPlayerEHumanoid(outraParte)
+	local character = outraParte:FindFirstAncestorOfClass("Model")
+	if not character then
+		return nil, nil
+	end
+
+	local player = Players:GetPlayerFromCharacter(character)
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	return player, humanoid
+end
+
+local function restaurarCheckpoint(player, character)
+	if ultimoCharacterRestaurado[player] == character then
+		return
+	end
+	ultimoCharacterRestaurado[player] = character
+
+	local destino = checkpointsPorPlayer[player] or inicio
+	character:WaitForChild("HumanoidRootPart")
+	character:PivotTo(destino.CFrame + Vector3.new(0, 3, 0))
+end
+
+local function prepararPlayer(player)
+	checkpointsPorPlayer[player] = inicio
+	player:SetAttribute("CheckpointAtual", "Início")
+
+	player.CharacterAdded:Connect(function(character)
+		restaurarCheckpoint(player, character)
+	end)
+
+	if player.Character then
+		restaurarCheckpoint(player, player.Character)
+	end
+end
+
+obstaculo.Touched:Connect(function(outraParte)
+	local player, humanoid = encontrarPlayerEHumanoid(outraParte)
+	if not player or not humanoid or humanoid.Health &lt;= 0 or emCooldown[player] then
+		return
+	end
+
+	emCooldown[player] = true
+	humanoid:TakeDamage(DANO)
+	task.delay(TEMPO_ENTRE_DANOS, function()
+		emCooldown[player] = nil
+	end)
+end)
+
+checkpoint1.Touched:Connect(function(outraParte)
+	local player, humanoid = encontrarPlayerEHumanoid(outraParte)
+	if not player or not humanoid or humanoid.Health &lt;= 0 then
+		return
+	end
+
+	checkpointsPorPlayer[player] = checkpoint1
+	player:SetAttribute("CheckpointAtual", "Checkpoint 1")
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	checkpointsPorPlayer[player] = nil
+	emCooldown[player] = nil
+	ultimoCharacterRestaurado[player] = nil
+end)
+
+for _, player in Players:GetPlayers() do
+	prepararPlayer(player)
+end
+Players.PlayerAdded:Connect(prepararPlayer)</code></pre></div>
+            <p>A Part que tocou não é aceita como identidade. O servidor sobe até um Model, exige um Player correspondente, exige Humanoid vivo e mantém cooldown separado por Player. O checkpoint guardado é uma Instance escolhida pelo servidor; o cliente não informa coordenadas.</p><ol class="step-list" start="4"><li>Use Play, toque o obstáculo e confira a queda de 20 pontos, no máximo uma vez por segundo.</li><li>Passe no checkpoint, use Reset Character e confirme o retorno três studs acima dele.</li><li>Antes de tocar o checkpoint, o respawn deve voltar ao início. No Explorer de teste, selecione Player e confira o atributo <code>CheckpointAtual</code>.</li></ol><div class="callout security"><strong>Seguro para esta etapa</strong><p>Dano e destino são decisões do servidor. O checkpoint ainda não sobrevive ao fechamento do servidor; DataStore será ensinado no Módulo 7. Não chame isso de progresso salvo.</p></div>
+          </section>
+
+          <section><h3>Exercícios e fechamento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Imprima Health antes e depois de <code>TakeDamage()</code> e explique os dois valores.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Crie <code>Checkpoint2</code> e atualize nome e destino sem aceitar Parts fora de Interacoes.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Teste com dois clientes e demonstre que o cooldown de um Player não bloqueia o outro.</p></article></div><p><strong>Projeto 3 concluído:</strong> o obstáculo valida Character/Humanoid e limita dano por jogador. <strong>Projeto 5 iniciado:</strong> o percurso já restaura checkpoint durante a sessão.</p><ul class="check-list"><li>Player e Character têm ciclos diferentes.</li><li>Uma peça tocada não prova identidade.</li><li>O servidor decide dano e checkpoint.</li><li>Estado por Player é limpo em PlayerRemoving.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> guarde <code>local antes = humanoid.Health</code>, aplique dano e imprima antes e <code>humanoid.Health</code>. ForceField ou morte podem afetar o observado; registre o contexto.</p><p><strong>Intermediário:</strong> crie outra conexão com a mesma validação e atribua a Part conhecida pelo servidor. Uma função <code>ativarCheckpoint(checkpoint, nome)</code> evita duplicação.</p><p><strong>Desafiador:</strong> use Test → Server &amp; Clients com dois clientes. Como <code>emCooldown[player]</code> tem chaves distintas, ambos podem receber dano no próprio ritmo.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>PlayerAdded, CharacterAdded e respawn</td><td><a href="https://create.roblox.com/docs/players" target="_blank" rel="noopener noreferrer">Players</a>, <a href="https://create.roblox.com/docs/characters" target="_blank" rel="noopener noreferrer">Characters</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/Player" target="_blank" rel="noopener noreferrer">Player API</a></td><td>Playlist não usada como autoridade</td><td>Atual e recomendada</td><td>Jogadores/personagens já existentes e limpeza foram incluídos.</td></tr><tr><td>GetPlayerFromCharacter, Died e TakeDamage</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/Players" target="_blank" rel="noopener noreferrer">Players API</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/Humanoid" target="_blank" rel="noopener noreferrer">Humanoid API</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Humanoid vivo e cooldown por jogador exigidos; <code>takeDamage</code> minúsculo não foi usado.</td></tr></tbody></table></div><p>Não foi possível confirmar um episódio específico da playlist Beginners Scripting sobre todo este ciclo; nenhum vídeo foi declarado analisado.</p></section><div class="chapter-pager"><a class="button" href="modulo-03.html#capitulo-04" data-previous-chapter>← Rever 3.4</a><a class="button primary" href="#capitulo-02" data-next-chapter>4.2 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-02" aria-labelledby="titulo-02">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 4.2</p><h2 id="titulo-02"><code>Script</code>, <code>LocalScript</code>, <code>ModuleScript</code> e locais de execução</h2><p>Escolha o lado pelo tipo de responsabilidade, não pelo nome do arquivo.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-04-capitulo-02"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos, termos e modelo mental</h3><p><strong>Pré-requisitos:</strong> 4.1 e 2.8. Você vai distinguir servidor, cliente, replicação, RunContext e módulos reutilizáveis.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Servidor</dt><dd>Processo que coordena a sessão e é autoridade para resultados importantes.</dd></div><div class="glossary-item"><dt>Cliente</dt><dd>Cópia executada no dispositivo de cada jogador.</dd></div><div class="glossary-item"><dt>Replicação</dt><dd>Sincronização seletiva de estado entre servidor e clientes.</dd></div><div class="glossary-item"><dt>RunContext</dt><dd>Propriedade de Script que define em qual lado ele executa.</dd></div><div class="glossary-item"><dt>ModuleScript</dt><dd>Unidade reutilizável carregada com <code>require()</code>.</dd></div><div class="glossary-item"><dt>Cache</dt><dd>Resultado guardado para os próximos <code>require()</code> do mesmo ambiente.</dd></div></dl><div class="concept-diagram" aria-label="Responsabilidades entre servidor e cliente"><div><strong>Servidor</strong><span>dano, itens, progresso</span></div><span class="concept-arrow">↔</span><div><strong>Estado replicado</strong><span>cópias autorizadas</span></div><span class="concept-arrow">↔</span><div><strong>Cliente</strong><span>input, câmera, GUI</span></div></div></section>
+          <section><h3>Os três tipos</h3><div class="table-wrap"><table><thead><tr><th>Objeto</th><th>Execução</th><th>Locais didáticos desta apostila</th></tr></thead><tbody><tr><td>Script</td><td>Servidor ou cliente conforme RunContext e local</td><td>ServerScriptService para servidor; ReplicatedStorage + RunContext Client para cliente estável</td></tr><tr><td>LocalScript</td><td>Cliente em contêineres permitidos; não possui RunContext</td><td>StarterPlayerScripts, StarterGui, StarterPack/Tool</td></tr><tr><td>ModuleScript</td><td>Quando outro script chama <code>require()</code></td><td>ReplicatedStorage se ambos os lados podem ler; ServerStorage se só servidor</td></tr></tbody></table></div><aside class="callout attention"><strong>Compartilhar o arquivo não compartilha a memória</strong><p>Um ModuleScript exigido no servidor e no cliente produz caches separados. Alterar uma tabela do módulo no cliente não altera a tabela do servidor e não é uma forma de comunicação.</p></aside></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada</p><h3>Compare os dois lados e um módulo compartilhado</h3><ol class="step-list"><li>Em ReplicatedStorage, crie ModuleScript <code>MensagemDeContexto</code>.</li><li>Em ServerScriptService, crie Script <code>ObservadorServidor</code>, RunContext Server.</li><li>Em ReplicatedStorage, crie Script <code>ObservadorCliente</code>, RunContext Client.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>MensagemDeContexto.luau</strong><small>ModuleScript · game → ReplicatedStorage · carregado separadamente por cada lado</small></div><button class="copy-button" type="button" data-copy-target="codigo-402-modulo" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-402-modulo"><code>local MensagemDeContexto = {}
+local vezesChamado = 0
+
+function MensagemDeContexto.criar(lado)
+	vezesChamado += 1
+	return string.format("[%s] chamada local número %d", lado, vezesChamado)
+end
+
+return MensagemDeContexto</code></pre></div>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ObservadorServidor.server.luau</strong><small>Script · game → ServerScriptService · servidor · início</small></div><button class="copy-button" type="button" data-copy-target="codigo-402-servidor" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-402-servidor"><code>local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local mensagem = require(ReplicatedStorage.MensagemDeContexto)
+
+print("Servidor?", RunService:IsServer(), "Cliente?", RunService:IsClient())
+print(mensagem.criar("SERVIDOR"))
+print(mensagem.criar("SERVIDOR"))</code></pre></div>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ObservadorCliente.client.luau</strong><small>Script · game → ReplicatedStorage · RunContext Client · início de cada cliente</small></div><button class="copy-button" type="button" data-copy-target="codigo-402-cliente" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-402-cliente"><code>local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local modulo = ReplicatedStorage:WaitForChild("MensagemDeContexto")
+local mensagem = require(modulo)
+
+print("Servidor?", RunService:IsServer(), "Cliente?", RunService:IsClient())
+print(mensagem.criar("CLIENTE"))
+print(mensagem.criar("CLIENTE"))</code></pre></div>
+            <p>Cada lado imprime chamadas 1 e 2: evidência de caches separados. O cliente usa <code>WaitForChild()</code> porque recebe objetos replicados; o servidor conhece o objeto editado desde o início.</p><ol class="step-list" start="4"><li>Use Test → Server &amp; Clients com dois clientes. No Output, habilite a coluna Source/Context se disponível.</li><li>Compare o Explorer do servidor com o de cada cliente. Cada cliente executa seu observador; o servidor executa um.</li><li>Mova ObservadorServidor para ServerStorage e teste: scripts ali não executam. Devolva-o a ServerScriptService.</li></ol><p><strong>Se não aparecer mensagem do cliente:</strong> confira RunContext Client e se o Script está em ReplicatedStorage. Se o módulo retornar nil, confirme a linha <code>return MensagemDeContexto</code>. Stop e corrija a hierarquia para reiniciar.</p>
+          </section>
+          <section><h3>Classifique antes de programar</h3><p><strong>Servidor:</strong> conceder moeda, aplicar dano, validar compra, salvar dados. <strong>Cliente:</strong> ler teclado, mover câmera, mostrar HUD, tocar efeito local. <strong>Ambos, com estados separados:</strong> utilitários puros e configurações públicas. “O cliente não é confiável” não significa que ele é inútil: significa que sua afirmação não basta para conceder uma vantagem.</p><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Classifique: câmera, preço final, texto do HUD, dano e salvamento.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Explique por que um ModuleScript em ReplicatedStorage não deve conter uma chave secreta.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Classifique vinte responsabilidades de um jogo próprio e justifique cinco casos ambíguos.</p></article></div><p><strong>Pequeno projeto:</strong> crie um documento dentro do Studio, como comentários em um Script desativado chamado <code>MapaDeResponsabilidades</code>, com as colunas servidor, cliente e compartilhado. Não implemente remotes ainda.</p><ul class="check-list"><li>RunContext define o lado de um Script.</li><li>LocalScript depende de local permitido.</li><li>ModuleScript executa quando requerido e tem cache por ambiente.</li><li>Resultado importante não nasce da palavra do cliente.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> câmera e HUD são cliente; preço final, dano e salvamento são servidor.</p><p><strong>Intermediário:</strong> ReplicatedStorage é legível pelo cliente. Segredo enviado ao cliente deixa de ser segredo, mesmo se o código estiver “escondido” em módulo.</p><p><strong>Desafiador:</strong> efeitos podem ser previstos no cliente e confirmados pelo servidor; inventário mostrado é cliente, mas sua fonte de verdade é servidor. Justificativa importa mais que rótulo isolado.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: 26/08/2026.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Tipos, locais e RunContext</td><td><a href="https://create.roblox.com/docs/scripting/locations" target="_blank" rel="noopener noreferrer">Script types and locations</a></td><td><a href="https://youtube.com/playlist?list=PLQ1Qd31Hmi3WKkVHnadvhOOjz04AuMYAf" target="_blank" rel="noopener noreferrer">Advanced Scripting — BrawlDev</a></td><td>Atual, mas depende do contexto</td><td>Incluída a recomendação atual de Script com RunContext Client em ReplicatedStorage.</td></tr><tr><td>require e cache do ModuleScript</td><td><a href="https://create.roblox.com/docs/scripting/module" target="_blank" rel="noopener noreferrer">ModuleScripts</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Cache separado por cliente/servidor demonstrado.</td></tr><tr><td>Fronteira cliente-servidor</td><td><a href="https://create.roblox.com/docs/projects/client-server" target="_blank" rel="noopener noreferrer">Client-server runtime</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/RunService" target="_blank" rel="noopener noreferrer">RunService</a></td><td>Playlist não usada como autoridade</td><td>Atual e recomendada</td><td>Responsabilidades importantes reservadas ao servidor.</td></tr></tbody></table></div><div class="callout tip"><strong>Complemento opcional</strong><p>Na playlist Advanced Scripting — BrawlDev, procure “Local Scripts (Server vs Client) — #1” somente depois desta prática. Observe visibilidade e lado de execução; reproduza mensagens rotuladas. Atualize qualquer regra absoluta de localização com a página oficial atual. <strong>Desafio:</strong> prove o cache separado com dois clientes.</p></div><p>O episódio foi localizado pelo título registrado no plano, mas não foi analisado integralmente nesta execução.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-01" data-previous-chapter>← 4.1</a><a class="button primary" href="#capitulo-03" data-next-chapter>4.3 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-03" aria-labelledby="titulo-03">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 4.3</p><h2 id="titulo-03">Tools, StarterPack, Backpack e inventário de sessão</h2><p>Construa uma ferramenta visual e entenda o que é copiado em cada respawn.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-04-capitulo-03"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 4.1, 4.2 e 3.1. Você criará uma Tool física, Handle, luz local, estado, cooldown e limpeza.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Tool</dt><dd>Objeto equipável do inventário.</dd></div><div class="glossary-item"><dt>Handle</dt><dd>Única BasePart filha direta chamada Handle, usada para segurar a Tool física.</dd></div><div class="glossary-item"><dt>StarterPack</dt><dd>Modelo inicial de ferramentas copiadas ao Backpack a cada spawn.</dd></div><div class="glossary-item"><dt>Backpack</dt><dd>Inventário daquela vida; é recriado no respawn.</dd></div><div class="glossary-item"><dt>Cooldown</dt><dd>Intervalo que impede ativações rápidas repetidas.</dd></div></dl><p>StarterPack não é o inventário vivo: é o molde. Ao nascer, o jogador recebe cópias no Backpack. Ao equipar, a Tool muda do Backpack para o Character; ao desequipar, volta.</p></section>
+          <aside class="callout security"><strong>Esta lanterna é deliberadamente visual</strong><p>A luz será alternada no cliente. Isso é adequado para um efeito pessoal sem recompensa. Uma espada, chave, compra ou item persistente exigiria decisão do servidor e comunicação validada, ensinadas no Módulo 5.</p></aside>
+          <section class="practice-card"><p class="practice-label">Prática guiada · início do Projeto 4</p><h3>Monte uma lanterna que se limpa ao desequipar</h3><ol class="step-list"><li>Com o teste parado, em StarterPack crie Tool <code>Lanterna</code>. Defina <code>RequiresHandle = true</code> e <code>CanBeDropped = false</code>.</li><li>Dentro da Tool, crie Part <code>Handle</code>: Size 1,1,2; Anchored false; CanCollide false; Massless true. Deve existir somente um Handle.</li><li>Dentro de Handle, crie PointLight <code>Luz</code>: Enabled false; Range 24; Brightness 2.</li><li>Dentro de Lanterna, crie LocalScript <code>ControleLanterna</code>. Ele executa no cliente quando a cópia da Tool chega ao Backpack.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ControleLanterna.client.luau</strong><small>LocalScript · game → StarterPack → Lanterna · cliente</small></div><button class="copy-button" type="button" data-copy-target="codigo-403" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-403"><code>local tool = script.Parent
+local handle = tool:WaitForChild("Handle")
+local luz = handle:WaitForChild("Luz")
+
+local INTERVALO = 0.25
+local ligada = false
+local emCooldown = false
+
+local function aplicarEstado()
+	luz.Enabled = ligada
+	print("Lanterna ligada?", ligada)
+end
+
+local function aoAtivar()
+	if emCooldown then
+		return
+	end
+
+	emCooldown = true
+	ligada = not ligada
+	aplicarEstado()
+
+	task.delay(INTERVALO, function()
+		emCooldown = false
+	end)
+end
+
+local function aoDesequipar()
+	ligada = false
+	aplicarEstado()
+end
+
+tool.Activated:Connect(aoAtivar)
+tool.Unequipped:Connect(aoDesequipar)</code></pre></div>
+            <p><code>ligada</code> é o estado visual; <code>emCooldown</code> controla frequência. <code>Activated</code> representa click, toque ou gatilho traseiro conforme a Tool. <code>Unequipped</code> restaura um estado previsível.</p><ol class="step-list" start="5"><li>Use Play. Selecione o slot da lanterna e ative. A PointLight deve alternar e o Output do cliente deve informar o estado.</li><li>Desequipe com outra tecla/slot: a luz deve apagar. Equipe novamente e confirme.</li><li>Use Reset Character. O Backpack e a Tool são recriados a partir do StarterPack; a nova lanterna começa apagada.</li><li>No Explorer do teste, observe a Tool sair de Backpack e entrar no Character quando equipada.</li></ol><p><strong>Diagnóstico:</strong> personagem preso geralmente indica Handle Anchored; ferramenta invisível no slot indica que ela não está em StarterPack; espera infinita indica nome incorreto de Handle ou Luz. Use Stop, corrija o molde em StarterPack e teste novamente.</p>
+          </section>
+          <section><h3>Exercícios e incremento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Altere Range e Brightness e registre qual combinação continua confortável.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Adicione uma segunda PointLight de cor diferente e alterne ambas pela mesma função.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Crie três estados locais — apagada, fraca e forte — avançando circularmente sem usar conceito futuro.</p></article></div><p><strong>Projeto 4 iniciado:</strong> lanterna física, estado local, cooldown e limpeza já funcionam. No próximo capítulo, o input sai do evento genérico da Tool e entra em ações nomeadas.</p><ul class="check-list"><li>StarterPack é molde; Backpack é inventário vivo.</li><li>Tool física exige um único Handle não ancorado.</li><li>Eventos de input da Tool são tratados no cliente.</li><li>Efeito importante para outros jogadores exigiria servidor.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> não existe um único valor ideal; compare alcance, claridade e desconforto visual. Uma resposta válida registra os valores testados.</p><p><strong>Intermediário:</strong> obtenha a segunda luz com WaitForChild e atribua <code>Enabled = ligada</code> dentro de <code>aplicarEstado()</code>.</p><p><strong>Desafiador:</strong> use <code>local estado = 0</code>, avance com <code>estado = (estado + 1) % 3</code> e escolha Enabled/Brightness com condições. Várias soluções são válidas.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: 26/08/2026.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Tool, Handle e posição no inventário</td><td><a href="https://create.roblox.com/docs/players/tools" target="_blank" rel="noopener noreferrer">In-game tools</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/Tool" target="_blank" rel="noopener noreferrer">Tool API</a></td><td><a href="https://youtube.com/playlist?list=PLhieaQmOk7nIoGnFoACf33M3o0BOqB38a" target="_blank" rel="noopener noreferrer">Advanced Scripting — TheDevKing</a></td><td>Atual e recomendada</td><td>Handle único, não ancorado, e responsabilidades locais explicitadas.</td></tr><tr><td>StarterPack → Backpack no spawn</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/StarterPack" target="_blank" rel="noopener noreferrer">StarterPack</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/Backpack" target="_blank" rel="noopener noreferrer">Backpack</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Respawn testado; inventário persistente não foi prometido.</td></tr><tr><td>Activated/Unequipped no cliente</td><td><a href="https://create.roblox.com/docs/players/tools#implement-tool-effects" target="_blank" rel="noopener noreferrer">Tool effects</a></td><td>Vídeo não analisado integralmente</td><td>Atual, mas depende do contexto</td><td>Somente efeito visual local; servidor será acrescentado para efeitos autoritativos.</td></tr></tbody></table></div><p>“Tools — #1” pode ser usado apenas como estudo histórico depois da prática. Compare input e divisão cliente-servidor com a documentação atual; reconstrua a lanterna e acrescente o estado fraco. Não foi possível validar integralmente o vídeo nesta execução.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-02" data-previous-chapter>← 4.2</a><a class="button primary" href="#capitulo-04" data-next-chapter>4.4 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-04" aria-labelledby="titulo-04">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 4.4</p><h2 id="titulo-04">Input Action System: teclado e gamepad</h2><p>Nomeie a intenção primeiro; associe teclas e botões depois.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-04-capitulo-04"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e termos</h3><p><strong>Pré-requisitos:</strong> 4.2 e 4.3. Neste primeiro contato não existe botão touch: ScreenGui e GuiButton ainda não foram ensinados.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Ação</dt><dd>Intenção do jogo, como AlternarLanterna, independente do dispositivo.</dd></div><div class="glossary-item"><dt>Binding</dt><dd>Associação entre uma ação e uma entrada física ou botão de UI.</dd></div><div class="glossary-item"><dt>InputContext</dt><dd>Grupo de ações ativas em uma fase do jogo.</dd></div><div class="glossary-item"><dt>Bool</dt><dd>Tipo de ação com estados pressionado e liberado.</dd></div><div class="glossary-item"><dt>Input analógico</dt><dd>Entrada que pode variar, como gatilho ou direcional; não será necessária para alternar a luz.</dd></div></dl><div class="concept-diagram" aria-label="Uma ação com dois bindings"><div><strong>Tecla L</strong><span>binding teclado</span></div><span class="concept-arrow">→</span><div><strong>AlternarLanterna</strong><span>ação Bool</span></div><span class="concept-arrow">←</span><div><strong>ButtonY</strong><span>binding gamepad</span></div></div></section>
+          <aside class="callout attention"><strong>Não substitua controles padrão sem motivo</strong><p>Movimento, câmera, menu e outros inputs possuem bindings conhecidos e alguns reservados. Escolha L e ButtonY para esta prática e verifique conflitos no seu projeto.</p></aside>
+          <section class="practice-card"><p class="practice-label">Prática guiada · Projeto 4 multiplataforma, parte 1</p><h3>Converta a lanterna para uma ação</h3><ol class="step-list"><li>Selecione Workspace e, em Properties, defina <code>PlayerScriptsUseInputActionSystem = Enabled</code>, conforme a recomendação atual.</li><li>Em ReplicatedStorage crie Folder <code>Inputs</code>. Dentro, crie InputContext <code>Jogabilidade</code>, Enabled true.</li><li>Dentro do contexto, crie InputAction <code>AlternarLanterna</code>, Type Bool.</li><li>Dentro da ação, crie dois InputBindings: <code>Teclado</code> com KeyCode L e <code>Gamepad</code> com KeyCode ButtonY.</li><li>Apague <code>StarterPack → Lanterna → ControleLanterna</code> para que a mesma intenção não seja processada duas vezes.</li><li>Dentro de AlternarLanterna, crie Script <code>AoAlternarLanterna</code>, RunContext Client.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>AoAlternarLanterna.client.luau</strong><small>Script · ReplicatedStorage → Inputs → Jogabilidade → AlternarLanterna · cliente</small></div><button class="copy-button" type="button" data-copy-target="codigo-404" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-404"><code>local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local inputAction = script.Parent
+
+local ligada = false
+
+local function encontrarLanternaEquipada()
+	local character = player.Character
+	if not character then
+		return nil
+	end
+	return character:FindFirstChild("Lanterna")
+end
+
+local function aoPressionar()
+	local lanterna = encontrarLanternaEquipada()
+	if not lanterna or not lanterna:IsA("Tool") then
+		warn("Equipe a Lanterna antes de usar a ação.")
+		return
+	end
+
+	local handle = lanterna:FindFirstChild("Handle")
+	local luz = handle and handle:FindFirstChild("Luz")
+	if not luz or not luz:IsA("PointLight") then
+		warn("A Lanterna equipada não possui Handle/Luz válidos.")
+		return
+	end
+
+	ligada = not ligada
+	luz.Enabled = ligada
+	print("AlternarLanterna recebeu input. Ligada?", ligada)
+end
+
+inputAction.Pressed:Connect(aoPressionar)
+
+player.CharacterRemoving:Connect(function()
+	ligada = false
+end)</code></pre></div>
+            <p>O Script escuta a ação, não a tecla. A guard clause exige a Tool equipada e valida sua estrutura. O estado é local e reinicia quando o Character é removido.</p><ol class="step-list" start="7"><li>Use Play, equipe a lanterna e pressione L. Ela deve alternar uma vez por pressão.</li><li>Abra Test → Controller Emulator, escolha um gamepad e pressione ButtonY. O mesmo callback deve executar.</li><li>Pressione L sem equipar. Espere warning, não erro. Use Stop para recomeçar.</li></ol><p><strong>Se a ação não dispara:</strong> confira Workspace.PlayerScriptsUseInputActionSystem, hierarquia InputContext → InputAction → InputBinding, Type Bool, Enabled e RunContext Client. Se dispara duas vezes, procure o LocalScript antigo da Tool ou bindings duplicados.</p>
+          </section>
+          <section><h3>Pressed, Released e StateChanged</h3><p>Para uma ação Bool, <code>Pressed</code> ocorre na transição false → true e <code>Released</code> na volta. <code>StateChanged</code> serve para observar ambos. Gatilhos analógicos usam limiares de pressão e liberação; para um simples alternador, Pressed é suficiente e evita alternar também ao soltar.</p><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Troque a tecla L por F e comprove que o código não mudou.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Conecte Released apenas para imprimir “soltou”, sem alterar a luz.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Crie outro contexto desativado e explique, com teste, por que sua ação não dispara até Enabled virar true.</p></article></div><p><strong>Incremento do Projeto 4:</strong> teclado e gamepad agora convergem para a mesma intenção. Touch permanece pendente de propósito até 4.6.</p><ul class="check-list"><li>Ação descreve intenção; binding descreve hardware.</li><li>Uma ação Bool oferece Pressed e Released.</li><li>O código não precisa conhecer cada tecla.</li><li>Nenhuma GUI foi usada antes de ser ensinada.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> altere apenas KeyCode do binding Teclado. A função continua conectada à ação.</p><p><strong>Intermediário:</strong> use <code>inputAction.Released:Connect(function() print("soltou") end)</code>. Não inverta <code>ligada</code> nessa conexão.</p><p><strong>Desafiador:</strong> um InputContext desabilitado também desabilita suas ações. Depois do teste, volte ao contexto Jogabilidade para não criar conflito.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: 26/08/2026.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>InputContext, InputAction e InputBinding</td><td><a href="https://create.roblox.com/docs/input/input-action-system" target="_blank" rel="noopener noreferrer">Input Action System</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/InputAction" target="_blank" rel="noopener noreferrer">InputAction</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/InputBinding" target="_blank" rel="noopener noreferrer">InputBinding</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Primeira passagem limitada a teclado e gamepad.</td></tr><tr><td>Pressed/Released em ação Bool</td><td><a href="https://create.roblox.com/docs/input/input-action-system#input-events" target="_blank" rel="noopener noreferrer">Input events</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Alternância apenas em Pressed.</td></tr><tr><td>InputAction:Fire()</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/InputAction" target="_blank" rel="noopener noreferrer">InputAction API</a></td><td>Não utilizada</td><td>Antiga ou obsoleta</td><td>Não usado; eventos e bindings atuais substituem a abordagem.</td></tr></tbody></table></div><p>Nenhuma playlist foi associada: vídeos de GUI só entram após ScreenGui e GuiButton, no capítulo seguinte.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-03" data-previous-chapter>← 4.3</a><a class="button primary" href="#capitulo-05" data-next-chapter>4.5 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-05" aria-labelledby="titulo-05">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 4.5</p><h2 id="titulo-05">Fundamentos de GUI e interação</h2><p>Organize informação em uma hierarquia visual e use um botão que fala a linguagem de vários dispositivos.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-04-capitulo-05"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e termos</h3><p><strong>Pré-requisitos:</strong> 4.1 e 4.2; a noção de ação de 4.4 ajuda, mas esta GUI ainda não é um binding touch.</p><dl class="glossary-grid"><div class="glossary-item"><dt>GUI</dt><dd>Interface gráfica que apresenta informação ou recebe escolhas.</dd></div><div class="glossary-item"><dt>ScreenGui</dt><dd>Contêiner de interface desenhada na tela do jogador.</dd></div><div class="glossary-item"><dt>Frame</dt><dd>Retângulo usado para agrupar e organizar objetos visuais.</dd></div><div class="glossary-item"><dt>TextLabel</dt><dd>Texto informativo, sem ação de botão.</dd></div><div class="glossary-item"><dt>GuiButton</dt><dd>Base de TextButton e ImageButton, com evento Activated.</dd></div><div class="glossary-item"><dt>UDim2</dt><dd>Posição ou tamanho em Scale relativo mais Offset em pixels.</dd></div><div class="glossary-item"><dt>AnchorPoint</dt><dd>Ponto do próprio objeto usado como origem de posicionamento.</dd></div></dl></section>
+          <section><h3>Da tela para os filhos</h3><div class="concept-diagram" aria-label="Hierarquia do HUD"><div><strong>StarterGui</strong><span>molde</span></div><span class="concept-arrow">→</span><div><strong>HUDPercurso</strong><span>ScreenGui</span></div><span class="concept-arrow">→</span><div><strong>Painel</strong><span>Frame</span></div><span class="concept-arrow">→</span><div><strong>Textos e botão</strong><span>GuiObjects</span></div></div><p>Ao entrar, o conteúdo de StarterGui é copiado para PlayerGui. Scale acompanha o tamanho do contêiner; Offset mantém pixels fixos. Um painel pode usar ambos. <code>AnchorPoint = 0.5, 0</code> faz a posição referir-se ao centro superior do próprio painel.</p></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada · Projeto 5</p><h3>Construa um HUD para o checkpoint</h3><ol class="step-list"><li>Em StarterGui, crie ScreenGui <code>HUDPercurso</code>. Defina ResetOnSpawn false e ScreenInsets CoreUISafeInsets.</li><li>Dentro, crie Frame <code>Painel</code>: AnchorPoint 0.5,0; Position <code>{0.5,0},{0,20}</code>; Size <code>{0.8,0},{0,150}</code>; BackgroundColor3 escuro; BackgroundTransparency 0.1.</li><li>Dentro do painel, crie TextLabel <code>Titulo</code> com Text “Percurso”, BackgroundTransparency 1, TextScaled false e TextSize 24.</li><li>Crie TextLabel <code>CheckpointAtual</code> com Text “Checkpoint: Início”, BackgroundTransparency 1, TextWrapped true.</li><li>Crie TextLabel <code>Mensagem</code> com Text “Atravesse o percurso.” e BackgroundTransparency 1.</li><li>Crie TextButton <code>BotaoMensagem</code> com Text “Ver objetivo”, Active true, Selectable true e tamanho mínimo confortável.</li><li>Posicione os quatro filhos sem sobreposição, usando Scale horizontal e Offset vertical. Dentro de HUDPercurso, crie LocalScript <code>ControleHUD</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ControleHUD.client.luau</strong><small>LocalScript · game → StarterGui → HUDPercurso · cliente · ao receber PlayerGui</small></div><button class="copy-button" type="button" data-copy-target="codigo-405" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-405"><code>local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local hud = script.Parent
+local painel = hud:WaitForChild("Painel")
+local checkpointLabel = painel:WaitForChild("CheckpointAtual")
+local mensagemLabel = painel:WaitForChild("Mensagem")
+local botao = painel:WaitForChild("BotaoMensagem")
+
+local function atualizarCheckpoint()
+	local nome = player:GetAttribute("CheckpointAtual") or "Início"
+	checkpointLabel.Text = "Checkpoint: " .. nome
+
+	if nome == "Checkpoint 1" then
+		mensagemLabel.Text = "Checkpoint alcançado. Teste o respawn!"
+	else
+		mensagemLabel.Text = "Atravesse o obstáculo e alcance o checkpoint."
+	end
+end
+
+botao.Activated:Connect(function()
+	mensagemLabel.Text = "Objetivo: alcance o Checkpoint 1 sem desistir."
+end)
+
+player:GetAttributeChangedSignal("CheckpointAtual"):Connect(atualizarCheckpoint)
+atualizarCheckpoint()</code></pre></div>
+            <p>O servidor do capítulo 4.1 define o atributo; a cópia do cliente observa e apresenta. <code>Activated</code> é preferível a eventos exclusivos de mouse porque reúne click, toque e ativação por gamepad. O botão só muda uma mensagem local, não o checkpoint.</p><ol class="step-list" start="8"><li>Use Play. O painel deve ficar no topo, dentro da área segura. Ative o botão com mouse.</li><li>Alcance Checkpoint1; o texto deve mudar sem polling. Use Reset Character e confirme que HUD e checkpoint permanecem durante a sessão.</li><li>No Controller Emulator, navegue até o botão e ative-o. Se o foco não aparece, confirme Selectable e se existe outro objeto capturando seleção.</li></ol><p><strong>Diagnóstico:</strong> GUI ausente geralmente indica objeto fora de StarterGui ou Enabled false; texto não atualiza indica nome do atributo divergente ou SistemaDePercurso inativo; sobreposição indica Position/Size incorretos. Stop restaura a cópia de PlayerGui; edite sempre o molde em StarterGui.</p>
+          </section>
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Troque o AnchorPoint do painel e reposicione-o mantendo o mesmo centro visual.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Crie um segundo botão “Ocultar dica” que alterna Visible da Mensagem.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Crie Checkpoint2 no servidor e adapte o HUD com mensagens distintas sem polling.</p></article></div><p><strong>Incremento do Projeto 5:</strong> o checkpoint de sessão agora possui HUD e feedback. A responsividade completa e o botão touch da lanterna chegam em 4.6.</p><ul class="check-list"><li>Conheço a hierarquia StarterGui → ScreenGui → GuiObjects.</li><li>Distingo Scale e Offset.</li><li>Posiciono a partir de AnchorPoint consciente.</li><li>Uso Activated para interação ampla.</li><li>GUI apresenta estado; não concede recompensa.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> se AnchorPoint mudar de 0.5,0 para 0,0, a posição passa a apontar para o canto esquerdo; ajuste Position para preservar o local.</p><p><strong>Intermediário:</strong> no Activated, use <code>mensagemLabel.Visible = not mensagemLabel.Visible</code> e atualize o texto do botão para indicar a próxima ação.</p><p><strong>Desafiador:</strong> o servidor define “Checkpoint 2”; a função local acrescenta uma condição. Outra solução válida é uma tabela local de mensagens por nome.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: 26/08/2026.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>ScreenGui, Frame e TextLabel</td><td><a href="https://create.roblox.com/docs/ui" target="_blank" rel="noopener noreferrer">User interface</a>, <a href="https://create.roblox.com/docs/ui/frames" target="_blank" rel="noopener noreferrer">Frames</a> e <a href="https://create.roblox.com/docs/ui/labels" target="_blank" rel="noopener noreferrer">Labels</a></td><td><a href="https://youtube.com/playlist?list=PLQ1Qd31Hmi3Xnlu8u9hCYClLurMQYJIrz" target="_blank" rel="noopener noreferrer">GUI — BrawlDev</a></td><td>Atual e recomendada</td><td>Hierarquia e estado apresentados antes do touch binding.</td></tr><tr><td>UDim2 e AnchorPoint</td><td><a href="https://create.roblox.com/docs/ui/position-and-size" target="_blank" rel="noopener noreferrer">Position and size UI objects</a></td><td>Não utilizada como autoridade</td><td>Atual e recomendada</td><td>Scale e Offset explicados sem posições mágicas.</td></tr><tr><td>GuiButton.Activated</td><td><a href="https://create.roblox.com/docs/ui/buttons" target="_blank" rel="noopener noreferrer">Text &amp; image buttons</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/GuiButton" target="_blank" rel="noopener noreferrer">GuiButton API</a></td><td>Playlist não validada integralmente</td><td>Atual e recomendada</td><td>Activated usado no lugar de evento exclusivo de mouse.</td></tr></tbody></table></div><div class="callout tip"><strong>Complemento opcional · GUI — BrawlDev</strong><p>Escolha uma aula de primeira tela somente depois de concluir o HUD. Observe hierarquia, nomes e eventos; refaça sem copiar posições fixas e troque eventos exclusivos de mouse por Activated quando aplicável. <strong>Desafio:</strong> centralize o painel com AnchorPoint.</p></div><p>Não foi possível confirmar e analisar integralmente uma aula específica da playlist nesta execução.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-04" data-previous-chapter>← 4.4</a><a class="button primary" href="#capitulo-06" data-next-chapter>4.6 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-06" aria-labelledby="titulo-06">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 4.6</p><h2 id="titulo-06">Touch, responsividade, acessibilidade e localização</h2><p>Complete a mesma ação em telas, distâncias e dispositivos diferentes.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-04-capitulo-06"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 4.4 e 4.5. Agora ScreenGui e GuiButton já são conhecidos, então podemos criar o binding touch sem antecipar conceitos.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Responsivo</dt><dd>Layout que se reorganiza ou redimensiona conforme a tela.</dd></div><div class="glossary-item"><dt>Área segura</dt><dd>Região não coberta por top bar, recortes de câmera ou bordas problemáticas.</dd></div><div class="glossary-item"><dt>Foco</dt><dd>Elemento atualmente selecionado para teclado/gamepad.</dd></div><div class="glossary-item"><dt>Contraste</dt><dd>Diferença visual suficiente entre conteúdo e fundo.</dd></div><div class="glossary-item"><dt>Localização</dt><dd>Preparação e tradução do conteúdo para idiomas e formatos diferentes.</dd></div><div class="glossary-item"><dt>Device Emulator</dt><dd>Ferramenta do Studio para simular telas e orientações.</dd></div></dl></section>
+          <section><h3>Adaptação não é apenas encolher</h3><p>Um telefone vertical, um tablet e uma TV mudam espaço, distância de leitura e input. Use Scale para proporções, Offset para limites legíveis, áreas seguras para recortes, contraste para fundos 3D imprevisíveis e botões alcançáveis pelo polegar. Textos traduzidos podem crescer; reserve espaço e use TextWrapped.</p><div class="table-wrap"><table><thead><tr><th>Risco</th><th>Decisão desta prática</th></tr></thead><tbody><tr><td>Notch/top bar cobre conteúdo</td><td>ScreenInsets = CoreUISafeInsets</td></tr><tr><td>Painel largo demais em celular</td><td>largura relativa com limite por UISizeConstraint</td></tr><tr><td>Texto traduzido cresce</td><td>TextWrapped e área vertical suficiente</td></tr><tr><td>Gamepad não alcança botão</td><td>Selectable true e teste de foco</td></tr><tr><td>Touch conflita com controles padrão</td><td>botão na zona direita acessível, sem cobrir pulo</td></tr></tbody></table></div></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · Projetos 4 e 5 concluídos</p><h3>Adicione touch e adapte o HUD</h3><ol class="step-list"><li>Em <code>StarterGui → HUDPercurso</code>, confirme ScreenInsets CoreUISafeInsets e ClipToDeviceSafeArea true.</li><li>Dentro de Painel, crie UISizeConstraint <code>LimitesPainel</code>: MinSize 280,150 e MaxSize 720,220. Mantenha largura do Painel em Scale.</li><li>Nos TextLabels, use TextWrapped true. Evite TextScaled em parágrafos; escolha TextSize legível e teste.</li><li>Dentro de HUDPercurso, crie TextButton <code>BotaoLanterna</code>: Text “Lanterna”; AnchorPoint 1,1; Position <code>{1,-24},{1,-120}</code>; Size <code>{0,120},{0,56}</code>; Active/Selectable true. Ele fica fora de Painel para ter zona própria.</li><li>Selecione <code>ReplicatedStorage → Inputs → Jogabilidade → AlternarLanterna</code> e crie terceiro InputBinding <code>Touch</code>. Na propriedade UIButton, selecione <code>StarterGui → HUDPercurso → BotaoLanterna</code>.</li><li>Não adicione outro LocalScript ao botão. O binding encaminha sua pressão para a mesma InputAction de 4.4.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>Árvore final do input</strong><small>Estrutura para conferir · não é código Luau</small></div><button class="copy-button" type="button" data-copy-target="codigo-406-arvore" data-copy-label="Copiar estrutura">Copiar estrutura</button></div><pre id="codigo-406-arvore"><code>game
+├─ ReplicatedStorage
+│  └─ Inputs
+│     └─ Jogabilidade [InputContext]
+│        └─ AlternarLanterna [InputAction: Bool]
+│           ├─ Teclado [InputBinding: L]
+│           ├─ Gamepad [InputBinding: ButtonY]
+│           ├─ Touch [InputBinding: UIButton → BotaoLanterna]
+│           └─ AoAlternarLanterna [Script: RunContext Client]
+└─ StarterGui
+   └─ HUDPercurso [ScreenGui]
+      ├─ Painel [Frame]
+      ├─ BotaoLanterna [TextButton]
+      └─ ControleHUD [LocalScript]</code></pre></div>
+            <p>O terceiro binding não cria uma segunda mecânica. Ele oferece outra entrada para a mesma ação, que continua validando se a Tool está equipada.</p><ol class="step-list" start="7"><li>Use Test → Device Emulator em telefone vertical. Equipe a lanterna e toque BotaoLanterna; a luz deve alternar. O botão não pode cobrir pulo ou thumbstick.</li><li>Teste em cerca de 375 px de largura, tablet perto de 768 px e desktop amplo. Confirme painel dentro da área segura, texto sem corte e botão alcançável.</li><li>Teste teclado L e Controller Emulator ButtonY novamente. Os três caminhos devem produzir o mesmo log.</li><li>Com gamepad, alcance BotaoMensagem e BotaoLanterna pelo foco. Confirme contorno visível e Activated no botão de mensagem.</li><li>Troque textos por versões propositalmente longas, como “Ponto de verificação intermediário alcançado”, e confirme quebra sem sobreposição.</li></ol><p><strong>Se touch falhar:</strong> confirme que UIButton aponta para o TextButton correto, a ação é Bool e o contexto está Enabled. Se a GUI é cortada, verifique ScreenInsets/ClipToDeviceSafeArea e MaxSize. Se gamepad não seleciona, confirme Selectable e ausência de sobreposição invisível. Para desfazer, remova só o binding Touch e o BotaoLanterna; teclado/gamepad continuam intactos.</p>
+          </section>
+          <section><h3>Prepare a localização sem fingir tradução</h3><p>Mantenha textos visíveis em objetos de texto com <code>AutoLocalize</code> habilitado quando usar captura automática. Publicação, idiomas e revisão da tabela de localização pertencem a um módulo posterior. Tradução automática não dispensa revisão humana: nomes próprios, contexto e comprimento precisam ser verificados.</p><aside class="callout tip"><strong>Teste de acessibilidade</strong><p>Afaste-se da tela, reduza o brilho, use cenário claro e escuro, tente apenas gamepad e depois apenas touch. Cor não deve ser a única forma de comunicar estado; combine texto, forma ou ícone. Mantivemos <code>TextScaled = false</code> para não impedir a preferência de tamanho de texto do jogador; se você animar a GUI no futuro, consulte <code>GuiService.ReducedMotionEnabled</code> e ofereça uma alternativa sem deslocamento.</p></aside></section>
+          <section><h3>Exercícios e projetos</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Mova o botão touch sem cobrir controles reservados em telefone e tablet; registre duas posições.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Crie estados de texto “Lanterna ligada/desligada” além da diferença luminosa.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Projete uma matriz de teste com três larguras, duas orientações e três inputs; registre esperado e observado.</p></article></div><p><strong>Projeto 4 concluído:</strong> ferramenta utilizável com teclado, gamepad e touch, estado previsível e efeito local claramente delimitado. <strong>Projeto 5 concluído:</strong> checkpoint de sessão, restauração no respawn, HUD, feedback, área segura, foco e adaptação de tela.</p><ul class="check-list"><li>Touch foi adicionado somente após GuiButton.</li><li>Os três inputs alimentam a mesma ação.</li><li>HUD respeita área segura e tamanhos diferentes.</li><li>Foco e contraste são verificáveis.</li><li>Textos suportam expansão e futura localização.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> não há coordenada universal. Uma solução válida mantém o botão perto do polegar direito, acima/ao lado do pulo e testa telefone e tablet.</p><p><strong>Intermediário:</strong> adicione TextLabel <code>EstadoLanterna</code>. Atualizá-lo diretamente no Script da ação é válido nesta etapa porque é apresentação local; use WaitForChild no PlayerGui.</p><p><strong>Desafiador:</strong> a matriz contém ao menos 18 combinações. Para cada uma, confira legibilidade, sobreposição, foco, ação e checkpoint. Uma falha reproduzível deve indicar dispositivo, orientação e passo.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: 26/08/2026.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>InputBinding.UIButton para touch</td><td><a href="https://create.roblox.com/docs/input/input-action-system" target="_blank" rel="noopener noreferrer">Input Action System</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/InputBinding#UIButton" target="_blank" rel="noopener noreferrer">InputBinding.UIButton</a></td><td><a href="https://youtube.com/playlist?list=PLQ1Qd31Hmi3Xnlu8u9hCYClLurMQYJIrz" target="_blank" rel="noopener noreferrer">GUI — BrawlDev</a></td><td>Atual e recomendada</td><td>Binding touch adiado até depois dos fundamentos de GUI.</td></tr><tr><td>UDim2, zonas móveis e área segura</td><td><a href="https://create.roblox.com/docs/ui/position-and-size" target="_blank" rel="noopener noreferrer">Position and size</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/ScreenGui" target="_blank" rel="noopener noreferrer">ScreenGui</a> e <a href="https://create.roblox.com/docs/production/publishing/adaptive-design" target="_blank" rel="noopener noreferrer">Adaptive design</a></td><td>Playlist não usada como autoridade</td><td>Atual e recomendada</td><td>CoreUISafeInsets, constraints e testes em múltiplas telas.</td></tr><tr><td>Foco de gamepad e contraste</td><td><a href="https://create.roblox.com/docs/production/publishing/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/GuiObject#Selectable" target="_blank" rel="noopener noreferrer">GuiObject.Selectable</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Foco testável e comunicação além de cor.</td></tr><tr><td>AutoLocalize e tradução</td><td><a href="https://create.roblox.com/docs/production/localization" target="_blank" rel="noopener noreferrer">Localization</a> e <a href="https://create.roblox.com/docs/production/localization/automatic-translations" target="_blank" rel="noopener noreferrer">Automatic translation</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Preparação ensinada sem prometer qualidade automática.</td></tr></tbody></table></div><div class="callout tip"><strong>Complemento opcional · GUI — BrawlDev</strong><p>Assista a uma aula de GUI relacionada depois do teste em três dispositivos. Observe a hierarquia e reproduza o visual com layout adaptativo. Corrija posições fixas frágeis, use Activated e acrescente o binding touch atual. <strong>Desafio:</strong> faça o exemplo caber em telefone vertical sem esconder controles.</p></div><p>Uma aula específica não foi confirmada nem analisada integralmente; a documentação oficial determinou todas as decisões técnicas.</p></section><div class="chapter-pager"><a class="button" href="#capitulo-05" data-previous-chapter>← 4.5</a><a class="button primary" href="#glossario" data-next-chapter>Glossário →</a></div>
+        </div>
+      </article>
+
+      <section class="chapter reference-section" id="glossario" aria-labelledby="titulo-glossario"><div class="reading-flow"><h2 id="titulo-glossario">Glossário do módulo</h2><dl class="glossary-grid"><div class="glossary-item"><dt>Player</dt><dd>Identidade do usuário na sessão.</dd></div><div class="glossary-item"><dt>Character</dt><dd>Corpo recriável do Player.</dd></div><div class="glossary-item"><dt>Humanoid</dt><dd>Saúde, movimento e morte do Character.</dd></div><div class="glossary-item"><dt>Servidor</dt><dd>Autoridade compartilhada da sessão.</dd></div><div class="glossary-item"><dt>Cliente</dt><dd>Execução no dispositivo de um jogador.</dd></div><div class="glossary-item"><dt>RunContext</dt><dd>Lado de execução de um Script.</dd></div><div class="glossary-item"><dt>Tool</dt><dd>Objeto equipável.</dd></div><div class="glossary-item"><dt>Backpack</dt><dd>Inventário da vida atual.</dd></div><div class="glossary-item"><dt>InputAction</dt><dd>Intenção independente do hardware.</dd></div><div class="glossary-item"><dt>InputBinding</dt><dd>Entrada ligada a uma ação.</dd></div><div class="glossary-item"><dt>ScreenGui</dt><dd>Contêiner de interface em tela.</dd></div><div class="glossary-item"><dt>UDim2</dt><dd>Scale e Offset em dois eixos.</dd></div><div class="glossary-item"><dt>Área segura</dt><dd>Região não obstruída da tela.</dd></div><div class="glossary-item"><dt>Localização</dt><dd>Adaptação linguística e cultural.</dd></div></dl><div class="callout success"><strong>Módulo 4 concluído</strong><p>Você concluiu três projetos incrementais e construiu a base visual e conceitual necessária para rede segura. Continue no Módulo 5 para transformar intenções do cliente em decisões validadas pelo servidor.</p></div></div></section>
+
+      <section class="chapter reference-section" id="fontes" aria-labelledby="titulo-fontes"><div class="reading-flow"><h2 id="titulo-fontes">Fontes oficiais consolidadas</h2><p>Consultadas em 26 de agosto de 2026.</p><ul><li><a href="https://create.roblox.com/docs/players" target="_blank" rel="noopener noreferrer">Players</a>, <a href="https://create.roblox.com/docs/characters" target="_blank" rel="noopener noreferrer">Characters</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/Players" target="_blank" rel="noopener noreferrer">Players API</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/Humanoid" target="_blank" rel="noopener noreferrer">Humanoid API</a></li><li><a href="https://create.roblox.com/docs/scripting/locations" target="_blank" rel="noopener noreferrer">Script types and locations</a>, <a href="https://create.roblox.com/docs/projects/client-server" target="_blank" rel="noopener noreferrer">Client-server runtime</a> e <a href="https://create.roblox.com/docs/scripting/module" target="_blank" rel="noopener noreferrer">ModuleScripts</a></li><li><a href="https://create.roblox.com/docs/players/tools" target="_blank" rel="noopener noreferrer">In-game tools</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/Tool" target="_blank" rel="noopener noreferrer">Tool</a>, <a href="https://create.roblox.com/docs/reference/engine/classes/StarterPack" target="_blank" rel="noopener noreferrer">StarterPack</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/Backpack" target="_blank" rel="noopener noreferrer">Backpack</a></li><li><a href="https://create.roblox.com/docs/input/input-action-system" target="_blank" rel="noopener noreferrer">Input Action System</a>, <a href="https://create.roblox.com/docs/input/mouse-and-keyboard" target="_blank" rel="noopener noreferrer">mouse e teclado</a> e <a href="https://create.roblox.com/docs/input/gamepad" target="_blank" rel="noopener noreferrer">gamepad</a></li><li><a href="https://create.roblox.com/docs/ui" target="_blank" rel="noopener noreferrer">UI</a>, <a href="https://create.roblox.com/docs/ui/position-and-size" target="_blank" rel="noopener noreferrer">posição e tamanho</a>, <a href="https://create.roblox.com/docs/ui/buttons" target="_blank" rel="noopener noreferrer">botões</a>, <a href="https://create.roblox.com/docs/production/publishing/adaptive-design" target="_blank" rel="noopener noreferrer">adaptive design</a> e <a href="https://create.roblox.com/docs/production/localization" target="_blank" rel="noopener noreferrer">localização</a></li></ul><div class="button-row"><a class="button" href="modulo-03.html">Módulo 3</a><a class="button primary" href="modulo-05.html">Módulo 5</a></div></div></section>
+    </div>
+  </main>
+  <footer class="site-footer"><p>Módulo 4 completo · conteúdo técnico consultado em 26 de agosto de 2026.</p></footer>
+</body>
+</html>
+
+

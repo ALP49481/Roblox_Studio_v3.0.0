@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Módulo 6 da Apostila Roblox Studio: arquitetura modular, máquinas de estado, depuração, testes, versões e colaboração.">
+  <title>Módulo 6 — Arquitetura, estados, depuração e colaboração</title>
+  <link rel="stylesheet" href="../assets/styles.css?v=20260826-11"><script src="../assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a><div class="header-actions"><a class="button" href="../index.html#modulos">Todos os módulos</a><a class="button" href="../conta.html" data-account-label>Conta</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div></div></header>
+
+  <main class="module-shell" id="conteudo">
+    <aside class="module-sidebar" data-module-sidebar data-collapsed="false">
+      <button class="button mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="true">Ocultar capítulos</button>
+      <h2>Módulo 6</h2><p>Arquitetura, estados, depuração e colaboração</p>
+      <nav class="chapter-nav" aria-label="Capítulos do Módulo 6"><a href="#capitulo-01">6.1 Módulos e contratos</a><a href="#capitulo-02">6.2 Composição e estados</a><a href="#capitulo-03">6.3 Debug e regressão</a><a href="#capitulo-04">6.4 Versões e colaboração</a><a href="#referencias-modulo">Glossário e fontes</a></nav>
+      <div class="sidebar-extra"><div class="progress-track" role="progressbar" aria-label="Progresso do módulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" data-progress-fill data-progress-scope="6"></div></div><p class="progress-label" data-progress-label data-progress-scope="6">0 de 4 capítulos disponíveis concluídos · 0%</p><p><small>Alt + ← e Alt + → alternam seções.</small></p></div>
+    </aside>
+
+    <div class="module-content">
+      <section class="module-intro" aria-labelledby="titulo-modulo"><span class="eyebrow">Dificuldade 3/5 · intermediária</span><h1 id="titulo-modulo">Organize para mudar sem quebrar — e prove cada mudança.</h1><p class="lead">Você dividirá a loja segura em responsabilidades pequenas, construirá uma porta com estados explícitos, investigará defeitos com evidências e criará uma rotina de versão e revisão. Arquitetura não significa mais arquivos: significa limites claros.</p><ul class="lesson-map"><li><strong>Ponto de partida:</strong> tipagem Luau, eventos, cliente-servidor, validação e loja segura</li><li><strong>Projeto:</strong> concluir a Loja segura com módulos, ciclo de vida e matriz de regressão</li><li><strong>Limite consciente:</strong> o inventário continua em memória; persistência e DataStore começam somente no Módulo 7</li></ul><div class="callout tip"><strong>O teste guia a divisão</strong><p>Se uma regra pode ser testada sem Player, GUI ou rede, mantenha-a pura. Se precisa da engine, isole a borda. Assim um erro aponta para uma região menor.</p></div></section>
+
+      <article class="chapter" id="capitulo-01" aria-labelledby="titulo-01">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 6.1</p><h2 id="titulo-01"><code>ModuleScript</code>, configuração, estado e contratos tipados</h2><p>Extraia regras da loja sem perder a autoridade do servidor.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-06-capitulo-01"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos, pré-requisitos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 2.7–2.9 e 5.5. Ao terminar, você distinguirá configuração de estado, projetará uma API pública pequena, usará tipos exportados e explicará o cache de <code>require()</code>.</p><dl class="glossary-grid"><div class="glossary-item"><dt>API pública</dt><dd>Funções e tipos que o módulo oferece aos consumidores.</dd></div><div class="glossary-item"><dt>Configuração</dt><dd>Regra definida pelo desenvolvedor, como preço e limite.</dd></div><div class="glossary-item"><dt>Estado</dt><dd>Valor que muda durante a sessão, como saldo e quantidade possuída.</dd></div><div class="glossary-item"><dt>Contrato tipado</dt><dd>Descrição verificável das entradas e saídas de uma função.</dd></div><div class="glossary-item"><dt>Cache</dt><dd>Reutilização do valor retornado pelo primeiro require no mesmo ambiente.</dd></div><div class="glossary-item"><dt>Função pura</dt><dd>Função cujo resultado depende apenas dos argumentos e não altera o mundo.</dd></div></dl></section>
+          <section><h3>Um módulo não é automaticamente uma boa arquitetura</h3><p><code>require(moduleScript)</code> executa o ModuleScript uma vez e devolve seu valor. Outro <code>require()</code> no mesmo ambiente recebe a mesma referência; servidor e cliente mantêm caches separados. Por isso, alterar uma tabela retornada pode afetar todos os consumidores daquele lado.</p><div class="table-wrap"><table><thead><tr><th>Conteúdo</th><th>Exemplo</th><th>Local</th></tr></thead><tbody><tr><td>configuração pública</td><td>nome visual de item</td><td>ReplicatedStorage, se o cliente pode ler</td></tr><tr><td>regra ou segredo do servidor</td><td>concessão e inventário</td><td>ServerScriptService/ServerStorage</td></tr><tr><td>estado de sessão</td><td>saldo de um Player</td><td>serviço do servidor, não no catálogo</td></tr><tr><td>função pura</td><td>saldo ≥ preço</td><td>módulo pequeno e testável</td></tr></tbody></table></div><aside class="callout security"><strong>Compartilhado não significa secreto</strong><p>ModuleScript em ReplicatedStorage pode ser lido pelo cliente. Preços podem ser públicos, mas o servidor ainda usa sua própria cópia e decide a compra. Nunca coloque chave, token ou lógica confidencial em conteúdo replicado.</p></aside><aside class="callout error"><strong>Dependência circular</strong><p>Se A exige B e B exige A, o carregamento falha como módulo requerido recursivamente. Faça o fluxo apontar numa direção: o servidor de entrada conhece Shop; Shop conhece catálogo e economia; esses módulos não conhecem o servidor de entrada.</p></aside></section>
+
+          <section class="practice-card"><p class="practice-label">Prática guiada · Projeto 7</p><h3>Crie a estrutura modular da loja</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Primeira sala interativa com a loja de 5.5</dd></div><div><dt>Pasta</dt><dd><code>game → ServerScriptService → Loja</code></dd></div><div><dt>Módulos</dt><dd><code>ItemCatalog</code>, <code>Economy</code> e <code>Shop</code></dd></div><div><dt>Contexto</dt><dd>Somente servidor · carregados pelo bootstrap</dd></div></dl><ol class="step-list"><li>Duplique o lugar ou salve uma versão com notas antes da refatoração.</li><li>Em ServerScriptService, crie Folder <code>Loja</code>. Dentro, crie três ModuleScripts com os nomes acima.</li><li>Mova o catálogo para <code>ItemCatalog</code>. Configuração não guarda saldo nem Player.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ItemCatalog.luau</strong><small>ModuleScript · ServerScriptService/Loja · servidor · no primeiro require</small></div><button class="copy-button" type="button" data-copy-target="codigo-601-catalog" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-601-catalog"><code>--!strict
+export type ItemDefinition = {
+	id: string,
+	displayName: string,
+	price: number,
+	maxOwned: number,
+	templateName: string,
+}
+
+local definitions: {[string]: ItemDefinition} = {
+	lanterna_dourada = table.freeze({
+		id = "lanterna_dourada",
+		displayName = "Lanterna dourada",
+		price = 25,
+		maxOwned = 1,
+		templateName = "LanternaDourada",
+	}),
+}
+
+local ItemCatalog = {}
+
+function ItemCatalog.get(itemId: string): ItemDefinition?
+	return definitions[itemId]
+end
+
+function ItemCatalog.list(): {ItemDefinition}
+	local result = {}
+	for _, definition in definitions do
+		table.insert(result, definition)
+	end
+	return result
+end
+
+return table.freeze(ItemCatalog)</code></pre></div>
+            <p>O tipo exportado documenta cada item. As definições e a API são congeladas para impedir alterações acidentais; <code>list()</code> devolve uma lista nova. Congelamento melhora disciplina, não transforma ReplicatedStorage em segredo.</p><ol class="step-list" start="4"><li>Em <code>Economy</code>, deixe apenas cálculos e alterações numéricas explícitas.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>Economy.luau</strong><small>ModuleScript · ServerScriptService/Loja · servidor · no primeiro require</small></div><button class="copy-button" type="button" data-copy-target="codigo-601-economy" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-601-economy"><code>--!strict
+local Economy = {}
+
+function Economy.canAfford(balance: number, price: number): boolean
+	return math.isfinite(balance)
+		and math.isfinite(price)
+		and balance >= 0
+		and price >= 0
+		and balance >= price
+end
+
+function Economy.debit(balance: number, price: number): number?
+	if not Economy.canAfford(balance, price) then
+		return nil
+	end
+	return balance - price
+end
+
+return table.freeze(Economy)</code></pre></div>
+            <p>Essas funções não procuram Instances nem alteram IntValue. Isso permite testar saldo exato e valores inválidos sem abrir uma sessão multiplayer.</p><ol class="step-list" start="5"><li>Em <code>Shop</code>, componha catálogo e economia. O estado de inventário é recebido como argumento, não escondido dentro do catálogo.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>Shop.luau</strong><small>ModuleScript · ServerScriptService/Loja · servidor · chamado pelo bootstrap</small></div><button class="copy-button" type="button" data-copy-target="codigo-601-shop" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-601-shop"><code>--!strict
+local ItemCatalog = require(script.Parent.ItemCatalog)
+local Economy = require(script.Parent.Economy)
+
+export type Inventory = {[string]: number}
+export type Result = {ok: boolean, message: string, newBalance: number?}
+
+local Shop = {}
+
+function Shop.evaluate(
+	balance: number,
+	inventory: Inventory,
+	itemId: string
+): Result
+	local item = ItemCatalog.get(itemId)
+	if not item then
+		return {ok = false, message = "Item desconhecido.", newBalance = nil}
+	end
+
+	local owned = inventory[itemId] or 0
+	if owned >= item.maxOwned then
+		return {ok = false, message = "Limite do item alcançado.", newBalance = nil}
+	end
+
+	local newBalance = Economy.debit(balance, item.price)
+	if newBalance == nil then
+		return {ok = false, message = "Moedas insuficientes.", newBalance = nil}
+	end
+
+	return {ok = true, message = "Compra aprovada.", newBalance = newBalance}
+end
+
+return table.freeze(Shop)</code></pre></div>
+            <p><code>evaluate()</code> calcula uma decisão; não concede a Tool. O bootstrap de 5.5 continua validando remote, requestId, frequência, vida e distância. Depois chama <code>Shop.evaluate()</code> e, se <code>ok</code>, atualiza saldo/inventário e clona o molde sem yield.</p><ol class="step-list" start="6"><li>No Script ServidorDaLoja, remova CATALOGO e as comparações extraídas. Adicione <code>local Shop = require(script.Parent.Loja.Shop)</code> no topo.</li><li>No ponto já validado da transação, chame <code>local decision = Shop.evaluate(moedas.Value, inventarios[player], itemId)</code>. Se não aprovado, devolva a mensagem; se aprovado, use <code>decision.newBalance</code> após confirmar que não é nil.</li><li>Use Script Analysis: não deve haver aviso de tipo. Use Play perto do balcão e repita os testes de 5.5.</li></ol><p><strong>Resultado esperado:</strong> comportamento externo idêntico ao anterior, com regras puras isoladas. Se require falhar, confira nomes, parentes e ausência de ciclo. Para desfazer, abra a versão salva ou restaure a cópia local, nunca improvise metade da arquitetura antiga com metade da nova.</p>
+          </section>
+          <section><h3>Exercícios e incremento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Adicione um item válido ao catálogo e confirme que list() devolve dois elementos.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Crie função pura que valida quantidade inteira entre zero e maxOwned.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Desenhe o grafo de dependências da loja e prove que nenhuma seta volta ao bootstrap.</p></article></div><p><strong>Projeto 7 melhorado:</strong> catálogo, regra econômica e avaliação de compra agora possuem contratos separados. Segurança de rede permanece na borda do servidor.</p><ul class="check-list"><li>Configuração e estado não foram misturados.</li><li>API pública é menor que a implementação.</li><li>Tipos exportados descrevem dados compartilhados.</li><li>Não existe require circular.</li><li>Funções puras podem ser testadas isoladamente.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> crie outra definição congelada com id único, preço finito e limite inteiro positivo. A ordem da lista não deve ser usada como identidade.</p><p><strong>Intermediário:</strong> <code>return math.isfinite(value) and value == math.floor(value) and value >= 0 and value <= maximum</code> é uma solução possível.</p><p><strong>Desafiador:</strong> Bootstrap → Shop → ItemCatalog/Economy. ItemCatalog e Economy não exigem Shop; nenhum módulo exige Bootstrap.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>require, cache e módulos por ambiente</td><td><a href="https://create.roblox.com/docs/scripting/module" target="_blank" rel="noopener noreferrer">Reuse code</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript API</a></td><td>Vídeos avançados não analisados integralmente</td><td>Atual e recomendada</td><td>Cache e referências separadas cliente/servidor explicitados.</td></tr><tr><td>Tipos exportados e strict</td><td><a href="https://create.roblox.com/docs/luau/type-checking" target="_blank" rel="noopener noreferrer">Type checking</a> e <a href="https://luau.org/typecheck" target="_blank" rel="noopener noreferrer">Luau type checking</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Contrato de item, inventário e resultado tipado.</td></tr><tr><td>table.freeze</td><td><a href="https://luau.org/library#table-library" target="_blank" rel="noopener noreferrer">Luau table library</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Protege configuração contra mutação acidental, sem prometer confidencialidade.</td></tr><tr><td>OOP/herança de playlists</td><td><a href="https://create.roblox.com/docs/luau/metatables" target="_blank" rel="noopener noreferrer">Metatables</a></td><td>Advanced Scripting — BrawlDev/TheDevKing</td><td>Atual, mas depende do contexto</td><td>Composição e funções simples preferidas; nenhum padrão foi adotado só por aparecer em vídeo.</td></tr></tbody></table></div><p>Não foi possível analisar integralmente uma aula específica sobre módulos/OOP. Se assistir, faça depois desta prática e compare dependências, cache, estado e herança com as fontes oficiais.</p></section><div class="chapter-pager"><a class="button" href="modulo-05.html#capitulo-05" data-previous-chapter>← Rever 5.5</a><a class="button primary" href="#capitulo-02" data-next-chapter>6.2 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-02" aria-labelledby="titulo-02">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 6.2</p><h2 id="titulo-02">Composição, ciclo de vida e máquinas de estado</h2><p>Uma porta parece simples até receber dois comandos ao mesmo tempo. Organize mudanças em estados válidos e dê ao sistema começo, execução e encerramento claros.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-06-capitulo-02"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Antes de começar</h3><p><strong>Você aprenderá:</strong> composição, dependências explícitas, estados, transições e o ciclo <code>init → start → destroy</code>. <strong>Pré-requisito:</strong> 6.1, eventos de 3.1 e CFrame de 4.2.</p><dl class="glossary-inline"><div><dt>Composição</dt><dd>Construir um sistema juntando partes menores com responsabilidades diferentes.</dd></div><div><dt>Dependência</dt><dd>Serviço ou objeto de que um módulo precisa para trabalhar.</dd></div><div><dt>Estado</dt><dd>Situação atual do sistema, como <code>Closed</code> ou <code>Open</code>.</dd></div><div><dt>Transição</dt><dd>Mudança autorizada de um estado para outro.</dd></div><div><dt>Ciclo de vida</dt><dd>Fases de preparação, funcionamento e limpeza de um sistema.</dd></div></dl></section>
+          <section><h3>Um modelo mental para sistemas que mudam</h3><p>Imagine um semáforo. Ele não pula livremente para qualquer cor; há uma sequência permitida. Uma <strong>máquina de estados</strong> registra a situação atual e aceita somente mudanças válidas. Isso evita que a porta tente abrir, fechar e abrir outra vez no mesmo instante.</p><div class="flow-diagram" role="img" aria-label="Fluxo dos estados da porta: Closed para Opening, depois Open, Closing e de volta a Closed"><span>Closed</span><span aria-hidden="true">→</span><span>Opening</span><span aria-hidden="true">→</span><span>Open</span><span aria-hidden="true">→</span><span>Closing</span><span aria-hidden="true">→</span><span>Closed</span></div><p>O controlador receberá o <code>TweenService</code> pelo construtor. Essa <strong>injeção de dependência</strong> torna claro o que ele usa e facilita trocar uma dependência em testes. Não é preciso criar uma hierarquia de classes para tudo: composição costuma ser mais direta para sistemas de jogo.</p><aside class="callout security"><strong>Regra de segurança</strong><p>Esta porta reage a um <code>ProximityPrompt</code> no servidor. Se um dia um LocalScript solicitar a abertura por RemoteEvent, o servidor ainda deverá confirmar permissão, distância, estado e frequência.</p></aside></section>
+          <section><h3>Prática guiada: uma porta com estados válidos</h3><p><strong>Projeto aberto:</strong> crie uma cópia local da experiência da loja segura. Assim, a porta não interfere no projeto que já funciona.</p><ol class="step-list"><li>No Explorer, crie <code>Workspace → Arquitetura → PortaArquitetada</code>, nesta ordem: Folder, Model.</li><li>Dentro do Model, crie duas Parts: <code>Painel</code> e <code>DestinoAberto</code>. Em ambas, marque <code>Anchored = true</code>. No destino, use <code>Transparency = 1</code> e <code>CanCollide = false</code>; mova-o alguns studs para o lado.</li><li>Dentro de <code>Painel</code>, crie um <code>ProximityPrompt</code> chamado <code>AlternarPorta</code>. Defina <code>ActionText = Abrir ou fechar</code>, <code>ObjectText = Porta</code> e <code>HoldDuration = 0</code>.</li><li>Crie <code>ServerScriptService → Arquitetura → DoorController</code> como ModuleScript e substitua todo o conteúdo.</li></ol><p class="path">game → ServerScriptService → Arquitetura → DoorController</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>DoorController.luau</strong><small>ModuleScript · ServerScriptService/Arquitetura · servidor · carregado pelo bootstrap</small></div><button class="copy-button" type="button" data-copy-target="codigo-602-controller" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-602-controller"><code>--!strict
+local DoorController = {}
+DoorController.__index = DoorController
+
+export type DoorState = "Closed" | "Opening" | "Open" | "Closing"
+
+type Dependencies = {
+	TweenService: typeof(game:GetService("TweenService")),
+}
+
+type ControllerData = {
+	model: Model,
+	dependencies: Dependencies,
+	state: DoorState,
+	panel: BasePart?,
+	prompt: ProximityPrompt?,
+	closedCFrame: CFrame?,
+	openCFrame: CFrame?,
+	promptConnection: RBXScriptConnection?,
+	tweenConnection: RBXScriptConnection?,
+	activeTween: Tween?,
+	destroyed: boolean,
+}
+
+export type Controller = typeof(setmetatable({} :: ControllerData, DoorController))
+
+local VALID_TRANSITIONS: {[DoorState]: {[DoorState]: boolean}} = {
+	Closed = {Opening = true},
+	Opening = {Open = true},
+	Open = {Closing = true},
+	Closing = {Closed = true},
+}
+
+function DoorController.new(model: Model, dependencies: Dependencies): Controller
+	local self = setmetatable({
+		model = model,
+		dependencies = dependencies,
+		state = "Closed" :: DoorState,
+		panel = nil,
+		prompt = nil,
+		closedCFrame = nil,
+		openCFrame = nil,
+		promptConnection = nil,
+		tweenConnection = nil,
+		activeTween = nil,
+		destroyed = false,
+	}, DoorController)
+	return self
+end
+
+function DoorController._transition(self: Controller, nextState: DoorState): boolean
+	if not VALID_TRANSITIONS[self.state][nextState] then
+		warn(`Transição inválida: {self.state} → {nextState}`)
+		return false
+	end
+	self.state = nextState
+	self.model:SetAttribute("DoorState", nextState)
+	return true
+end
+
+function DoorController.init(self: Controller)
+	assert(not self.destroyed, "Controlador destruído não pode ser iniciado")
+	local panel = self.model:FindFirstChild("Painel")
+	local destination = self.model:FindFirstChild("DestinoAberto")
+	assert(panel and panel:IsA("BasePart"), "Painel BasePart ausente")
+	assert(destination and destination:IsA("BasePart"), "DestinoAberto BasePart ausente")
+	local prompt = panel:FindFirstChild("AlternarPorta")
+	assert(prompt and prompt:IsA("ProximityPrompt"), "ProximityPrompt ausente")
+
+	self.panel = panel
+	self.prompt = prompt
+	self.closedCFrame = panel.CFrame
+	self.openCFrame = destination.CFrame
+	self.model:SetAttribute("DoorState", self.state)
+end
+
+function DoorController._move(
+	self: Controller,
+	target: CFrame,
+	finalState: DoorState
+)
+	local panel = assert(self.panel, "init() precisa ser chamado primeiro")
+	local tween = self.dependencies.TweenService:Create(
+		panel,
+		TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{CFrame = target}
+	)
+	self.activeTween = tween
+	self.tweenConnection = tween.Completed:Connect(function(playbackState)
+		if tween ~= self.activeTween then
+			return
+		end
+		if self.tweenConnection then
+			self.tweenConnection:Disconnect()
+			self.tweenConnection = nil
+		end
+		self.activeTween = nil
+		if playbackState == Enum.PlaybackState.Completed then
+			self:_transition(finalState)
+		end
+	end)
+	tween:Play()
+end
+
+function DoorController.toggle(self: Controller)
+	if self.destroyed then
+		return
+	end
+	if self.state == "Closed" and self:_transition("Opening") then
+		self:_move(assert(self.openCFrame), "Open")
+	elseif self.state == "Open" and self:_transition("Closing") then
+		self:_move(assert(self.closedCFrame), "Closed")
+	end
+end
+
+function DoorController.start(self: Controller)
+	assert(self.prompt, "init() precisa ser chamado antes de start()")
+	assert(not self.promptConnection, "start() não pode ser chamado duas vezes")
+	self.promptConnection = self.prompt.Triggered:Connect(function()
+		self:toggle()
+	end)
+end
+
+function DoorController.destroy(self: Controller)
+	if self.destroyed then
+		return
+	end
+	self.destroyed = true
+	if self.promptConnection then
+		self.promptConnection:Disconnect()
+		self.promptConnection = nil
+	end
+	if self.tweenConnection then
+		self.tweenConnection:Disconnect()
+		self.tweenConnection = nil
+	end
+	if self.activeTween then
+		self.activeTween:Cancel()
+		self.activeTween = nil
+	end
+end
+
+return table.freeze(DoorController)</code></pre></div>
+            <p><code>new()</code> guarda dados, <code>init()</code> verifica objetos, <code>start()</code> conecta o evento e <code>destroy()</code> desfaz conexões e animações. Durante <code>Opening</code> ou <code>Closing</code>, novos acionamentos são ignorados. O atributo <code>DoorState</code> permite observar o estado em Properties.</p><ol class="step-list" start="5"><li>Crie um Script chamado <code>BootstrapPortas</code> dentro de <code>ServerScriptService → Arquitetura</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>BootstrapPortas.server.luau</strong><small>Script · ServerScriptService/Arquitetura · servidor · ao iniciar a sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-602-bootstrap" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-602-bootstrap"><code>--!strict
+local TweenService = game:GetService("TweenService")
+local DoorController = require(script.Parent.DoorController)
+
+local architecture = workspace:WaitForChild("Arquitetura")
+local doorModel = architecture:WaitForChild("PortaArquitetada")
+assert(doorModel:IsA("Model"), "PortaArquitetada precisa ser Model")
+local controller = DoorController.new(doorModel, {
+	TweenService = TweenService,
+})
+
+controller:init()
+controller:start()
+
+game:BindToClose(function()
+	controller:destroy()
+end)</code></pre></div>
+            <ol class="step-list" start="6"><li>Use Play, aproxime-se e pressione a tecla exibida pelo prompt. Observe <code>DoorState</code> no Model. Acione rapidamente: a porta não deve entrar em um estado impossível.</li><li>Use Stop. Para reiniciar, confirme as posições no modo de edição e execute Play novamente. Para desfazer, apague apenas <code>Arquitetura</code> de Workspace e ServerScriptService na cópia de teste.</li></ol><p><strong>Resultado esperado:</strong> cada interação completa uma abertura ou um fechamento. Se o Output mostrar “ausente”, confira exatamente os nomes e a hierarquia. Se a porta não se mover, compare o CFrame de <code>DestinoAberto</code> com o de <code>Painel</code>.</p>
+          </section>
+          <section><h3>Exercícios e incremento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Adicione um atributo <code>LastTransitionAt</code> com <code>workspace:GetServerTimeNow()</code> após uma transição válida.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Crie o estado <code>Locked</code> e permita ir de Closed para Locked e de Locked para Closed, sem abrir enquanto travada.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Faça o bootstrap iniciar duas portas usando dois Models, sem copiar o módulo controlador.</p></article></div><p><strong>Pequeno projeto:</strong> a arquitetura da loja ganha uma porta reutilizável, com dependências visíveis e limpeza das conexões.</p><ul class="check-list"><li>Reconheço configuração, estado e dependência.</li><li>Sei por que transições inválidas são recusadas.</li><li>Sei a responsabilidade de init, start e destroy.</li><li>Não criei dependência circular.</li><li>Consigo observar o estado no Studio.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> depois de atualizar <code>self.state</code>, use <code>self.model:SetAttribute("LastTransitionAt", workspace:GetServerTimeNow())</code>. O servidor é a fonte desse registro.</p><p><strong>Intermediário:</strong> amplie o tipo e a tabela de transições. Uma solução válida adiciona <code>Closed = {Opening = true, Locked = true}</code> e <code>Locked = {Closed = true}</code>; o <code>toggle()</code> não age em Locked.</p><p><strong>Desafiador:</strong> mantenha uma lista de Models, crie um controlador por elemento e guarde-os em uma tabela para chamar <code>destroy()</code> em todos. Não use um estado global compartilhado.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>TweenService:Create e Tween.Completed</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/TweenService" target="_blank" rel="noopener noreferrer">TweenService API</a> e <a href="https://create.roblox.com/docs/reference/engine/classes/Tween" target="_blank" rel="noopener noreferrer">Tween API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Animação tem estado final e conexão é removida.</td></tr><tr><td>Eventos e RBXScriptConnection</td><td><a href="https://create.roblox.com/docs/scripting/events" target="_blank" rel="noopener noreferrer">Events</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>destroy() evita conexão abandonada.</td></tr><tr><td>ProximityPrompt.Triggered</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/ProximityPrompt" target="_blank" rel="noopener noreferrer">ProximityPrompt API</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Executado no servidor; sistemas importantes ainda exigem validação de contexto.</td></tr><tr><td>Máquina de estados</td><td><a href="https://create.roblox.com/docs/education/battle-royale-series/managing-players" target="_blank" rel="noopener noreferrer">Exemplo oficial de estados</a></td><td>Advanced Scripting — playlists não analisadas integralmente</td><td>Atual, mas depende do contexto</td><td>Aplicada somente onde estados explícitos reduzem ambiguidade.</td></tr></tbody></table></div></section><div class="chapter-pager"><a class="button" href="#capitulo-01" data-previous-chapter>← 6.1</a><a class="button primary" href="#capitulo-03" data-next-chapter>6.3 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-03" aria-labelledby="titulo-03">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 6.3</p><h2 id="titulo-03">Depuração, testes e proteção contra regressões</h2><p>Um erro deixa de ser um mistério quando você consegue reproduzi-lo, observar evidências e confirmar a correção.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-06-capitulo-03"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Antes de começar</h3><p><strong>Você aprenderá:</strong> diferença entre erro de sintaxe, execução e lógica; leitura de stack trace; breakpoints; Watch, Call Stack e testes de regressão. <strong>Pré-requisitos:</strong> Módulo 5 e capítulos 6.1–6.2.</p><dl class="glossary-inline"><div><dt>Bug</dt><dd>Comportamento diferente do que foi especificado.</dd></div><div><dt>Reprodução</dt><dd>Sequência mínima e repetível que faz o problema aparecer.</dd></div><div><dt>Stack trace</dt><dd>Lista de chamadas que mostra o caminho até um erro.</dd></div><div><dt>Breakpoint</dt><dd>Ponto onde o depurador pausa a execução para inspecionar valores.</dd></div><div><dt>Regressão</dt><dd>Falha reaparecida ou criada ao modificar algo que funcionava.</dd></div><div><dt>Caso de teste</dt><dd>Entrada, ação e resultado esperado definidos antecipadamente.</dd></div></dl></section>
+          <section><h3>Investigue, não adivinhe</h3><p>Um fluxo confiável tem seis passos: <strong>descrever</strong> o esperado, <strong>reproduzir</strong>, <strong>reduzir</strong> o caso, <strong>observar</strong> evidências, <strong>corrigir a causa</strong> e <strong>retestar</strong>. Alterar várias linhas ao acaso destrói pistas.</p><div class="flow-diagram" role="img" aria-label="Fluxo de depuração: esperado, reproduzir, reduzir, observar, corrigir e testar novamente"><span>Esperado</span><span aria-hidden="true">→</span><span>Reproduzir</span><span aria-hidden="true">→</span><span>Reduzir</span><span aria-hidden="true">→</span><span>Observar</span><span aria-hidden="true">→</span><span>Corrigir</span><span aria-hidden="true">→</span><span>Retestar</span></div><p>O Output informa mensagem, script e linha. A Call Stack mostra quem chamou quem. Watch acompanha expressões enquanto a sessão está pausada. Um logpoint registra informação sem interromper; um breakpoint comum pausa. Escolha o contexto correto — servidor ou cliente — porque cada lado possui execução e memória próprias.</p><aside class="callout error"><strong>Erro comum</strong><p>Colocar todo o código dentro de <code>pcall()</code> para “parar mensagens” esconde a causa e torna o estado imprevisível. Nesta prática, <code>pcall</code> isola casos de teste; uma falha ainda é exibida e o conjunto termina com erro.</p></aside></section>
+          <section><h3>Prática guiada: três falhas, cinco testes</h3><p><strong>Projeto aberto:</strong> a cópia da loja modular feita em 6.1. Salve uma versão antes de inserir falhas intencionais.</p><h4>Parte A — diagnostique três classes de erro</h4><ol class="step-list"><li><strong>Tipo/sintaxe:</strong> em uma cópia de <code>ItemCatalog</code>, troque temporariamente <code>price = 25</code> por <code>price = "25"</code>. Abra Script Analysis. O contrato deve indicar que string não é number. Desfaça a linha.</li><li><strong>Execução:</strong> troque temporariamente o nome <code>MoldeLanterna</code> procurado pelo servidor por <code>MoldeLanternaa</code>. Execute a compra. Leia a mensagem e clique no link da linha no Output. Corrija o nome.</li><li><strong>Lógica:</strong> em <code>Economy.canAfford()</code>, troque <code>balance &gt;= price</code> por <code>balance &gt; price</code>. Um saldo exatamente igual ao preço será recusado sem erro vermelho. Restaure <code>&gt;=</code>.</li><li>Adicione um breakpoint na primeira linha de <code>Shop.evaluate()</code>. Use Play e compre. No painel Watch, observe <code>balance</code>, <code>itemId</code> e <code>inventory[itemId]</code>; na Call Stack, encontre o Script servidor que chamou o módulo. Continue a execução e remova o breakpoint.</li></ol><p><strong>Resultado esperado:</strong> cada falha possui evidência diferente. Se o breakpoint não for alcançado, confirme que ele está no contexto Server e que a ação realmente chegou ao servidor.</p><h4>Parte B — transforme regras em testes repetíveis</h4><ol class="step-list" start="5"><li>Crie um Script desabilitado chamado <code>TestadorDaLoja</code> em <code>ServerScriptService → Loja</code>. Ele deve existir apenas na cópia de desenvolvimento; não publique um testador que force falha no servidor de produção.</li><li>Cole o código, marque <code>Enabled = true</code> e use Run. Leia cada PASS no Output.</li></ol><p class="path">game → ServerScriptService → Loja → TestadorDaLoja</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>TestadorDaLoja.server.luau</strong><small>Script · ServerScriptService/Loja · servidor · somente em sessão de desenvolvimento</small></div><button class="copy-button" type="button" data-copy-target="codigo-603-tests" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-603-tests"><code>--!strict
+local ItemCatalog = require(script.Parent.ItemCatalog)
+local Economy = require(script.Parent.Economy)
+local Shop = require(script.Parent.Shop)
+
+type TestCase = {
+	name: string,
+	run: () -> (),
+}
+
+local tests: {TestCase} = {}
+
+local function addTest(name: string, run: () -> ())
+	table.insert(tests, {name = name, run = run})
+end
+
+addTest("saldo exato compra", function()
+	assert(Economy.canAfford(25, 25), "25 deveria pagar 25")
+	assert(Economy.debit(25, 25) == 0, "saldo final deveria ser zero")
+end)
+
+addTest("saldo insuficiente não debita", function()
+	assert(Economy.debit(24, 25) == nil, "débito deveria ser recusado")
+end)
+
+addTest("item desconhecido não existe", function()
+	assert(ItemCatalog.get("nao_existe") == nil, "id inválido foi encontrado")
+end)
+
+addTest("loja aprova caso feliz", function()
+	local result = Shop.evaluate(30, {}, "lanterna_dourada")
+	assert(result.ok, result.message)
+	assert(result.newBalance == 5, "saldo final incorreto")
+end)
+
+addTest("loja respeita limite", function()
+	local result = Shop.evaluate(100, {lanterna_dourada = 1}, "lanterna_dourada")
+	assert(not result.ok, "segunda lanterna deveria ser recusada")
+	assert(result.newBalance == nil, "recusa não deve criar saldo novo")
+end)
+
+local failures = 0
+for _, testCase in tests do
+	local ok, message = pcall(testCase.run)
+	if ok then
+		print(`[PASS] {testCase.name}`)
+	else
+		failures += 1
+		warn(`[FAIL] {testCase.name}: {message}`)
+	end
+end
+
+assert(failures == 0, `{failures} teste(s) falharam`)
+print(`Todos os {#tests} testes passaram.`)</code></pre></div>
+            <p>Cada função testa uma regra pequena. O <code>pcall</code> permite executar os casos restantes depois de um <code>assert</code>, mas a asserção final mantém a falha visível.</p><ol class="step-list" start="7"><li>Reintroduza apenas o bug <code>&gt;</code>. Use Run: o primeiro teste deve falhar e os demais devem continuar. Corrija e execute novamente.</li><li>Ao terminar, marque <code>Enabled = false</code>. Use Play Solo para o fluxo comum; depois use Test → Server &amp; Clients com dois clientes e encerre com End Session.</li><li>No Device Emulator, confira a interface da loja nas resoluções usadas no Módulo 4. No Controller Emulator, repita a navegação. Para testar condições piores, use Network Simulation e nunca o controle legado de atraso de replicação em implementações novas.</li></ol>
+          </section>
+          <section><h3>Matriz de conclusão do Projeto 7</h3><p>Registre data, resultado e evidência. “Funcionou uma vez” não é critério de conclusão.</p><div class="table-wrap"><table><thead><tr><th>Cenário</th><th>Resultado esperado</th><th>Modo indicado</th></tr></thead><tbody><tr><td>Compra comum e saldo exato</td><td>Uma concessão, saldo correto</td><td>Run + Play</td></tr><tr><td>Saldo insuficiente e item inexistente</td><td>Recusa sem alterar estado</td><td>Teste puro + Play</td></tr><tr><td>Longe, morto ou em frequência excessiva</td><td>Servidor recusa</td><td>Server &amp; Clients</td></tr><tr><td>Mesmo requestId repetido</td><td>Sem cobrança ou item duplicado</td><td>Server &amp; Clients</td></tr><tr><td>Duas solicitações quase simultâneas</td><td>Limite e saldo permanecem consistentes</td><td>Server &amp; Clients</td></tr><tr><td>Dois jogadores</td><td>Inventários independentes</td><td>2 Clients</td></tr><tr><td>Atraso de rede</td><td>Interface informa espera; servidor decide</td><td>Network Simulation</td></tr><tr><td>Tela pequena e gamepad</td><td>Ação alcançável, foco visível</td><td>Device/Controller Emulator</td></tr></tbody></table></div><p><strong>Projeto 7 concluído:</strong> a loja segura agora possui regras modulares, testes de regressão e uma matriz hostil. A implementação real continua responsável por serializar alterações importantes por jogador e manter o servidor como autoridade.</p></section>
+          <section><h3>Exercícios</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Crie um teste para preço negativo e escreva primeiro o resultado esperado.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Crie um teste para saldo infinito e explique por que deve ser recusado.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Transforme a matriz acima em um roteiro de execução com evidência a coletar em cada linha.</p></article></div><ul class="check-list"><li>Consigo diferenciar sintaxe, execução e lógica.</li><li>Leio a primeira linha útil de um stack trace.</li><li>Uso breakpoint, Watch e Call Stack no contexto correto.</li><li>Um teste falha antes da correção e passa depois.</li><li>Testei servidor e clientes separados.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> <code>assert(not Economy.canAfford(100, -1))</code>. Um preço negativo não é promoção; é entrada inválida.</p><p><strong>Intermediário:</strong> <code>assert(not Economy.canAfford(math.huge, 25))</code>. Valores não finitos podem quebrar limites e cálculos; o módulo já usa <code>math.isfinite</code>.</p><p><strong>Desafiador:</strong> uma solução válida contém: preparação, ação, resultado esperado, captura do Output/estado, limpeza e reteste. Para duplicidade, registre saldo, quantidade e requestId antes e depois.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Breakpoints, Watch e Call Stack</td><td><a href="https://create.roblox.com/docs/studio/debugging" target="_blank" rel="noopener noreferrer">Studio debugging</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Contexto cliente/servidor e fluxo de evidências explicitados.</td></tr><tr><td>Server &amp; Clients, emuladores e simulação</td><td><a href="https://create.roblox.com/docs/studio/testing-modes" target="_blank" rel="noopener noreferrer">Studio testing modes</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Fluxos individuais, multiplayer, dispositivo e rede separados.</td></tr><tr><td>Incoming Replication Lag</td><td><a href="https://create.roblox.com/docs/studio/testing-modes" target="_blank" rel="noopener noreferrer">Network Simulation</a></td><td>Não utilizada</td><td>Antiga ou obsoleta</td><td>Planejamento usa Network Simulation em conteúdo novo.</td></tr><tr><td>pcall em test runner</td><td><a href="https://luau.org/library#global-functions" target="_blank" rel="noopener noreferrer">Luau global functions</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Isola testes sem ocultar falha; não mascara bugs de programação.</td></tr></tbody></table></div></section><div class="chapter-pager"><a class="button" href="#capitulo-02" data-previous-chapter>← 6.2</a><a class="button primary" href="#capitulo-04" data-next-chapter>6.4 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-04" aria-labelledby="titulo-04">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 6.4</p><h2 id="titulo-04">Versões, colaboração, Packages e arquivos locais</h2><p>Manutenção começa antes do problema: uma mudança pequena, revisável e recuperável é muito mais segura que uma grande alteração sem histórico.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-06-capitulo-04"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Antes de começar</h3><p><strong>Você aprenderá:</strong> diferença entre salvar, publicar, versionar e colaborar; uso cuidadoso de Packages; Script Sync; revisão e rollback. <strong>Pré-requisito:</strong> loja testada do 6.3.</p><dl class="glossary-inline"><div><dt>Versão</dt><dd>Registro identificado do estado do projeto em determinado momento.</dd></div><div><dt>Commit</dt><dd>Registro local de um conjunto coerente de mudanças no controle de versão.</dd></div><div><dt>Diff</dt><dd>Comparação que mostra linhas adicionadas, removidas ou modificadas.</dd></div><div><dt>Package</dt><dd>Conjunto reutilizável de Instances com versões e atualizações próprias.</dd></div><div><dt>Script Sync</dt><dd>Recurso do Studio que sincroniza scripts selecionados com arquivos locais.</dd></div><div><dt>Rollback</dt><dd>Retorno planejado a um estado conhecido como estável.</dd></div></dl></section>
+          <section><h3>Quatro ações que não significam a mesma coisa</h3><div class="table-wrap"><table><thead><tr><th>Ação</th><th>O que faz</th><th>O que não garante</th></tr></thead><tbody><tr><td>Salvar localmente</td><td>Grava um arquivo no computador</td><td>Backup remoto ou publicação</td></tr><tr><td>Save to Roblox</td><td>Cria/atualiza uma versão na nuvem</td><td>Que o público já recebeu a versão</td></tr><tr><td>Publish to Roblox</td><td>Disponibiliza a versão publicada da experiência</td><td>Que não existam bugs</td></tr><tr><td>Commit</td><td>Registra mudanças nos arquivos sob controle de versão</td><td>Salvar partes do projeto que não foram sincronizadas</td></tr></tbody></table></div><p>Um fluxo seguro liga essas ações: mudança pequena → revisão do diff → testes → versão com nota → publicação deliberada → monitoramento. Restaurar uma versão no Creator Dashboard cria uma nova versão, mas não a publica automaticamente.</p><aside class="callout security"><strong>Permissão mínima</strong><p>Dê acesso de edição somente a quem precisa. Colaboradores podem ter permissões diferentes, e os requisitos de idade/conta para colaboração devem ser conferidos na documentação atual. Nunca coloque tokens, senhas ou chaves dentro de scripts, commits ou Packages.</p></aside></section>
+          <section><h3>Prática guiada: torne a loja recuperável</h3><p><strong>Projeto aberto:</strong> a experiência de desenvolvimento da loja, com todos os testes do 6.3 aprovados. Não pratique restauração diretamente na experiência pública.</p><h4>Parte A — marque um ponto estável</h4><ol class="step-list"><li>Execute os cinco testes e a matriz mínima: compra comum, recusa e dois clientes.</li><li>Use File → Save to Roblox. Quando disponível, escreva uma nota objetiva como <code>M6: loja modular com testes aprovados</code>.</li><li>No Creator Dashboard, abra a experiência, o place e Version History. Localize a versão pela data e pela nota. Não restaure ainda.</li></ol><h4>Parte B — experimente um Package com cautela</h4><ol class="step-list" start="4"><li>Na cópia de desenvolvimento, selecione <code>Workspace → Arquitetura → PortaArquitetada</code> e use a opção de converter/publicar como Package. Defina proprietário e permissões conscientemente.</li><li>Faça uma alteração visual pequena, publique a atualização do Package e aplique-a primeiro em uma cópia de teste. Ative atualização automática somente quando a compatibilidade tiver sido comprovada.</li><li>Antes de inserir Package de terceiros, salve a experiência e inspecione todos os descendentes, especialmente Scripts. Remover <code>PackageLink</code> transforma a cópia em objetos comuns e encerra o comportamento de Package.</li></ol><aside class="callout warning"><strong>Atenção</strong><p>Um Package não é automaticamente confiável. Código malicioso pode vir dentro de um modelo. Origem, conteúdo, permissões e atualizações precisam de revisão.</p></aside><h4>Parte C — sincronize scripts com arquivos locais</h4><ol class="step-list" start="7"><li>No Explorer, clique com o botão direito em <code>ServerScriptService → Loja</code> e escolha <code>Sync to…</code>. Selecione uma pasta local dedicada, como <code>roblox-aprendizado/src/Loja</code>.</li><li>Confirme os nomes: <code>ItemCatalog.luau</code>, <code>Economy.luau</code> e <code>Shop.luau</code> representam ModuleScripts; um Script servidor usa o sufixo <code>.server.luau</code>. Nomes duplicados ou inválidos impedem a sincronização.</li><li>Faça uma cópia de segurança antes da primeira sincronização. Tags e Attributes não são representados pelos arquivos de script e podem ser ignorados, com risco de perda se você presumir o contrário. O depurador do Studio também não é controlado pelo editor externo.</li></ol><p>Para sincronizar um projeto inteiro e sua hierarquia, a documentação cita ferramentas externas como Rojo. Essa é uma opção futura, não um requisito deste capítulo.</p><h4>Parte D — registre uma mudança local</h4><p>Se Git estiver instalado, abra um terminal <strong>dentro da pasta sincronizada</strong>. Cada comando abaixo é executado separadamente. Não copie arquivos secretos para essa pasta.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>.gitignore</strong><small>Arquivo de texto · raiz da pasta local · lido pelo Git</small></div><button class="copy-button" type="button" data-copy-target="codigo-604-ignore" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-604-ignore"><code># Arquivos do sistema e do editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Segredos e configuração local
+.env
+.env.*
+secrets/
+
+# Cópias temporárias
+*.tmp
+*.bak</code></pre></div>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>Registro inicial</strong><small>Terminal · pasta sincronizada · executado por você no computador</small></div><button class="copy-button" type="button" data-copy-target="codigo-604-git" data-copy-label="Copiar comandos">Copiar comandos</button></div><pre id="codigo-604-git"><code>git init
+git status
+git add .
+git commit -m "refatora loja em modulos testados"</code></pre></div>
+            <ol class="step-list" start="10"><li>Em <code>ItemCatalog</code>, altere apenas <code>displayName</code>. Use <code>git diff</code> e explique a mudança antes de aceitá-la.</li><li>Sincronize, execute os testes do 6.3 e confirme a interface da loja. Depois use <code>git add .</code> e um novo commit descritivo.</li><li>Para ensaiar rollback sem afetar jogadores, abra uma cópia local da versão estável no histórico e repita os testes. Uma restauração real cria uma versão nova; publique somente depois da confirmação. Se Team Create estiver ativo, desative-o antes de reverter, pois edições ativas podem sobrescrever o retorno.</li></ol><p><strong>Resultado esperado:</strong> você consegue provar qual linha mudou, qual teste protegeu a mudança e qual versão recuperaria. Para desfazer a prática, use sua cópia local ou a versão estável identificada; não apague o histórico.</p>
+          </section>
+          <section><h3>Checklist de revisão e plano de rollback</h3><div class="table-wrap"><table><thead><tr><th>Antes de publicar</th><th>Evidência</th></tr></thead><tbody><tr><td>Escopo pequeno e compreensível</td><td>Diff revisado</td></tr><tr><td>Sem credenciais, dados pessoais ou assets suspeitos</td><td>Busca e inspeção</td></tr><tr><td>Testes puros e matriz relevante aprovados</td><td>Output e roteiro</td></tr><tr><td>Versão estável identificada</td><td>Data/nota/version ID</td></tr><tr><td>Responsável e gatilho de rollback definidos</td><td>Plano escrito</td></tr></tbody></table></div><p>Um plano curto responde: <em>qual sinal exige retorno, quem decide, qual versão restaurar, como testar a restauração e como informar a equipe?</em></p></section>
+          <section><h3>Exercícios e encerramento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Escreva uma nota de versão que diga o que mudou e qual teste passou.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Compare Live Scripting com Drafts Mode e escolha um fluxo para duas pessoas.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Escreva um plano de rollback da loja com três gatilhos observáveis e uma validação após restauração.</p></article></div><p><strong>Projeto do módulo:</strong> a loja segura agora é modular, verificável, versionada e recuperável. O próximo módulo tratará persistência; ele só começará com sua autorização.</p><ul class="check-list"><li>Distingo salvar, publicar, versionar e fazer commit.</li><li>Reviso Package e permissões antes de usar.</li><li>Conheço limites do Script Sync.</li><li>Faço uma mudança pequena e leio o diff.</li><li>Tenho uma versão estável e um plano de rollback.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> “Catálogo: corrige nome exibido da lanterna; testes puros 5/5 e compra com dois clientes aprovados”. É melhor que “correções”.</p><p><strong>Intermediário:</strong> Live Scripting mostra alterações em tempo real; Drafts permite editar localmente e depois comparar, mesclar e confirmar. Para uma dupla que quer revisão antes de integrar scripts, Drafts pode ser apropriado; a escolha depende do fluxo e deve ser combinada.</p><p><strong>Desafiador:</strong> gatilhos possíveis são taxa anormal de erros de compra, duplicação confirmada ou falha generalizada no carregamento. Restaure a versão identificada em ambiente controlado, reteste compra/recusa/duplicidade e só então publique. Mais de um plano pode ser válido.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Colaboração, Live Scripting e Drafts</td><td><a href="https://create.roblox.com/docs/projects/collaboration" target="_blank" rel="noopener noreferrer">Collaboration</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Permissões e fluxos de integração tratados separadamente.</td></tr><tr><td>Version History e restauração</td><td><a href="https://create.roblox.com/docs/projects/version-history" target="_blank" rel="noopener noreferrer">Version history</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Restaurar cria versão nova e não publica automaticamente; cuidado com Team Create.</td></tr><tr><td>Packages e PackageLink</td><td><a href="https://create.roblox.com/docs/projects/assets/packages" target="_blank" rel="noopener noreferrer">Packages</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Conteúdo de terceiros, atualização e permissões exigem revisão.</td></tr><tr><td>Script Sync e convenções de arquivo</td><td><a href="https://create.roblox.com/docs/scripting/sync" target="_blank" rel="noopener noreferrer">Script Sync</a></td><td>Rojo apenas citado pela documentação</td><td>Atual, mas depende do contexto</td><td>Limites de Attributes, tags, nomes e depurador declarados.</td></tr><tr><td>Git local</td><td><a href="https://git-scm.com/docs/gittutorial" target="_blank" rel="noopener noreferrer">Git tutorial oficial</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Uso opcional e limitado à pasta sincronizada; segredos excluídos.</td></tr></tbody></table></div></section><div class="chapter-pager"><a class="button" href="#capitulo-03" data-previous-chapter>← 6.3</a><a class="button primary" href="../index.html#modulo-06" data-next-chapter>Voltar ao sumário</a></div>
+        </div>
+      </article>
+
+      <section class="module-reference" aria-labelledby="referencias-modulo"><h2 id="referencias-modulo">Glossário e referências do Módulo 6</h2><div class="glossary-grid"><article><h3>Bootstrap</h3><p>Script pequeno que reúne dependências, cria controladores e inicia o sistema.</p></article><article><h3>Contrato</h3><p>Formato e comportamento que uma parte promete oferecer às demais.</p></article><article><h3>Função pura</h3><p>Função cujo resultado depende apenas das entradas e que não altera estado externo.</p></article><article><h3>Idempotência</h3><p>Propriedade de repetir uma solicitação sem repetir seu efeito importante.</p></article><article><h3>Máquina de estados</h3><p>Modelo que enumera estados e transições permitidas.</p></article><article><h3>Regressão</h3><p>Falha introduzida ou reintroduzida por uma mudança.</p></article></div><p>Fontes centrais: <a href="https://create.roblox.com/docs/scripting/module" target="_blank" rel="noopener noreferrer">ModuleScripts</a>, <a href="https://create.roblox.com/docs/luau/type-checking" target="_blank" rel="noopener noreferrer">tipagem Luau</a>, <a href="https://create.roblox.com/docs/studio/debugging" target="_blank" rel="noopener noreferrer">depuração</a>, <a href="https://create.roblox.com/docs/studio/testing-modes" target="_blank" rel="noopener noreferrer">modos de teste</a>, <a href="https://create.roblox.com/docs/projects/collaboration" target="_blank" rel="noopener noreferrer">colaboração</a>, <a href="https://create.roblox.com/docs/projects/version-history" target="_blank" rel="noopener noreferrer">histórico</a>, <a href="https://create.roblox.com/docs/projects/assets/packages" target="_blank" rel="noopener noreferrer">Packages</a> e <a href="https://create.roblox.com/docs/scripting/sync" target="_blank" rel="noopener noreferrer">Script Sync</a>.</p><p class="callout info"><strong>Playlists:</strong> materiais de BrawlDev e TheDevKing podem ser observados depois do módulo para comparar organização, mas nenhuma aula específica foi declarada como assistida ou validada integralmente. A documentação oficial prevalece.</p></section>
+    </div>
+  </main>
+  <footer class="site-footer"><p>Módulo 6 completo · conteúdo técnico consultado em 26 de agosto de 2026.</p></footer>
+</body>
+</html>
+
+

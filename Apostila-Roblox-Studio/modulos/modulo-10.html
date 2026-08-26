@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Módulo 10 da Apostila Roblox Studio: múltiplos places, teleporte seguro, MemoryStore, MessagingService, matchmaking e Open Cloud.">
+  <title>Módulo 10 — Escala, múltiplos places e Open Cloud</title>
+  <link rel="stylesheet" href="../assets/styles.css?v=20260826-11">
+  <script src="../assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a><div class="header-actions"><a class="button" href="../index.html#modulos">Todos os módulos</a><a class="button" href="../conta.html" data-account-label>Conta</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div></div></header>
+
+  <main class="module-shell" id="conteudo">
+    <aside class="module-sidebar" data-module-sidebar data-collapsed="false">
+      <button class="button mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="true">Ocultar capítulos</button>
+      <nav aria-label="Capítulos do Módulo 10"><p class="eyebrow">Módulo 10</p><h2>Escala e Open Cloud</h2><ol class="chapter-nav">
+        <li><a href="#capitulo-01" data-chapter-link><span>10.1</span> Places e teleporte</a></li>
+        <li><a href="#capitulo-02" data-chapter-link><span>10.2</span> Serviços entre servidores</a></li>
+        <li><a href="#capitulo-03" data-chapter-link><span>10.3</span> Open Cloud e HTTP</a></li>
+      </ol></nav>
+      <section class="module-progress" aria-labelledby="progresso-modulo"><h3 id="progresso-modulo">Progresso do módulo</h3><div class="progress-track" role="progressbar" aria-label="Progresso do módulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" data-progress-fill data-progress-scope="10"></div></div><p class="progress-label" data-progress-label data-progress-scope="10">0 de 3 capítulos disponíveis concluídos · 0%</p><p><small>Alt + ← e Alt + → alternam capítulos.</small></p></section>
+      <a class="button" href="modulo-09.html">← Módulo 9</a>
+    </aside>
+
+    <section class="module-content">
+      <header class="module-hero"><p class="eyebrow">Dificuldade 5/5 · avançada e opcional</p><h1>Módulo 10 — Escala, múltiplos places e Open Cloud</h1><p>Você aprenderá a coordenar destinos, servidores e ferramentas externas sem confundir velocidade com durabilidade nem expor credenciais. Cada laboratório tem falhas simuladas porque sistemas distribuídos precisam ser projetados para a realidade, não apenas para o caminho feliz.</p><div class="concept-diagram" aria-label="Fluxo de escala"><div class="concept-node"><strong>Organizar</strong><br>places e destinos</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Coordenar</strong><br>estado temporário</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Automatizar</strong><br>com menor privilégio</div></div><aside class="callout security"><strong>Regra central</strong><p>Uma mensagem, um dado de teleporte ou uma resposta HTTP é entrada não confiável até ser validada. O servidor mantém decisões importantes e nenhuma chave aparece em Script, LocalScript, ModuleScript, interface ou repositório.</p></aside></header>
+
+      <article class="chapter" id="capitulo-01" aria-labelledby="titulo-01">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 10.1</p><h2 id="titulo-01">TeleportService, múltiplos places e servidores reservados</h2><p>Conduza um grupo a uma instância reservada e trate cada tentativa como uma operação de rede que pode falhar.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-10-capitulo-01"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos, pré-requisitos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 6.3, 7.3 e 9.4. Ao terminar, você distinguirá experiência, place e servidor, configurará um destino, usará <code>TeleportAsync</code> no servidor, transportará apenas contexto não sensível e recuperará falhas iniciais e tardias.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Place</dt><dd>Um mapa executável dentro de uma experiência; uma experiência pode ter vários.</dd></div><div class="glossary-item"><dt>PlaceId</dt><dd>Número que identifica um place específico.</dd></div><div class="glossary-item"><dt>JobId</dt><dd>Identificador de uma instância de servidor em execução.</dd></div><div class="glossary-item"><dt>Servidor reservado</dt><dd>Instância acessível por um código próprio, criada para um grupo ou partida.</dd></div><div class="glossary-item"><dt>Teleporte</dt><dd>Operação que encerra a presença no servidor atual e inicia entrada em outro destino.</dd></div></dl></section>
+
+          <section><h3>O mapa não é o servidor</h3><p>A <strong>experiência</strong> é o produto inteiro. Cada <strong>place</strong> é um mapa publicado dentro dela. Quando jogadores entram, a plataforma executa uma cópia temporária desse place em um <strong>servidor</strong>. Dois grupos podem estar no mesmo PlaceId, mas em JobIds diferentes.</p><div class="table-wrap"><table><thead><tr><th>Destino</th><th>Configuração</th><th>Uso típico</th></tr></thead><tbody><tr><td>servidor público escolhido pela plataforma</td><td>sem opção de instância</td><td>entrada comum</td></tr><tr><td>servidor público existente</td><td><code>ServerInstanceId</code></td><td>reencontro em JobId conhecido</td></tr><tr><td>novo servidor reservado</td><td><code>ShouldReserveServer = true</code></td><td>dungeon ou partida exclusiva</td></tr><tr><td>servidor reservado existente</td><td><code>ReservedServerAccessCode</code></td><td>reunir partes do mesmo grupo</td></tr></tbody></table></div><aside class="callout warning"><strong>Opções incompatíveis</strong><p>Não combine <code>ServerInstanceId</code> com <code>ShouldReserveServer</code> ou código reservado, nem combine <code>ShouldReserveServer</code> com <code>ReservedServerAccessCode</code>. Escolha um tipo de destino.</p></aside><p><code>TeleportOptions:SetTeleportData()</code> leva contexto pequeno, visível ao cliente e não criptografado. Um nome de missão ou identificador de grupo serve; moedas, inventário, permissão e recompensa devem ser confirmados por DataStore, MemoryStore ou estado do servidor.</p></section>
+
+          <section><h3>Prática guiada — lobby privado com cancelamento</h3><p><strong>Projeto aberto:</strong> uma cópia privada de staging chamada <em>ExpedicaoEscala</em>. Ela deve estar publicada, com um segundo place chamado <em>ExpeditionTest</em>. No Creator Dashboard, mantenha ambos privados para testes e configure o acesso de teleporte dentro da própria experiência. Copie o PlaceId do destino.</p><ol class="step-list"><li>No place inicial, crie <code>Workspace → TeleportLobby</code> (Model). Dentro, crie Parts <code>JoinPad</code>, <code>CancelPad</code> e <code>StartPad</code>, todas ancoradas.</li><li>Dentro de cada Part, crie um <code>ProximityPrompt</code> chamado respectivamente <code>JoinPrompt</code>, <code>CancelPrompt</code> e <code>StartPrompt</code>. Ajuste <code>ActionText</code> para Entrar, Cancelar e Iniciar.</li><li>Em <code>ServerScriptService</code>, crie Script <code>GroupTeleport</code>. Substitua somente <code>TARGET_PLACE_ID</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>GroupTeleport.server.luau</strong><small>Script · game → ServerScriptService → GroupTeleport · servidor · inicia com a sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-1001-teleport" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-1001-teleport"><code>--!strict
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+
+local TARGET_PLACE_ID = 1234567890 -- substitua pelo PlaceId do destino
+local MAX_RETRIES = 3
+local lobby = workspace:WaitForChild("TeleportLobby")
+local joinPrompt = lobby.JoinPad:WaitForChild("JoinPrompt") :: ProximityPrompt
+local cancelPrompt = lobby.CancelPad:WaitForChild("CancelPrompt") :: ProximityPrompt
+local startPrompt = lobby.StartPad:WaitForChild("StartPrompt") :: ProximityPrompt
+local waiting: {[Player]: boolean} = {}
+local retryCount: {[Player]: number} = {}
+
+local function setStatus(player: Player, status: string)
+	player:SetAttribute("TeleportStatus", status)
+end
+
+joinPrompt.Triggered:Connect(function(player: Player)
+	if player:GetAttribute("TeleportStatus") == "Teleportando" then return end
+	waiting[player] = true
+	setStatus(player, "Na fila")
+end)
+
+cancelPrompt.Triggered:Connect(function(player: Player)
+	if player:GetAttribute("TeleportStatus") == "Teleportando" then
+		setStatus(player, "Cancelamento tardio recusado")
+		return
+	end
+	waiting[player] = nil
+	setStatus(player, "Fora da fila")
+end)
+
+local function collectWaiting(): {Player}
+	local group: {Player} = {}
+	for player in waiting do
+		if player.Parent == Players then table.insert(group, player) end
+	end
+	return group
+end
+
+local function startGroup(player: Player)
+	if not waiting[player] then
+		setStatus(player, "Entre na fila primeiro")
+		return
+	end
+	local group = collectWaiting()
+	if #group &lt; 2 then
+		setStatus(player, "Aguarde pelo menos 2 jogadores")
+		return
+	end
+
+	local options = Instance.new("TeleportOptions")
+	options.ShouldReserveServer = true
+	options:SetTeleportData({
+		partyId = HttpService:GenerateGUID(false),
+		sourcePlaceId = game.PlaceId,
+	}) -- contexto, nunca saldo, item ou permissão
+
+	for _, member in group do
+		waiting[member] = nil
+		retryCount[member] = 0
+		setStatus(member, "Teleportando")
+	end
+	local success, message = pcall(function()
+		TeleportService:TeleportAsync(TARGET_PLACE_ID, group, options)
+	end)
+	if not success then
+		warn("[Teleport] início falhou:", message)
+		for _, member in group do
+			setStatus(member, "Falhou; entre novamente")
+		end
+	end
+end
+
+startPrompt.Triggered:Connect(startGroup)
+
+TeleportService.TeleportInitFailed:Connect(function(
+	player: Player,
+	teleportResult: Enum.TeleportResult,
+	errorMessage: string,
+	placeId: number,
+	retryOptions: TeleportOptions
+)
+	if player.Parent ~= Players then return end
+	local attempt = (retryCount[player] or 0) + 1
+	retryCount[player] = attempt
+	if attempt &gt; MAX_RETRIES then
+		setStatus(player, "Falha final; entre novamente")
+		warn("[Teleport] desistiu:", teleportResult.Name, errorMessage)
+		return
+	end
+	setStatus(player, "Tentativa " .. tostring(attempt))
+	task.delay(2 ^ (attempt - 1), function()
+		if player.Parent ~= Players then return end
+		local ok, retryMessage = pcall(function()
+			TeleportService:TeleportAsync(placeId, {player}, retryOptions)
+		end)
+		if not ok then warn("[Teleport] retry falhou:", retryMessage) end
+	end)
+end)
+
+Players.PlayerRemoving:Connect(function(player: Player)
+	waiting[player] = nil
+	retryCount[player] = nil
+end)</code></pre></div>
+            <p><strong>Leitura do código:</strong> <code>waiting</code> existe apenas no servidor atual; o prompt entrega uma instância <code>Player</code> já ligada ao acionador; o servidor escolhe integrantes e destino. <code>pcall</code> captura falha durante o início. <code>TeleportInitFailed</code> cobre a falha posterior e entrega novas opções que preservam o mesmo destino reservado.</p><ol class="step-list"><li>No place <em>ExpeditionTest</em>, crie <code>ServerScriptService → DestinationArrival</code> com o código seguinte.</li><li>Publique os dois places. <strong>TeleportService não funciona em Play/Run do Studio.</strong> Abra a experiência no aplicativo Roblox com duas contas de teste autorizadas; entre na fila e inicie.</li><li>Antes de iniciar, cancele uma conta: somente quem permaneceu deve ser coletado. Durante “Teleportando”, o cancelamento é recusado para não criar resultado ambíguo.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>DestinationArrival.server.luau</strong><small>Script · destino → ServerScriptService → DestinationArrival · servidor · ao entrar no place</small></div><button class="copy-button" type="button" data-copy-target="codigo-1001-arrival" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-1001-arrival"><code>--!strict
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player: Player)
+	local joinData = player:GetJoinData()
+	local raw = joinData.TeleportData
+	if typeof(raw) ~= "table" then
+		player:SetAttribute("ArrivalContext", "Sem contexto")
+		return
+	end
+	local partyId = raw.partyId
+	local sourcePlaceId = raw.sourcePlaceId
+	if typeof(partyId) ~= "string" or #partyId &gt; 64
+		or typeof(sourcePlaceId) ~= "number" or not math.isfinite(sourcePlaceId) then
+		player:SetAttribute("ArrivalContext", "Contexto inválido")
+		return
+	end
+	player:SetAttribute("ArrivalContext", "Grupo " .. partyId)
+	-- partyId organiza a sessão; não concede moeda, item ou acesso.
+end)</code></pre></div>
+            <p><strong>Resultado esperado:</strong> o grupo abre o place de destino na mesma instância reservada e recebe <code>ArrivalContext</code>. <strong>Diagnóstico:</strong> falha no Studio é a limitação esperada; PlaceId incorreto ou acesso fechado produz erro; integrantes em servidores diferentes não podem ser enviados juntos por este script; uma falha tardia deve deixar o jogador no lobby com status de tentativa. Para reiniciar, reabra o lobby; para desfazer, apague apenas <code>TeleportLobby</code> e os dois scripts.</p>
+          </section>
+
+          <section><h3>Teste parcial, falha e segurança</h3><p>Não existe “teleporte atômico de grupo”: alguns jogadores podem chegar e outros falhar. O destino precisa tolerar chegada parcial, abandono e repetição. Para estado importante, grave um ticket curto no servidor antes de mover o grupo e reconcilie no destino. Não use <code>TeleportData</code> como prova de pagamento.</p><aside class="callout error"><strong>APIs antigas</strong><p><code>Teleport</code>, <code>TeleportPartyAsync</code>, <code>TeleportToPlaceInstance</code> e <code>TeleportToPrivateServer</code> estão depreciadas para código novo. Use <code>TeleportAsync</code> com <code>TeleportOptions</code>.</p></aside></section>
+
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Explique com exemplos a diferença entre PlaceId e JobId.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Adicione limite de quatro integrantes e recuse a quinta entrada com status claro.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Desenhe a reconciliação quando dois integrantes chegam e dois falham: timeout, retorno seguro e nenhuma recompensa duplicada.</p></article></div><p><strong>Projeto do capítulo:</strong> lobby privado com entrada, cancelamento seguro, partida reservada, contexto não sensível e recuperação limitada. Registre num roteiro em quais estados o jogador pode cancelar.</p><ul class="check-list"><li>Distingo experiência, place, servidor, PlaceId e JobId.</li><li>Chamo <code>TeleportAsync</code> somente no servidor.</li><li>Não misturo propriedades incompatíveis de <code>TeleportOptions</code>.</li><li>Uso <code>pcall</code> e <code>TeleportInitFailed</code>.</li><li>Valido TeleportData e não concedo valor por ela.</li><li>Testo teleporte real no aplicativo Roblox publicado.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> PlaceId identifica o mapa publicado; JobId identifica uma execução temporária dele. Reiniciar um servidor muda o JobId, não o PlaceId.</p><p><strong>Intermediário:</strong> conte <code>collectWaiting()</code> antes de inserir. A quinta pessoa permanece fora e recebe “Grupo cheio”. O limite é decidido no servidor.</p><p><strong>Desafiador:</strong> uma solução válida cria um ticket idempotente por partida, marca quem chegou, espera um prazo e retorna os presentes ao lobby se o mínimo não for atingido. Recompensa só é concedida depois do estado confirmado e com marcador persistente.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td><code>TeleportAsync</code> e teste publicado</td><td><a href="https://create.roblox.com/docs/projects/teleport" target="_blank" rel="noopener noreferrer">Teleport between places</a></td><td>BrawlDev Advanced — Teleport Service #26; referência temática, não revalidada integralmente</td><td>Atual e recomendada</td><td>Servidor e teste no aplicativo Roblox.</td></tr><tr><td><code>TeleportOptions</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/TeleportOptions" target="_blank" rel="noopener noreferrer">TeleportOptions API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Combinações incompatíveis explicitadas.</td></tr><tr><td><code>TeleportInitFailed</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/TeleportService/TeleportInitFailed" target="_blank" rel="noopener noreferrer">TeleportInitFailed API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Retry limitado usa as opções recebidas.</td></tr><tr><td><code>TeleportData</code>/<code>GetJoinData</code></td><td><a href="https://create.roblox.com/docs/projects/teleport#send-user-data-along-with-teleports" target="_blank" rel="noopener noreferrer">Send data</a></td><td>Não utilizada</td><td>Insegura sem validação</td><td>Apenas contexto não sensível e validado.</td></tr><tr><td>métodos <code>Teleport*</code> legados</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/TeleportService" target="_blank" rel="noopener noreferrer">TeleportService API</a></td><td>Playlists antigas podem exibi-los</td><td>Antiga ou obsoleta</td><td>Substituídos por <code>TeleportAsync</code>.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="modulo-09.html">← Módulo 9</a><a class="button primary" href="#capitulo-02" data-next-chapter>10.2 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-02" aria-labelledby="titulo-02">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 10.2</p><h2 id="titulo-02">MemoryStore, MessagingService e matchmaking</h2><p>Coordene servidores com dados temporários, aceite entrega imperfeita e projete recuperação antes da escala.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-10-capitulo-02"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos, pré-requisitos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 7.3, 8.1 e 10.1. Você escolherá entre DataStore e MemoryStore, usará fila e mapa temporários, tratará expiração e invisibilidade, explicará mensagens de melhor esforço e simulará uma fila 2v2 com abandono.</p><dl class="glossary-grid"><div class="glossary-item"><dt>TTL</dt><dd>Tempo de vida; após ele, o dado temporário expira.</dd></div><div class="glossary-item"><dt>Fila</dt><dd>Estrutura em que itens aguardam processamento por ordem/prioridade.</dd></div><div class="glossary-item"><dt>Invisibility timeout</dt><dd>Período em que um item lido fica oculto de outros leitores antes de reaparecer.</dd></div><div class="glossary-item"><dt>Best effort</dt><dd>Entrega tentada, mas sem garantia absoluta.</dd></div><div class="glossary-item"><dt>Reconciliação</dt><dd>Consulta ao estado verdadeiro para corrigir mensagem perdida, repetida ou atrasada.</dd></div></dl></section>
+
+          <section><h3>Escolha pelo tempo de vida</h3><div class="table-wrap"><table><thead><tr><th>Necessidade</th><th>Serviço</th><th>Exemplo</th></tr></thead><tbody><tr><td>sobreviver a sessões</td><td>DataStore</td><td>moedas, inventário, progresso</td></tr><tr><td>temporário e compartilhado entre servidores</td><td>MemoryStore</td><td>fila de partida, lock, presença curta</td></tr><tr><td>avisar outros servidores rapidamente</td><td>MessagingService</td><td>“partida encontrada”; não é prova única</td></tr><tr><td>temporário em um único servidor</td><td>tabela Luau</td><td>cooldown, estado da rodada local</td></tr></tbody></table></div><p>MemoryStore oferece <strong>hash map</strong> para chave direta, <strong>sorted map</strong> para ordenação e <strong>queue</strong> para processamento. Tudo expira: remova itens concluídos, use TTL curto, envolva chamadas em <code>pcall</code> e respeite quotas compartilhadas pela experiência.</p><p>Na fila, <code>ReadAsync</code> devolve itens e um identificador de leitura. Esses itens ficam invisíveis pelo prazo configurado. Só depois de concluir o passo correspondente você chama <code>RemoveAsync</code>; se o worker morrer antes, os itens reaparecem.</p><aside class="callout security"><strong>Mensagem não é estado</strong><p><code>MessagingService</code> normalmente é rápido, mas é de melhor esforço. Uma mensagem pode atrasar ou não chegar. Grave a atribuição temporária e permita que o servidor consulte essa atribuição: a mensagem apenas acelera a descoberta.</p></aside></section>
+
+          <section><h3>Prática guiada — laboratório 2v2</h3><p><strong>Escopo honesto:</strong> este laboratório forma grupos de quatro jogadores no mesmo lobby e usa MemoryStore para observar as APIs e falhas. Ele não é um matchmaking distribuído completo. Para produção com jogadores em servidores diferentes, acrescente claim atômico, atribuição por usuário, servidor reservado, notificação e reconciliação.</p><p><strong>Projeto aberto:</strong> place inicial de <em>ExpedicaoEscala</em>. Ative Studio → Game Settings → Security → Enable Studio Access to API Services apenas numa versão de teste. Nunca aponte esse teste para dados de produção.</p><ol class="step-list"><li>Crie <code>Workspace → MatchmakingLab</code> (Model), Parts ancoradas <code>JoinQueue</code> e <code>CancelQueue</code>.</li><li>Em cada Part, crie <code>ProximityPrompt</code> chamado <code>JoinPrompt</code> e <code>CancelPrompt</code>.</li><li>Em <code>ServerScriptService</code>, crie Script <code>MatchmakingLab</code>. Primeiro use <code>SIMULATE_SERVER_START_FAILURE = true</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>MatchmakingLab.server.luau</strong><small>Script · game → ServerScriptService → MatchmakingLab · servidor · inicia com a sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-1002-match" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-1002-match"><code>--!strict
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local MemoryStoreService = game:GetService("MemoryStoreService")
+local MessagingService = game:GetService("MessagingService")
+
+local TICKET_TTL = 45
+local INVISIBILITY_TIMEOUT = 8
+local SIMULATE_SERVER_START_FAILURE = true
+local queue = MemoryStoreService:GetQueue("MatchQueue2v2V1", INVISIBILITY_TIMEOUT)
+local tickets = MemoryStoreService:GetHashMap("MatchTickets2v2V1")
+local assignments = MemoryStoreService:GetHashMap("MatchAssignments2v2V1")
+local lab = workspace:WaitForChild("MatchmakingLab")
+local joinPrompt = lab.JoinQueue:WaitForChild("JoinPrompt") :: ProximityPrompt
+local cancelPrompt = lab.CancelQueue:WaitForChild("CancelPrompt") :: ProximityPrompt
+local localTokens: {[Player]: string} = {}
+local processing = false
+
+local function key(userId: number): string
+	return "user:" .. tostring(userId)
+end
+
+local function setStatus(player: Player, value: string)
+	player:SetAttribute("MatchStatus", value)
+end
+
+local function join(player: Player)
+	if localTokens[player] then
+		setStatus(player, "Já está na fila")
+		return
+	end
+	local token = HttpService:GenerateGUID(false)
+	local ticket = {userId = player.UserId, token = token, jobId = game.JobId}
+	local ok, message = pcall(function()
+		tickets:SetAsync(key(player.UserId), ticket, TICKET_TTL)
+		queue:AddAsync(ticket, TICKET_TTL, 0)
+	end)
+	if not ok then
+		warn("[Match] entrada falhou:", message)
+		setStatus(player, "Serviço indisponível; tente depois")
+		return
+	end
+	localTokens[player] = token
+	setStatus(player, "Procurando partida")
+end
+
+local function cancel(player: Player)
+	local token = localTokens[player]
+	if not token then
+		setStatus(player, "Não estava na fila")
+		return
+	end
+	local ok, message = pcall(function()
+		tickets:RemoveAsync(key(player.UserId))
+	end)
+	if not ok then
+		warn("[Match] cancelamento inconclusivo:", message)
+		setStatus(player, "Cancelamento inconclusivo; aguarde o TTL")
+		return
+	end
+	localTokens[player] = nil
+	setStatus(player, "Fila cancelada")
+	-- O item da queue expira; o mapa invalida seu token imediatamente.
+end
+
+local function currentTicket(candidate: any): boolean
+	if typeof(candidate) ~= "table" or typeof(candidate.userId) ~= "number"
+		or typeof(candidate.token) ~= "string" or typeof(candidate.jobId) ~= "string" then
+		return false
+	end
+	local stored = tickets:GetAsync(key(candidate.userId))
+	return typeof(stored) == "table" and stored.token == candidate.token
+end
+
+local function tryFormMatch()
+	if processing then return end
+	processing = true
+	local ok, message = pcall(function()
+		local items, readId = queue:ReadAsync(4, true, 2)
+		if #items ~= 4 then return end
+		local seen: {[number]: boolean} = {}
+		for _, candidate in items do
+			if not currentTicket(candidate) or seen[candidate.userId] then
+				return -- itens reaparecem depois da invisibilidade
+			end
+			seen[candidate.userId] = true
+		end
+
+		if SIMULATE_SERVER_START_FAILURE then
+			warn("[Match] falha simulada; itens não removidos e voltarão à fila")
+			return
+		end
+
+		local matchId = HttpService:GenerateGUID(false)
+		for index, candidate in items do
+			assignments:SetAsync(key(candidate.userId), {
+				matchId = matchId,
+				team = if index &lt;= 2 then "Azul" else "Laranja",
+			}, 30)
+		end
+		queue:RemoveAsync(readId)
+		for _, candidate in items do
+			tickets:RemoveAsync(key(candidate.userId))
+			MessagingService:PublishAsync("match:" .. candidate.jobId, {
+				userId = candidate.userId,
+				matchId = matchId,
+			}) -- aviso rápido; assignments é a reconciliação
+		end
+	end)
+	if not ok then warn("[Match] worker falhou:", message) end
+	processing = false
+end
+
+local function applyAssignment(player: Player)
+	local ok, assignment = pcall(function()
+		return assignments:GetAsync(key(player.UserId))
+	end)
+	if ok and typeof(assignment) == "table"
+		and typeof(assignment.matchId) == "string"
+		and (assignment.team == "Azul" or assignment.team == "Laranja") then
+		localTokens[player] = nil
+		setStatus(player, "Partida " .. assignment.matchId .. " · " .. assignment.team)
+	end
+end
+
+local connection = MessagingService:SubscribeAsync("match:" .. game.JobId, function(message)
+	local data = message.Data
+	if typeof(data) ~= "table" or typeof(data.userId) ~= "number" then return end
+	local player = Players:GetPlayerByUserId(data.userId)
+	if player then applyAssignment(player) end
+end)
+
+joinPrompt.Triggered:Connect(join)
+cancelPrompt.Triggered:Connect(cancel)
+Players.PlayerRemoving:Connect(function(player)
+	cancel(player)
+end)
+
+task.spawn(function()
+	while task.wait(3) do
+		tryFormMatch()
+		for _, player in Players:GetPlayers() do applyAssignment(player) end
+	end
+end)
+
+game:BindToClose(function()
+	connection:Disconnect()
+end)</code></pre></div>
+            <p><strong>Leitura:</strong> cada ticket recebe token imprevisível e TTL. Cancelar remove o registro atual do hash map; uma cópia antiga na fila deixa de ser válida. A leitura fica invisível por oito segundos; falha simulada não remove o lote, então ele volta. A atribuição é gravada antes da mensagem. O polling de <code>applyAssignment</code> reconcilia avisos perdidos.</p><ol class="step-list"><li>Use Test → Start com quatro clientes. Acione <code>JoinPrompt</code> em todos. Com falha simulada, o Output deve avisar e os status devem continuar procurando.</li><li>Pare, altere a constante para <code>false</code> e repita. Os quatro devem receber o mesmo MatchId e dois jogadores por equipe.</li><li>Repita com três jogadores e depois com quatro, cancelando um antes do processamento. O ticket cancelado não pode receber atribuição.</li><li>Para inspecionar, use Creator Dashboard → Data Stores → Memory Stores/Observability quando disponível. Para reiniciar limpo, troque o sufixo <code>V1</code> por <code>V2</code>; para desfazer, remova Model e Script.</li></ol><p><strong>Erros comuns:</strong> “API Services rejected request” indica acesso de teste desativado; limite excedido pede menos chamadas e backoff; quatro cópias do mesmo usuário não formam grupo por causa de <code>seen</code>; a assinatura de mensagem pode falhar e deve ser tratada com <code>pcall</code> em produção. O código é um laboratório didático: a escrita sequencial de quatro assignments ainda pode falhar no meio.</p>
+          </section>
+
+          <section><h3>Do laboratório ao distribuído</h3><p>Roblox também possui matchmaking de plataforma: ele filtra servidores elegíveis e os pontua com sinais. Uma fila própria de gameplay é outra arquitetura. Para evoluir este laboratório, escolha um coordenador com lease, faça claim atômico por usuário, crie o servidor reservado, grave uma atribuição idempotente, avise os servidores de origem e deixe cada origem teleportar seus jogadores locais. Se o destino não iniciar, expire a atribuição e recoloque o usuário com uma nova tentativa.</p><div class="table-wrap"><table><thead><tr><th>Falha</th><th>Detecção</th><th>Recuperação</th></tr></thead><tbody><tr><td>jogador abandona</td><td>ticket atual ausente/token mudou</td><td>ignorar item antigo; TTL limpa</td></tr><tr><td>worker cai após leitura</td><td>invisibility timeout termina</td><td>item reaparece</td></tr><tr><td>mensagem some</td><td>poll da assignment</td><td>reconciliação encontra estado</td></tr><tr><td>destino não inicia</td><td>assignment/heartbeat expira</td><td>retornar à fila com novo ticket</td></tr><tr><td>quota</td><td>erro + observabilidade</td><td>backoff, lote, sharding e menos payload</td></tr></tbody></table></div></section>
+
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Classifique moeda, fila, aviso de partida e cooldown entre DataStore, MemoryStore, MessagingService e tabela Luau.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Adicione ao ticket uma faixa de habilidade inteira entre 0 e 100 e rejeite tipo/valor inválido no worker.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Desenhe o protocolo distribuído completo com claim, assignment, reserved server, mensagem, polling, timeout e idempotência.</p></article></div><p><strong>Projeto do capítulo:</strong> fila 2v2 observável com cancelamento, TTL, falha simulada, assignment temporária e reconciliação. Entregue também um diagrama de estados: fora → procurando → atribuído → iniciado/expirado.</p><ul class="check-list"><li>Persistência usa DataStore; coordenação temporária usa MemoryStore.</li><li>Entendo TTL, invisibilidade, leitura e remoção.</li><li>Toda chamada de nuvem pode falhar.</li><li>Mensagem acelera, mas não substitui estado consultável.</li><li>Não confundo fila própria com matchmaking padrão da plataforma.</li><li>Sei explicar o limite didático do laboratório.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> moeda: DataStore; fila: MemoryStoreQueue; aviso: MessagingService; cooldown local: tabela Luau. Assignment curta cabe em MemoryStoreHashMap.</p><p><strong>Intermediário:</strong> valide <code>typeof(skill) == "number"</code>, <code>math.isfinite(skill)</code>, inteiro e faixa. O servidor calcula a habilidade; não aceite a pontuação declarada pelo cliente.</p><p><strong>Desafiador:</strong> o protocolo correto grava antes de avisar, usa um identificador estável da operação e permite polling. Se qualquer etapa fica inconclusiva, o mesmo ID não pode criar duas partidas nem duas recompensas. Há mais de uma solução válida; documente consistência e rollback.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>DataStore × MemoryStore</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores-vs-memory-stores" target="_blank" rel="noopener noreferrer">Choose between cloud services</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Escolha ligada à durabilidade.</td></tr><tr><td>queue, hash map, TTL e quotas</td><td><a href="https://create.roblox.com/docs/cloud-services/memory-stores" target="_blank" rel="noopener noreferrer">Memory stores</a>; <a href="https://create.roblox.com/docs/cloud-services/memory-stores/best-practices" target="_blank" rel="noopener noreferrer">Best practices</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Limpeza, expiração, pcall e backoff.</td></tr><tr><td><code>MemoryStoreQueue</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/MemoryStoreQueue" target="_blank" rel="noopener noreferrer">MemoryStoreQueue API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td><code>ReadAsync</code>/<code>RemoveAsync</code> explicados.</td></tr><tr><td><code>MessagingService</code></td><td><a href="https://create.roblox.com/docs/cloud-services/cross-server-messaging" target="_blank" rel="noopener noreferrer">Cross-server messaging</a>; <a href="https://create.roblox.com/docs/reference/engine/classes/MessagingService" target="_blank" rel="noopener noreferrer">Engine API</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Best effort mais reconciliação.</td></tr><tr><td>matchmaking da plataforma</td><td><a href="https://create.roblox.com/docs/matchmaking" target="_blank" rel="noopener noreferrer">Matchmaking</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Separado da fila customizada.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-01">← 10.1</a><a class="button primary" href="#capitulo-03" data-next-chapter>10.3 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-03" aria-labelledby="titulo-03">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 10.3</p><h2 id="titulo-03">Open Cloud, autenticação e automação externa</h2><p>Separe código da Engine, requisições do servidor e ferramentas externas; conceda só a permissão necessária.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-10-capitulo-03"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos, pré-requisitos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 9.1, 9.4, 9.6 e introdução a HTTP. Você distinguirá três superfícies de API, configurará um segredo sem escrevê-lo no código, fará leitura fixa no servidor, validará resposta e projetará uma automação externa com menor privilégio.</p><dl class="glossary-grid"><div class="glossary-item"><dt>REST API</dt><dd>Interface web organizada em URLs, métodos HTTP e respostas estruturadas.</dd></div><div class="glossary-item"><dt>Endpoint</dt><dd>Método e endereço exatos de uma operação.</dd></div><div class="glossary-item"><dt>Credencial</dt><dd>Prova secreta usada para autenticar um programa.</dd></div><div class="glossary-item"><dt>Escopo</dt><dd>Permissão limitada concedida à credencial.</dd></div><div class="glossary-item"><dt>Menor privilégio</dt><dd>Dar somente os recursos e ações indispensáveis.</dd></div><div class="glossary-item"><dt>Webhook</dt><dd>Notificação HTTP enviada a um serviço quando ocorre um evento.</dd></div></dl></section>
+
+          <section><h3>Três superfícies, três responsabilidades</h3><div class="table-wrap"><table><thead><tr><th>Superfície</th><th>Onde roda</th><th>Exemplo</th></tr></thead><tbody><tr><td>Engine API</td><td>Script/LocalScript no runtime Roblox</td><td><code>TeleportService:TeleportAsync()</code></td></tr><tr><td><code>HttpService</code></td><td>Script no servidor da experiência</td><td>chamar serviço HTTPS ou subconjunto permitido do Open Cloud</td></tr><tr><td>Open Cloud</td><td>ferramenta externa ou endpoint permitido no jogo</td><td>REST para places, DataStore, analytics ou automação</td></tr></tbody></table></div><p>Open Cloud é um conjunto de APIs REST. Uma automação no Render, numa pipeline ou num computador não está dentro da sessão Roblox: ela autentica diretamente e continua existindo mesmo sem servidor de jogo. Um Script com <code>HttpService</code> roda dentro de cada servidor e compartilha seus limites. Ele alcança sites HTTPS permitidos e somente os endpoints Open Cloud explicitamente marcados com suporte a HttpService.</p><aside class="callout warning"><strong>“É Open Cloud” não significa “pode chamar do jogo”</strong><p>Abra a referência do endpoint e procure o selo <em>HttpService</em>. A lista muda; valide novamente antes de implementar. Nunca use o jogo como proxy para uma URL escolhida pelo cliente.</p></aside></section>
+
+          <section><h3>Segredo, autenticação e escopo</h3><p>Para uma automação sob seu controle, API key costuma ser o começo mais simples. Para um aplicativo de terceiros agir em nome de cada usuário com consentimento, use OAuth 2.0 quando o endpoint e o cenário suportarem. Em ambos os casos, selecione o recurso exato, apenas leitura ou escrita necessária, expiração e rotação.</p><ol class="step-list"><li>No Creator Dashboard, crie uma API key dedicada ao laboratório, limitada somente à experiência e à permissão de leitura exigida por <strong>Get Universe</strong>. Não reutilize uma chave administrativa.</li><li>Na experiência, abra Creator Dashboard → Secrets e crie <code>OPEN_CLOUD_READ_KEY</code>. Cole o valor apenas no campo secreto e limite o domínio aplicável a <code>apis.roblox.com</code>.</li><li>Para teste colaborativo/live, use o Secrets Store. Para teste local, configure Local Secrets em Studio → Experience Settings → Security. Não envie esse arquivo/valor a ninguém.</li><li>Ative Studio → File → Experience Settings → Security → Allow HTTP Requests somente no ambiente de laboratório.</li></ol><aside class="callout security"><strong>Nunca faça isto</strong><p>Não escreva a chave em Script, ModuleScript, ReplicatedStorage, DataStore, HTML, Aiven, log, print, screenshot ou Git. No Render, credenciais externas ficam em variáveis secretas do serviço e nunca no JavaScript enviado ao navegador.</p></aside></section>
+
+          <section><h3>Prática guiada A — leitura no servidor da experiência</h3><p><strong>Projeto aberto:</strong> <em>ExpedicaoEscala</em> em staging. Em <code>ServerScriptService</code>, crie Script <code>OpenCloudReadLab</code>. O endereço é fixo; jogador nenhum escolhe rota, método ou cabeçalho.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>OpenCloudReadLab.server.luau</strong><small>Script · game → ServerScriptService → OpenCloudReadLab · servidor · uma leitura na inicialização</small></div><button class="copy-button" type="button" data-copy-target="codigo-1003-http" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-1003-http"><code>--!strict
+local HttpService = game:GetService("HttpService")
+
+local MAX_ATTEMPTS = 3
+local universeId = tostring(game.GameId)
+local url = "https://apis.roblox.com/cloud/v2/universes/" .. universeId
+
+local function requestUniverse(): ({[string]: any}?, string?)
+	for attempt = 1, MAX_ATTEMPTS do
+		local ok, response = pcall(function()
+			return HttpService:RequestAsync({
+				Url = url,
+				Method = "GET",
+				Headers = {
+					["x-api-key"] = HttpService:GetSecret("OPEN_CLOUD_READ_KEY"),
+					["content-type"] = "application/json",
+				},
+			})
+		end)
+		if not ok then
+			if attempt == MAX_ATTEMPTS then return nil, "falha de rede" end
+			task.wait(2 ^ (attempt - 1))
+			continue
+		end
+		if response.Success and response.StatusCode == 200 then
+			local decodedOk, data = pcall(function()
+				return HttpService:JSONDecode(response.Body)
+			end)
+			if not decodedOk or typeof(data) ~= "table" then
+				return nil, "JSON inválido"
+			end
+			if typeof(data.path) ~= "string" or #data.path &gt; 200 then
+				return nil, "resposta fora do contrato"
+			end
+			return data, nil
+		end
+		if response.StatusCode ~= 429 and response.StatusCode &gt;= 400
+			and response.StatusCode &lt; 500 then
+			return nil, "pedido recusado: " .. tostring(response.StatusCode)
+		end
+		if attempt &lt; MAX_ATTEMPTS then task.wait(2 ^ (attempt - 1)) end
+	end
+	return nil, "serviço indisponível"
+end
+
+local universe, problem = requestUniverse()
+if universe then
+	print("Open Cloud validado para:", universe.path)
+else
+	warn("[OpenCloud]", problem) -- não imprime header, chave ou body
+end</code></pre></div>
+            <p><strong>Leitura:</strong> <code>GetSecret()</code> retorna um objeto secreto utilizável no header, não uma string para exibição. <code>RequestAsync()</code> retorna sucesso HTTP, status, headers e body; rede bem-sucedida não significa resposta válida. O código limita tentativas, distingue 4xx permanente de 429/5xx e valida o JSON mínimo.</p><ol class="step-list"><li>Execute em staging colaborativo/live. No Output, espere <code>Open Cloud validado para:</code> seguido do caminho do universo.</li><li>Renomeie temporariamente o segredo para simular ausência: o sistema deve exibir apenas <code>falha de rede</code>, nunca a credencial. Restaure.</li><li>Troque o endpoint temporariamente por uma rota inexistente: espere recusa 404 sem retry infinito. Restaure antes de salvar.</li><li>Para reiniciar, Stop/Play; para desfazer, apague o Script, remova o segredo de laboratório e revogue a API key no Creator Dashboard.</li></ol><p><strong>Diagnóstico:</strong> erro de HTTP desativado pede a configuração Security; 401/403 indica credencial, escopo ou recurso; 429 pede aguardar/reduzir; 5xx pede retry limitado; JSON inválido ou contrato inesperado deve falhar fechado. Não imprima <code>response.Body</code> indiscriminadamente.</p>
+          </section>
+
+          <section><h3>Prática guiada B — automação externa no Render</h3><p>A aplicação da apostila já usa Render e Aiven, mas a chave Roblox <strong>não pertence ao banco</strong> nem ao frontend. Um worker/rota administrativa no servidor lê uma variável secreta configurada no painel do Render. O exemplo abaixo é apenas uma requisição manual externa e não contém credencial.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>Consulta externa (PowerShell)</strong><small>Terminal local autorizado · fora do Roblox · variável de ambiente temporária</small></div><button class="copy-button" type="button" data-copy-target="codigo-1003-external" data-copy-label="Copiar comando">Copiar comando</button></div><pre id="codigo-1003-external"><code>$headers = @{ "x-api-key" = $env:ROBLOX_OPEN_CLOUD_KEY }
+$universeId = "SUBSTITUA_PELO_UNIVERSE_ID"
+Invoke-RestMethod `
+  -Method Get `
+  -Uri "https://apis.roblox.com/cloud/v2/universes/$universeId" `
+  -Headers $headers</code></pre></div>
+            <ol class="step-list"><li>Defina <code>ROBLOX_OPEN_CLOUD_KEY</code> apenas na sessão do terminal ou no cofre de segredos do Render; não salve no histórico, arquivo ou repositório.</li><li>Use uma chave separada daquela do jogo. Restrinja-a ao universo e à leitura.</li><li>Confirme o ID e execute. Valide status e campos antes de alimentar qualquer automação.</li><li>Apague a variável ao terminar e revogue a chave de laboratório. Em produção, registre código de status, latência e ID da operação — nunca a credencial.</li></ol><p><strong>Automação externa</strong> é a escolha natural para publicação, relatório agendado e integração administrativa. <strong>Servidor da experiência</strong> é apropriado para uma leitura necessária durante a sessão e explicitamente permitida. Aiven guarda o progresso da apostila; ele não é cofre de chave Open Cloud.</p>
+          </section>
+
+          <section><h3>Limites, respostas e webhooks</h3><p>Prepare-se para 401/403, 404, 409, 429, timeout e 5xx. Em 429, respeite <code>retry-after</code> quando disponível; caso contrário, use backoff exponencial com limite. API keys compartilham limites por owner, OAuth possui limites por token e chamadas dentro do jogo também consomem o limite HTTP do servidor. Faça lotes quando o endpoint permitir.</p><p>Para webhooks, confirme a autenticação/assinatura definida pela documentação do produto, limite o tamanho, valide <code>content-type</code> e schema, use ID de evento para idempotência e responda rapidamente. Um webhook pode repetir. Uma página web pública nunca recebe segredo de servidor.</p><div class="table-wrap"><table><thead><tr><th>Risco</th><th>Controle</th><th>Teste</th></tr></thead><tbody><tr><td>chave vazada</td><td>cofre, escopo mínimo, rotação/revogação</td><td>buscar segredo no repo e logs</td></tr><tr><td>rota arbitrária pelo cliente</td><td>allowlist fixa no servidor</td><td>enviar URL maliciosa e confirmar rejeição</td></tr><tr><td>resposta malformada</td><td>status, tamanho e schema</td><td>fixture sem campo/JSON inválido</td></tr><tr><td>repetição</td><td>ID idempotente</td><td>processar evento duas vezes</td></tr><tr><td>indisponibilidade</td><td>timeout, retry limitado, fallback seguro</td><td>simular 429, timeout e 503</td></tr></tbody></table></div></section>
+
+          <section><h3>Exercícios e projeto</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Classifique cinco ações como Engine API, HttpService no jogo ou automação externa.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Acrescente jitter ao backoff e trate <code>retry-after</code> sem criar espera ilimitada.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Modele uma automação de publicação e uma consulta permitida no jogo: ator, credencial, escopo, recurso, rotação, limites, schema, idempotência, logs e revogação.</p></article></div><p><strong>Projeto do capítulo:</strong> documento de ameaça e execução para duas rotas: leitura externa no Render e leitura fixa do servidor Roblox. Inclua diagrama, chave separada, menor privilégio, teste de falhas, resposta inválida e procedimento de revogação.</p><ul class="check-list"><li>Separo Engine API, HttpService e Open Cloud.</li><li>Verifico o selo HttpService no endpoint exato.</li><li>Nenhuma credencial aparece em código, frontend, banco ou log.</li><li>Uso Secrets Store/<code>GetSecret()</code> no servidor Roblox.</li><li>Escolho API key ou OAuth conforme o ator.</li><li>Valido status, JSON, schema e limites.</li><li>Falha e repetição produzem resultado seguro e idempotente.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> mover Player: Engine; consultar serviço externo durante a sessão: HttpService no servidor; publicar place em pipeline: Open Cloud externo; botão local: Engine/client; relatório noturno: automação externa.</p><p><strong>Intermediário:</strong> limite o atraso máximo, prefira <code>retry-after</code> válido e some pequena aleatoriedade. Cancele após poucas tentativas; retry infinito multiplica uma pane.</p><p><strong>Desafiador:</strong> publicação pede worker externo e escopo de escrita apenas no place necessário; leitura em jogo pede endpoint com selo HttpService, segredo restrito a <code>apis.roblox.com</code>, rota fixa, baixa frequência e fallback. Credenciais devem ser diferentes e revogáveis. Há outras soluções válidas.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>. Revalide endpoint, suporte HttpService e escopo na data de uso.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Open Cloud REST e subconjunto HttpService</td><td><a href="https://create.roblox.com/docs/cloud" target="_blank" rel="noopener noreferrer">Open Cloud</a>; <a href="https://create.roblox.com/docs/cloud-services/http-service" target="_blank" rel="noopener noreferrer">In-game HTTP requests</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Endpoint verificado individualmente.</td></tr><tr><td><code>RequestAsync</code>/<code>GetSecret</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/HttpService" target="_blank" rel="noopener noreferrer">HttpService API</a>; <a href="https://create.roblox.com/docs/cloud-services/secrets" target="_blank" rel="noopener noreferrer">Secrets Store</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Somente servidor; segredo no header.</td></tr><tr><td>Get Universe</td><td><a href="https://create.roblox.com/docs/cloud/reference/features/universes" target="_blank" rel="noopener noreferrer">Universes endpoints</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Stable, API key/OAuth/HttpService na consulta.</td></tr><tr><td>API keys e escopos</td><td><a href="https://create.roblox.com/docs/cloud/auth/api-keys" target="_blank" rel="noopener noreferrer">Manage API keys</a>; <a href="https://create.roblox.com/docs/cloud/reference/scopes" target="_blank" rel="noopener noreferrer">Scopes</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Chave dedicada e menor privilégio.</td></tr><tr><td>OAuth 2.0</td><td><a href="https://create.roblox.com/docs/cloud/auth/oauth2-overview" target="_blank" rel="noopener noreferrer">OAuth 2.0</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Reservado a consentimento por usuário.</td></tr><tr><td>rate limits e respostas</td><td><a href="https://create.roblox.com/docs/cloud/reference/rate-limits" target="_blank" rel="noopener noreferrer">Rate limits</a>; <a href="https://create.roblox.com/docs/cloud/reference/patterns" target="_blank" rel="noopener noreferrer">Request patterns</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>429, backoff e schema tratados.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-02">← 10.2</a><a class="button primary" href="modulo-11.html">Módulo 11 →</a></div>
+        </div>
+      </article>
+
+      <section class="page-section" id="glossario" aria-labelledby="glossario-titulo"><h2 id="glossario-titulo">Glossário do módulo</h2><dl class="glossary-grid"><div class="glossary-item"><dt>Backoff</dt><dd>Intervalos crescentes entre novas tentativas.</dd></div><div class="glossary-item"><dt>Idempotência</dt><dd>Repetir a mesma operação sem repetir seu efeito.</dd></div><div class="glossary-item"><dt>Lease</dt><dd>Direito temporário de coordenar um trabalho, renovado enquanto o worker vive.</dd></div><div class="glossary-item"><dt>REST</dt><dd>Estilo de API HTTP orientado a recursos e métodos.</dd></div><div class="glossary-item"><dt>Servidor reservado</dt><dd>Instância com código de acesso próprio.</dd></div><div class="glossary-item"><dt>TTL</dt><dd>Prazo após o qual um registro temporário expira.</dd></div></dl></section>
+      <section class="page-section" id="fontes" aria-labelledby="fontes-titulo"><h2 id="fontes-titulo">Fontes oficiais do módulo</h2><p>As tabelas de cada capítulo registram páginas específicas e a data. Portais gerais: <a href="https://create.roblox.com/docs/projects/teleport" target="_blank" rel="noopener noreferrer">Teleport</a>, <a href="https://create.roblox.com/docs/cloud-services" target="_blank" rel="noopener noreferrer">Cloud services</a>, <a href="https://create.roblox.com/docs/matchmaking" target="_blank" rel="noopener noreferrer">Matchmaking</a>, <a href="https://create.roblox.com/docs/cloud" target="_blank" rel="noopener noreferrer">Open Cloud</a> e <a href="https://create.roblox.com/docs/reference/engine" target="_blank" rel="noopener noreferrer">Engine API Reference</a>.</p></section>
+    </section>
+  </main>
+  <footer class="site-footer"><p>Apostila Roblox Studio · Módulo 10 completo · progresso local com sincronização opcional.</p></footer>
+</body>
+</html>

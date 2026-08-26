@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Módulo 7 da Apostila Roblox Studio: perfis, DataStore, salvamento robusto, economia, progressão e simulador enxuto.">
+  <title>Módulo 7 — Persistência, economia e progressão</title>
+  <link rel="stylesheet" href="../assets/styles.css?v=20260826-11"><script src="../assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a><div class="header-actions"><a class="button" href="../index.html#modulos">Todos os módulos</a><a class="button" href="../conta.html" data-account-label>Conta</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div></div></header>
+
+  <main class="module-shell" id="conteudo">
+    <aside class="module-sidebar" data-module-sidebar data-collapsed="false">
+      <button class="button mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="true">Ocultar capítulos</button>
+      <h2>Módulo 7</h2><p>Persistência, economia e progressão</p>
+      <nav class="chapter-nav" aria-label="Capítulos do Módulo 7"><a href="#capitulo-01">7.1 Perfil e leaderstats</a><a href="#capitulo-02">7.2 DataStore básico</a><a href="#capitulo-03">7.3 Salvamento robusto</a><a href="#capitulo-04">7.4 Economia e missões</a><a href="#capitulo-05">7.5 Simulador enxuto</a><a href="#avaliacao">Avaliação de domínio</a><a href="#referencias-modulo">Glossário e fontes</a></nav>
+      <div class="sidebar-extra"><div class="progress-track" role="progressbar" aria-label="Progresso do módulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" data-progress-fill data-progress-scope="7"></div></div><p class="progress-label" data-progress-label data-progress-scope="7">0 de 5 capítulos disponíveis concluídos · 0%</p><p><small>Alt + ← e Alt + → alternam seções.</small></p></div>
+    </aside>
+
+    <div class="module-content">
+      <section class="module-intro" aria-labelledby="titulo-modulo"><span class="eyebrow">Dificuldade 3–4/5 · intermediária avançada</span><h1 id="titulo-modulo">Salve progresso sem transformar uma falha em perda de dados.</h1><p class="lead">Você começará com um perfil em memória, fará a primeira gravação em uma experiência separada e evoluirá para migração, retries limitados, bloqueio de sessão, economia idempotente e uma pequena vertical slice de simulador.</p><ul class="lesson-map"><li><strong>Ponto de partida:</strong> servidor autoritativo, módulos, testes, tipos e loja segura</li><li><strong>Projetos:</strong> concluir Salvamento de progresso e construir Simulador enxuto</li><li><strong>Regra central:</strong> perfil que não carregou com segurança nunca pode sobrescrever o dado real</li></ul><div class="callout security"><strong>Persistência amplia consequências</strong><p>Um erro em memória termina com o servidor. Um erro persistido volta na próxima sessão. Por isso, cada escrita terá condição, evidência e caminho de recuperação.</p></div></section>
+
+      <article class="chapter" id="capitulo-01" aria-labelledby="titulo-01">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 7.1</p><h2 id="titulo-01">Estado de sessão, <code>leaderstats</code> e modelo de perfil</h2><p>Defina primeiro o formato confiável; a nuvem vem depois.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-07-capitulo-01"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos, pré-requisitos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 5.4 e 6.1. Ao terminar, você separará apresentação, estado de sessão e dado persistido; criará um schema versionado; migrará dados fictícios v1 para v2 e reconhecerá valores serializáveis.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Perfil</dt><dd>Conjunto coerente de dados persistentes de um jogador.</dd></div><div class="glossary-item"><dt>Schema</dt><dd>Formato esperado dos campos, tipos e versões.</dd></div><div class="glossary-item"><dt>Migração</dt><dd>Transformação determinística de um formato antigo para o atual.</dd></div><div class="glossary-item"><dt>Serialização</dt><dd>Conversão de dados para um formato que pode ser armazenado.</dd></div><div class="glossary-item"><dt>Valor padrão</dt><dd>Dado inicial usado quando a chave ainda não existe.</dd></div><div class="glossary-item"><dt>Fonte da verdade</dt><dd>Estado autorizado usado para resolver divergências.</dd></div></dl></section>
+          <section><h3>Três camadas, três responsabilidades</h3><div class="concept-diagram"><div class="concept-node"><strong>DataStore</strong><br>cópia persistida</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Perfil servidor</strong><br>fonte da sessão</div><span class="concept-arrow">→</span><div class="concept-node"><strong>leaderstats/UI</strong><br>apresentação</div></div><p>A pasta <code>leaderstats</code> precisa desse nome em letras minúsculas para aparecer no placar integrado. Ela exibe valores, mas não deve virar o banco de dados nem a autoridade. O servidor altera o perfil; depois espelha o valor necessário no placar.</p><div class="table-wrap"><table><thead><tr><th>Pode ser persistido diretamente</th><th>Precisa ser convertido</th><th>Não deve ser persistido</th></tr></thead><tbody><tr><td>string, boolean, número finito, tabelas</td><td>Vector3/CFrame em componentes numéricos</td><td>Instance, conexão de evento, função, thread</td></tr><tr><td>IDs estáveis e quantidades</td><td>Enum por nome validado</td><td>Player, Tool ou Part</td></tr></tbody></table></div><aside class="callout attention"><strong>Número válido</strong><p><code>NaN</code> e infinito não são progresso legítimo. Normalize inteiros, imponha mínimos/máximos e rejeite estruturas inesperadas antes de colocá-las no perfil.</p></aside></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada · Projeto 8 começa</p><h3>Modele e migre um perfil sem acessar a nuvem</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Cópia de desenvolvimento da Loja segura</dd></div><div><dt>Módulo</dt><dd><code>ServerScriptService → Dados → ProfileSchema</code></dd></div><div><dt>Teste</dt><dd><code>TesteDeSchema</code> · Script servidor</dd></div><div><dt>Nuvem</dt><dd>nenhuma chamada neste capítulo</dd></div></dl><ol class="step-list"><li>Com o teste parado, crie Folder <code>Dados</code> em ServerScriptService.</li><li>Dentro, crie ModuleScript <code>ProfileSchema</code>. Ele define o formato atual e não conhece Player nem DataStore.</li></ol><p class="path-display">game → ServerScriptService → Dados → ProfileSchema</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ProfileSchema.luau</strong><small>ModuleScript · ServerScriptService/Dados · servidor · no primeiro require</small></div><button class="copy-button" type="button" data-copy-target="codigo-701-schema" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-701-schema"><code>--!strict
+export type Profile = {
+	schemaVersion: number,
+	currencies: {coins: number},
+	progress: {checkpointId: string},
+	inventory: {[string]: number},
+	claimedRewards: {[string]: boolean},
+}
+
+local CURRENT_VERSION = 2
+local ProfileSchema = {}
+
+local function safeInteger(value: any, fallback: number, maximum: number): number
+	if typeof(value) ~= "number" or not math.isfinite(value) then
+		return fallback
+	end
+	return math.clamp(math.floor(value), 0, maximum)
+end
+
+function ProfileSchema.new(): Profile
+	return {
+		schemaVersion = CURRENT_VERSION,
+		currencies = {coins = 0},
+		progress = {checkpointId = "inicio"},
+		inventory = {},
+		claimedRewards = {},
+	}
+end
+
+function ProfileSchema.migrate(raw: any): Profile
+	local profile = ProfileSchema.new()
+	if typeof(raw) ~= "table" then
+		return profile
+	end
+
+	-- Formato antigo usado somente pelo laboratório.
+	if raw.version == 1 then
+		profile.currencies.coins = safeInteger(raw.coins, 0, 1_000_000_000)
+		profile.progress.checkpointId = `checkpoint_{safeInteger(raw.checkpoint, 0, 999)}`
+		return profile
+	end
+
+	if raw.schemaVersion == CURRENT_VERSION then
+		local currencies = raw.currencies
+		if typeof(currencies) == "table" then
+			profile.currencies.coins = safeInteger(currencies.coins, 0, 1_000_000_000)
+		end
+		local progress = raw.progress
+		if typeof(progress) == "table" and typeof(progress.checkpointId) == "string" then
+			profile.progress.checkpointId = string.sub(progress.checkpointId, 1, 50)
+		end
+		for itemId, amount in (raw.inventory or {}) do
+			if typeof(itemId) == "string" and #itemId <= 50 then
+				profile.inventory[itemId] = safeInteger(amount, 0, 10_000)
+			end
+		end
+		for rewardId, claimed in (raw.claimedRewards or {}) do
+			if typeof(rewardId) == "string" and claimed == true then
+				profile.claimedRewards[rewardId] = true
+			end
+		end
+	end
+
+	return profile
+end
+
+return table.freeze(ProfileSchema)</code></pre></div>
+            <ol class="step-list" start="3"><li>Crie Script <code>TesteDeSchema</code> no mesmo Folder. Ele migrará uma tabela fictícia e criará um placar de apresentação para cada jogador.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>TesteDeSchema.server.luau</strong><small>Script · ServerScriptService/Dados · servidor · início da sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-701-test" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-701-test"><code>--!strict
+local Players = game:GetService("Players")
+local ProfileSchema = require(script.Parent.ProfileSchema)
+
+local antigo = {version = 1, coins = 120.9, checkpoint = 3}
+local migrado = ProfileSchema.migrate(antigo)
+
+assert(migrado.schemaVersion == 2)
+assert(migrado.currencies.coins == 120)
+assert(migrado.progress.checkpointId == "checkpoint_3")
+print("[SCHEMA] migração v1 → v2 aprovada", migrado)
+
+Players.PlayerAdded:Connect(function(player)
+	local profile = ProfileSchema.migrate(antigo)
+	local leaderstats = Instance.new("Folder")
+	leaderstats.Name = "leaderstats"
+	leaderstats.Parent = player
+
+	local coins = Instance.new("IntValue")
+	coins.Name = "Coins"
+	coins.Value = profile.currencies.coins
+	coins.Parent = leaderstats
+end)</code></pre></div>
+            <ol class="step-list" start="4"><li>Use Play. No Output, confirme a migração. No Explorer durante o teste, abra <code>Players → seu jogador → leaderstats → Coins</code>.</li><li>Altere o dado fictício para <code>coins = 0/0</code>. O perfil deve usar zero, não NaN. Depois restaure 120.9.</li><li>Use Stop. Para desfazer, remova apenas <code>Dados</code> da cópia de desenvolvimento.</li></ol><p><strong>Resultado esperado:</strong> v1 vira v2 de forma repetível, o número é normalizado e o placar apenas espelha o perfil. Se o placar não aparecer, confira o nome minúsculo <code>leaderstats</code> e o contexto servidor.</p>
+          </section>
+          <section><h3>Exercícios e incremento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Adicione <code>xp</code> aos valores padrão, com mínimo zero e limite explícito.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Migre um item antigo <code>hasLantern = true</code> para <code>inventory.lanterna_dourada = 1</code>.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Crie cinco entradas hostis e prove que a migração sempre devolve um Profile válido.</p></article></div><p><strong>Projeto 8 iniciado:</strong> existe um schema v2, uma migração pura e um placar desacoplado. Nada foi gravado ainda.</p><ul class="check-list"><li>leaderstats é apresentação, não banco.</li><li>O perfil usa IDs estáveis.</li><li>Valores numéricos são finitos e limitados.</li><li>Migração não depende de Player ou rede.</li><li>Dados antigos não são alterados no lugar.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> acrescente <code>xp: number</code> ao tipo e <code>xp = 0</code> ao padrão; normalize com <code>safeInteger</code>. Atualize todos os caminhos antes de mudar a versão.</p><p><strong>Intermediário:</strong> dentro da ramificação v1, se <code>raw.hasLantern == true</code>, atribua <code>profile.inventory.lanterna_dourada = 1</code>. O nome visual pode mudar; o ID estável não.</p><p><strong>Desafiador:</strong> teste nil, string, NaN, moedas negativas e tabelas com chaves enormes. Uma solução válida usa asserts de tipos, limites e ausência de referências ao dado bruto.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Folder leaderstats em minúsculas</td><td><a href="https://create.roblox.com/docs/players/leaderboards" target="_blank" rel="noopener noreferrer">In-game leaderboards</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Placar tratado somente como projeção visual.</td></tr><tr><td>Dados persistentes por UserId</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores" target="_blank" rel="noopener noreferrer">Data stores</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Chave será criada no servidor no capítulo seguinte.</td></tr><tr><td>Tabela única por perfil</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores/best-practices" target="_blank" rel="noopener noreferrer">Best practices</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Campos relacionados permanecem num objeto versionado.</td></tr><tr><td>Playlist DataStore #17</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores" target="_blank" rel="noopener noreferrer">Data stores</a></td><td>Advanced Scripting — BrawlDev</td><td>Não foi possível confirmar</td><td>Nenhuma afirmação do vídeo foi usada como autoridade.</td></tr></tbody></table></div></section><div class="chapter-pager"><a class="button" href="modulo-06.html#capitulo-04" data-previous-chapter>← Rever 6.4</a><a class="button primary" href="#capitulo-02" data-next-chapter>7.2 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-02" aria-labelledby="titulo-02">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 7.2</p><h2 id="titulo-02"><code>DataStore</code> básico e ambiente de teste seguro</h2><p>Faça a primeira leitura e escrita sem tocar nos dados de produção.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-07-capitulo-02"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e novas palavras</h3><p><strong>Pré-requisitos:</strong> 7.1, 2.8 e 6.3. Você configurará uma experiência separada, usará <code>GetAsync</code> e <code>SetAsync</code>, aplicará <code>pcall</code> somente à chamada externa, observará budget e impedirá save após falha de load.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Data store</dt><dd>Armazenamento persistente compartilhado pelos places da experiência.</dd></div><div class="glossary-item"><dt>Chave</dt><dd>String única que identifica um valor armazenado.</dd></div><div class="glossary-item"><dt>Budget</dt><dd>Quantidade de solicitações que o servidor pode fazer naquele momento.</dd></div><div class="glossary-item"><dt>Throttling</dt><dd>Atraso ou recusa causada por excesso de solicitações.</dd></div><div class="glossary-item"><dt>Falha externa</dt><dd>Problema fora da lógica local, como conectividade ou serviço indisponível.</dd></div><div class="glossary-item"><dt>Resultado inconclusivo</dt><dd>Resposta falha que não prova sozinha qual estado final ficou gravado.</dd></div></dl></section>
+          <section><h3>Escolha a operação pelo conflito</h3><div class="table-wrap"><table><thead><tr><th>Operação</th><th>Serve para</th><th>Risco/limite</th></tr></thead><tbody><tr><td><code>GetAsync</code></td><td>ler uma chave</td><td>pode retornar cache e falhar</td></tr><tr><td><code>SetAsync</code></td><td>substituição simples e controlada</td><td>dois servidores podem sobrescrever um ao outro</td></tr><tr><td><code>UpdateAsync</code></td><td>ler a versão atual e decidir a escrita atomicamente</td><td>mais custoso; callback não pode fazer yield</td></tr><tr><td><code>IncrementAsync</code></td><td>incrementar um inteiro isolado</td><td>não atualiza um perfil composto</td></tr></tbody></table></div><p>O <code>pcall</code> captura o erro lançado pela operação de rede e devolve sucesso/resultado. Ele não valida dados e não deve envolver todo o sistema. Uma escrita que falhou pode ter estado final desconhecido; operações importantes precisam ser idempotentes e verificáveis.</p><aside class="callout security"><strong>Nunca teste contra produção</strong><p>Studio acessa os mesmos data stores da experiência publicada. Crie uma experiência de teste separada e habilite API Services somente nela. O nome <code>ProfileLab_v1</code> não torna seguro usar o mesmo universo público.</p></aside></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada · primeira persistência</p><h3>Carregue, altere e salve cinco moedas</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>experiência publicada separada chamada Laboratório de Dados</dd></div><div><dt>Configuração</dt><dd>Experience Settings → Security → Enable Studio Access to API Services</dd></div><div><dt>Módulo</dt><dd><code>ServerScriptService → Dados → BasicProfileStore</code></dd></div><div><dt>Teste</dt><dd>Play, Stop, Play novamente</dd></div></dl><ol class="step-list"><li>Publique uma cópia como experiência privada de teste. Confirme no Creator Dashboard que ela não é a experiência pública.</li><li>Nessa cópia, abra File → Experience Settings → Security, habilite Studio Access to API Services e salve. Se não puder confirmar o universo, pare.</li><li>Copie <code>ProfileSchema</code> de 7.1 para <code>ServerScriptService → Dados</code>. Crie ao lado ModuleScript <code>BasicProfileStore</code>.</li></ol><p class="path-display">game → ServerScriptService → Dados → BasicProfileStore</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>BasicProfileStore.luau</strong><small>ModuleScript · ServerScriptService/Dados · servidor · chamadas sob demanda</small></div><button class="copy-button" type="button" data-copy-target="codigo-702-store" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-702-store"><code>--!strict
+local DataStoreService = game:GetService("DataStoreService")
+local ProfileSchema = require(script.Parent.ProfileSchema)
+
+local store = DataStoreService:GetDataStore("ProfileLab_v1")
+local BasicProfileStore = {}
+local SIMULATE_FAILURE = false
+
+local function keyFor(userId: number): string
+	return `Player_{userId}`
+end
+
+function BasicProfileStore.loadAsync(userId: number)
+	local success, result = pcall(function()
+		if SIMULATE_FAILURE then
+			error("Falha externa simulada para a aula")
+		end
+		return store:GetAsync(keyFor(userId))
+	end)
+	if not success then
+		return false, nil, tostring(result)
+	end
+	return true, ProfileSchema.migrate(result), nil
+end
+
+function BasicProfileStore.saveAsync(userId: number, profile: ProfileSchema.Profile)
+	local success, result = pcall(function()
+		return store:SetAsync(keyFor(userId), profile)
+	end)
+	if not success then
+		return false, tostring(result)
+	end
+	return true, nil
+end
+
+return table.freeze(BasicProfileStore)</code></pre></div>
+            <p>A palavra <code>Async</code> lembra que a função pode ceder a execução. Somente <code>GetAsync/SetAsync</code> ficam dentro do <code>pcall</code>; erros em migração continuam visíveis.</p><ol class="step-list" start="4"><li>Crie Script <code>LaboratorioDeDados</code> no mesmo Folder. Desabilite <code>TesteDeSchema</code> para não duplicar leaderstats.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>LaboratorioDeDados.server.luau</strong><small>Script · ServerScriptService/Dados · servidor · PlayerAdded/PlayerRemoving</small></div><button class="copy-button" type="button" data-copy-target="codigo-702-lab" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-702-lab"><code>--!strict
+local Players = game:GetService("Players")
+local DataStoreService = game:GetService("DataStoreService")
+local BasicProfileStore = require(script.Parent.BasicProfileStore)
+
+local sessions = {}
+
+Players.PlayerAdded:Connect(function(player)
+	local loaded, profile, message = BasicProfileStore.loadAsync(player.UserId)
+	if not loaded or not profile then
+		player:SetAttribute("DataReady", false)
+		warn(`[LOAD] {player.UserId}: {message}`)
+		return
+	end
+
+	profile.currencies.coins += 5
+	sessions[player] = profile
+	player:SetAttribute("DataReady", true)
+	player:SetAttribute("Coins", profile.currencies.coins)
+	print(`[LOAD] pronto; moedas agora: {profile.currencies.coins}`)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	local profile = sessions[player]
+	if not profile then
+		warn("[SAVE BLOQUEADO] perfil não carregou com segurança")
+		return
+	end
+	local saved, message = BasicProfileStore.saveAsync(player.UserId, profile)
+	if not saved then
+		warn(`[SAVE] falhou: {message}`)
+	end
+	sessions[player] = nil
+end)
+
+print("Budget GetAsync:", DataStoreService:GetRequestBudgetForRequestType(
+	Enum.DataStoreRequestType.GetAsync
+))</code></pre></div>
+            <ol class="step-list" start="5"><li>Use Play e espere <code>DataReady = true</code>. Use Stop, aguarde o save terminar no Output e execute Play novamente: Coins deve subir mais cinco.</li><li>Em <code>BasicProfileStore</code>, mude temporariamente <code>SIMULATE_FAILURE</code> para true. Use Play: <code>DataReady</code> deve ser false. Use Stop: o Script precisa mostrar SAVE BLOQUEADO. Restaure false.</li><li>Abra Creator Hub → Monitoring → Data Stores para observar solicitações/status. Para reiniciar o laboratório, use uma nova chave de teste ou remova apenas a chave de teste no Data Stores Manager com extremo cuidado.</li></ol><p><strong>Resultado esperado:</strong> duas sessões bem-sucedidas acumulam dez moedas; uma falha de load não grava o perfil padrão. Erro 403 indica API Services desabilitada ou contexto inadequado. Throttling pede menos solicitações e espera planejada, não loop agressivo.</p>
+          </section>
+          <section><h3>Exercícios e incremento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Exiba também o budget de UpdateAsync e explique por que budget positivo não garante sucesso.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Compare SetAsync e UpdateAsync para dois servidores salvando a mesma chave.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Registre uma falha simulada com operação, tentativa e UserId, sem imprimir o perfil.</p></article></div><p><strong>Projeto 8 melhorado:</strong> o perfil chega à nuvem num laboratório, mas o SetAsync ainda é deliberadamente básico. Concorrência e sessão serão resolvidas em 7.3.</p><ul class="check-list"><li>Testo em experiência separada.</li><li>DataStore só é acessado no servidor.</li><li>pcall envolve somente a operação externa.</li><li>Falha de load impede save.</li><li>Não codifiquei limites numéricos que podem mudar.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> chame <code>GetRequestBudgetForRequestType(Enum.DataStoreRequestType.UpdateAsync)</code>. O budget é capacidade momentânea; conectividade, validação e serviço ainda podem falhar.</p><p><strong>Intermediário:</strong> SetAsync pode fazer o último servidor apagar uma versão mais nova. UpdateAsync lê a versão atual para a transformação, mas ainda exige ordem, idempotência e política de sessão.</p><p><strong>Desafiador:</strong> uma linha segura é <code>warn(`[DATA] op=load user={userId} attempt=1 error={message}`)</code>. Não registre inventário, tokens ou conteúdo privado.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Studio API Services</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores#enable-studio-access" target="_blank" rel="noopener noreferrer">Enable Studio access</a></td><td>Não utilizada</td><td>Insegura sem validação</td><td>Somente experiência separada de teste.</td></tr><tr><td>GetAsync, SetAsync, UpdateAsync e IncrementAsync</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/GlobalDataStore" target="_blank" rel="noopener noreferrer">GlobalDataStore API</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Operações comparadas por conflito e formato.</td></tr><tr><td>pcall para chamadas externas</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits" target="_blank" rel="noopener noreferrer">Errors and limits</a></td><td>BrawlDev #17 não analisado integralmente</td><td>Atual e recomendada</td><td>Falha continua observável; save é bloqueado após load falho.</td></tr><tr><td>GetRequestBudgetForRequestType</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/DataStoreService#GetRequestBudgetForRequestType" target="_blank" rel="noopener noreferrer">DataStoreService API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Nenhum limite mutável foi fixado na aula.</td></tr></tbody></table></div></section><div class="chapter-pager"><a class="button" href="#capitulo-01" data-previous-chapter>← 7.1</a><a class="button primary" href="#capitulo-03" data-next-chapter>7.3 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-03" aria-labelledby="titulo-03">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 7.3</p><h2 id="titulo-03">Salvamento robusto, migração, retries e sessão</h2><p>Proteja a versão mais nova contra falha, concorrência e entrada em outro servidor.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-07-capitulo-03"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 7.2 e 6.3. Você implementará retry com backoff limitado, <code>UpdateAsync</code> idempotente, session ownership em metadata, autosave, save final e observabilidade. Também provará que load falho e lock perdido não escrevem.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Concorrência</dt><dd>Duas execuções tentando alterar o mesmo estado em períodos sobrepostos.</dd></div><div class="glossary-item"><dt>Backoff</dt><dd>Espera crescente entre tentativas para não agravar uma falha.</dd></div><div class="glossary-item"><dt>Session lock</dt><dd>Marca persistente que reserva um perfil para um servidor.</dd></div><div class="glossary-item"><dt>Autosave</dt><dd>Gravação periódica que reduz a perda se o save final falhar.</dd></div><div class="glossary-item"><dt>Metadata</dt><dd>Informação associada à chave sem fazer parte do valor do perfil.</dd></div><div class="glossary-item"><dt>Dirty</dt><dd>Estado em memória alterado desde a última gravação confirmada.</dd></div></dl></section>
+          <section><h3>O problema que “salvar ao sair” não resolve</h3><p>O jogador pode sair do servidor A e entrar no B antes do save terminar. Sem lock, B carrega a versão antiga e depois pode apagar o avanço de A. O lock é adquirido atomicamente durante <code>UpdateAsync</code>, renovado pelo autosave e liberado no save final.</p><div class="flow-diagram" role="img" aria-label="Fluxo seguro: UpdateAsync adquire lock, perfil fica em memória, autosave renova, save final libera"><span>Load + lock</span><span>→</span><span>Sessão em memória</span><span>→</span><span>Autosave + renova</span><span>→</span><span>Save final + libera</span></div><p>Retries da mesma chave precisam permanecer em ordem. A operação abaixo é idempotente: repetir o load pelo mesmo <code>JobId</code> ou gravar o mesmo snapshot não duplica recompensa. Há no máximo três tentativas; falha persistente vira estado observável.</p><aside class="callout attention"><strong>Base educacional auditável</strong><p>Este módulo implementa as garantias estudadas, mas sistemas com trocas, compras e grande escala exigem testes de carga e auditoria. A própria amostra oficial alerta que código de referência não deve ser usado sem testes extensos.</p></aside></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada · Projeto 8 concluído</p><h3>Troque o store básico por load-and-lock</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Laboratório de Dados separado</dd></div><div><dt>Módulo</dt><dd><code>RobustProfileStore</code> substitui BasicProfileStore</dd></div><div><dt>Script</dt><dd><code>ProfileBootstrap</code> controla o ciclo de vida</dd></div><div><dt>Teste</dt><dd>normal, falha, dois servidores e fechamento</dd></div></dl><ol class="step-list"><li>Desabilite <code>LaboratorioDeDados</code>. Mantenha <code>ProfileSchema</code>.</li><li>Crie ModuleScript <code>RobustProfileStore</code> em <code>ServerScriptService → Dados</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>RobustProfileStore.luau</strong><small>ModuleScript · ServerScriptService/Dados · servidor · chamadas serializadas por jogador</small></div><button class="copy-button" type="button" data-copy-target="codigo-703-store" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-703-store"><code>--!strict
+local DataStoreService = game:GetService("DataStoreService")
+local HttpService = game:GetService("HttpService")
+local ProfileSchema = require(script.Parent.ProfileSchema)
+
+local store = DataStoreService:GetDataStore("Profiles_v2")
+local JOB_ID = if game.JobId ~= "" then game.JobId else `studio_{HttpService:GenerateGUID(false)}`
+local LOCK_SECONDS = 120
+local MAX_ATTEMPTS = 3
+local RobustProfileStore = {}
+
+local function keyFor(userId: number): string
+	return `Player_{userId}`
+end
+
+local function retry(operationName: string, operation: () -> any)
+	local lastMessage = "falha desconhecida"
+	for attempt = 1, MAX_ATTEMPTS do
+		local success, result = pcall(operation)
+		if success then
+			return true, result, nil
+		end
+		lastMessage = tostring(result)
+		warn(`[DATA] op={operationName} tentativa={attempt} erro={lastMessage}`)
+		if attempt < MAX_ATTEMPTS then
+			task.wait(2 ^ (attempt - 1) + math.random() * 0.25)
+		end
+	end
+	return false, nil, lastMessage
+end
+
+function RobustProfileStore.loadAsync(userId: number)
+	local blockedByOtherSession = false
+	local now = os.time()
+	local success, result, message = retry("load", function()
+		return store:UpdateAsync(keyFor(userId), function(current, keyInfo)
+			local metadata = if keyInfo then keyInfo:GetMetadata() else {}
+			local lockId = metadata.LockId
+			local expiresAt = metadata.LockExpiresAt or 0
+			if lockId and lockId ~= JOB_ID and expiresAt > now then
+				blockedByOtherSession = true
+				return nil
+			end
+			metadata.LockId = JOB_ID
+			metadata.LockExpiresAt = now + LOCK_SECONDS
+			return ProfileSchema.migrate(current), {userId}, metadata
+		end)
+	end)
+	if not success then
+		return false, nil, message
+	end
+	if blockedByOtherSession or result == nil then
+		return false, nil, "Perfil ocupado por outra sessão"
+	end
+	return true, ProfileSchema.migrate(result), nil
+end
+
+function RobustProfileStore.saveAsync(
+	userId: number,
+	profile: ProfileSchema.Profile,
+	releaseLock: boolean
+)
+	-- migrate cria um snapshot serializável e separado do estado vivo.
+	local snapshot = ProfileSchema.migrate(profile)
+	local lostLock = false
+	local success, _, message = retry("save", function()
+		return store:UpdateAsync(keyFor(userId), function(_current, keyInfo)
+			local metadata = if keyInfo then keyInfo:GetMetadata() else {}
+			if metadata.LockId ~= JOB_ID then
+				lostLock = true
+				return nil
+			end
+			if releaseLock then
+				metadata.LockId = nil
+				metadata.LockExpiresAt = nil
+			else
+				metadata.LockExpiresAt = os.time() + LOCK_SECONDS
+			end
+			return snapshot, {userId}, metadata
+		end)
+	end)
+	if lostLock then
+		return false, "Lock perdido; escrita cancelada"
+	end
+	return success, message
+end
+
+return table.freeze(RobustProfileStore)</code></pre></div>
+            <p>O callback de <code>UpdateAsync</code> não contém <code>task.wait</code> nem outra função que ceda. O backoff acontece fora dele. Metadata existente é preservada e o perfil não armazena o <code>JobId</code> como progresso.</p><ol class="step-list" start="3"><li>Crie Script <code>ProfileBootstrap</code> no mesmo Folder.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ProfileBootstrap.server.luau</strong><small>Script · ServerScriptService/Dados · servidor · entrada, autosave, saída e fechamento</small></div><button class="copy-button" type="button" data-copy-target="codigo-703-bootstrap" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-703-bootstrap"><code>--!strict
+local Players = game:GetService("Players")
+local RobustProfileStore = require(script.Parent.RobustProfileStore)
+
+local sessions = {}
+local saving = {}
+
+local function saveOne(player: Player, releaseLock: boolean): boolean
+	local profile = sessions[player]
+	if not profile or player:GetAttribute("DataReady") ~= true then
+		return false
+	end
+	if saving[player] then
+		if not releaseLock then
+			return false -- autosave: o anterior já protege esta sessão
+		end
+		local deadline = os.clock() + 10
+		while saving[player] and os.clock() < deadline do
+			task.wait(0.1)
+		end
+		if saving[player] then
+			return false -- encerramento não pode esperar indefinidamente
+		end
+	end
+	saving[player] = true
+	local success, message = RobustProfileStore.saveAsync(
+		player.UserId,
+		profile,
+		releaseLock
+	)
+	saving[player] = nil
+	if not success then
+		warn(`[SAVE] user={player.UserId} erro={message}`)
+	end
+	return success
+end
+
+Players.PlayerAdded:Connect(function(player)
+	player:SetAttribute("DataReady", false)
+	local loaded, profile, message = RobustProfileStore.loadAsync(player.UserId)
+	if not loaded or not profile then
+		warn(`[LOAD] user={player.UserId} erro={message}`)
+		return -- perfil padrão nunca entra em sessions
+	end
+	sessions[player] = profile
+	player:SetAttribute("Coins", profile.currencies.coins)
+	player:SetAttribute("CheckpointId", profile.progress.checkpointId)
+	player:SetAttribute("DataReady", true)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	local deadline = os.clock() + 10
+	while saving[player] and os.clock() < deadline do
+		task.wait(0.1)
+	end
+	saveOne(player, true)
+	sessions[player] = nil
+end)
+
+task.spawn(function()
+	while true do
+		task.wait(60)
+		for _, player in Players:GetPlayers() do
+			task.spawn(function()
+				task.wait((player.UserId % 10) / 10)
+				saveOne(player, false)
+			end)
+		end
+	end
+end)
+
+game:BindToClose(function()
+	local remaining = 0
+	for _, player in Players:GetPlayers() do
+		remaining += 1
+		task.spawn(function()
+			saveOne(player, true)
+			remaining -= 1
+		end)
+	end
+	local deadline = os.clock() + 25
+	while remaining > 0 and os.clock() < deadline do
+		task.wait(0.1)
+	end
+end)</code></pre></div>
+            <ol class="step-list" start="4"><li>Use Play. Confirme <code>DataReady = true</code>. Durante o teste, altere com Command Bar do servidor: <code>game.Players:GetPlayers()[1]:SetAttribute("Coins", 999)</code>. Isso muda só a projeção, não o perfil — evidência de separação.</li><li>Para alterar o perfil nesta etapa, adicione temporariamente após o load: <code>profile.inventory.lanterna_dourada = 1</code> e <code>profile.progress.checkpointId = "checkpoint_3"</code>. Pare, reabra e confirme os Attributes/Output; depois remova a alteração automática.</li><li>Use Server &amp; Clients. Enquanto uma sessão mantém o lock, tente iniciar outra sessão de servidor com a mesma conta em uma publicação privada. A segunda deve informar perfil ocupado, não carregar padrão salvável.</li><li>Simule falha inserindo <code>error("falha simulada")</code> no início da função passada a <code>retry</code>, apenas em cópia local. Confirme três tentativas, backoff e nenhum perfil em sessions. Desfaça imediatamente.</li></ol><p><strong>Resultado esperado:</strong> perfil migra, lock é renovado, retries terminam e save final libera. Se <code>DataReady</code> for false, compras e recompensas devem ficar indisponíveis. Para reiniciar, aguarde expiração do lock de laboratório ou feche a sessão normalmente; não apague o dado para “resolver” lock.</p>
+          </section>
+          <section><h3>Matriz de integridade do Projeto 8</h3><div class="table-wrap"><table><thead><tr><th>Cenário</th><th>Garantia</th><th>Evidência</th></tr></thead><tbody><tr><td>chave nova</td><td>padrão v2 e lock próprio</td><td>DataReady true</td></tr><tr><td>dado v1</td><td>migração determinística</td><td>campos v2 válidos</td></tr><tr><td>load falha</td><td>nenhum save</td><td>DataReady false</td></tr><tr><td>outro servidor ativo</td><td>load cancelado</td><td>mensagem de sessão</td></tr><tr><td>lock tomado após expirar</td><td>servidor antigo não grava</td><td>“Lock perdido”</td></tr><tr><td>falha transitória</td><td>até três tentativas em ordem</td><td>logs numerados</td></tr><tr><td>shutdown</td><td>saves paralelos com limite temporal</td><td>sem loop infinito</td></tr></tbody></table></div><p><strong>Projeto 8 concluído:</strong> moedas, inventário e checkpoint compartilham schema, migração, load seguro, session ownership, autosave e encerramento.</p></section>
+          <section><h3>Exercícios</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Adicione um log de duração de cada load sem registrar o perfil.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Marque o perfil dirty após uma alteração e pule autosave quando nada mudou, sem deixar o lock expirar.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Desenhe uma fila por UserId que preserve ordem e permita ao save final esperar o anterior.</p></article></div><ul class="check-list"><li>UpdateAsync não contém yield no callback.</li><li>Retries são limitados e ordenados por chave.</li><li>Load falho nunca entra em sessions.</li><li>Lock perdido cancela a escrita.</li><li>Autosave e shutdown são observáveis.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> capture <code>local startedAt = os.clock()</code> antes do load e registre <code>os.clock() - startedAt</code> depois. Inclua operação/UserId, não conteúdo.</p><p><strong>Intermediário:</strong> dirty evita snapshot desnecessário, mas um refresh de lock continua necessário. Separe <code>needsDataSave</code> de <code>needsLockRefresh</code>.</p><p><strong>Desafiador:</strong> cada chave possui uma lista FIFO e apenas um worker. Cada pedido recebe sinal de conclusão; retry pertence ao item atual e termina antes do próximo. O fechamento coloca o snapshot final por último.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>UpdateAsync e callback sem yield</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores#update-data" target="_blank" rel="noopener noreferrer">Update data</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Backoff fica fora da transformação.</td></tr><tr><td>Retry ordenado e backoff</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores/player-data-purchasing#retries" target="_blank" rel="noopener noreferrer">Player data sample — retries</a></td><td>BrawlDev #17 não validado integralmente</td><td>Atual e recomendada</td><td>Três tentativas idempotentes, sem retry solto.</td></tr><tr><td>Session locking</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores/player-data-purchasing#session-locking" target="_blank" rel="noopener noreferrer">Session locking</a></td><td>Bibliotecas comunitárias não utilizadas</td><td>Atual, mas depende do contexto</td><td>Lock em metadata, expiração, renovação e perda explícita.</td></tr><tr><td>PlayerRemoving e BindToClose</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/DataModel#BindToClose" target="_blank" rel="noopener noreferrer">BindToClose API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Fechamento paralelo e limitado.</td></tr><tr><td>Versionamento/observabilidade</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores/versioning-listing-and-caching" target="_blank" rel="noopener noreferrer">Versioning</a> e <a href="https://create.roblox.com/docs/cloud-services/data-stores/observability" target="_blank" rel="noopener noreferrer">Observability</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Recuperação e dashboards entram na matriz operacional.</td></tr></tbody></table></div></section><div class="chapter-pager"><a class="button" href="#capitulo-02" data-previous-chapter>← 7.2</a><a class="button primary" href="#capitulo-04" data-next-chapter>7.4 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-04" aria-labelledby="titulo-04">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 7.4</p><h2 id="titulo-04">Inventário, recompensas, economia e missões</h2><p>Faça cada recompensa existir uma vez e cada moeda ter origem ou destino explicável.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-07-capitulo-04"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 5.5, 7.3 e 6.2. Você evoluirá o schema para v3, modelará capacidade/upgrades, distinguirá fontes e sumidouros e concederá uma missão de forma idempotente.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Fonte</dt><dd>Ação que cria recurso na economia, como vender minério.</dd></div><div class="glossary-item"><dt>Sumidouro</dt><dd>Ação que remove recurso, como comprar upgrade.</dd></div><div class="glossary-item"><dt>Stack</dt><dd>Quantidade de unidades de um mesmo item sob um ID.</dd></div><div class="glossary-item"><dt>Capacidade</dt><dd>Limite de recurso que pode ser carregado.</dd></div><div class="glossary-item"><dt>Quest</dt><dd>Objetivo, quantidade necessária e recompensa.</dd></div><div class="glossary-item"><dt>Idempotência</dt><dd>Repetir o pedido sem repetir o efeito importante.</dd></div></dl></section>
+          <section><h3>Economia é fluxo, não apenas saldo</h3><div class="concept-diagram"><div class="concept-node"><strong>Minerar</strong><br>recurso na mochila</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Vender</strong><br>fonte de moedas</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Upgrade</strong><br>sumidouro</div></div><p>Se toda ação cria moeda e nada a remove, preços perdem significado. Registre a intenção de cada transação com um ID estável, quantidade, saldo depois e contexto. Analytics de economia será implementado no Módulo 9; aqui você prepara os pontos corretos no servidor.</p><p>Uma missão contém objetivo, quantidade e recompensa. Para evitar duplicação, a verificação e a marca <code>claimedRewards[rewardId]</code> acontecem na mesma alteração síncrona do perfil. Nenhum RemoteEvent decide o valor.</p><aside class="callout security"><strong>Valores finitos e limites</strong><p>Antes de somar, confirme inteiro não negativo e que o resultado não ultrapassa o teto do schema. “Moedas infinitas” não são um caso especial; são dados inválidos.</p></aside></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada · Projeto 9 começa</p><h3>Evolua v2 para v3 e conceda a primeira missão</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Laboratório de Dados</dd></div><div><dt>Schema antigo</dt><dd><code>ProfileSchemaV2</code> preservado</dd></div><div><dt>Schema atual</dt><dd><code>ProfileSchema</code> v3</dd></div><div><dt>Regra</dt><dd><code>RewardRules</code> · função pura no servidor</dd></div></dl><ol class="step-list"><li>Renomeie o ModuleScript atual <code>ProfileSchema</code> para <code>ProfileSchemaV2</code>. Não altere seu conteúdo.</li><li>Crie um novo ModuleScript <code>ProfileSchema</code> no mesmo Folder. O RobustProfileStore continuará exigindo <code>script.Parent.ProfileSchema</code> e passará a usar v3.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ProfileSchema.luau · v3</strong><small>ModuleScript · ServerScriptService/Dados · servidor · migra v1/v2/v3</small></div><button class="copy-button" type="button" data-copy-target="codigo-704-schema" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-704-schema"><code>--!strict
+local V2 = require(script.Parent.ProfileSchemaV2)
+
+export type Profile = {
+	schemaVersion: number,
+	currencies: {coins: number},
+	progress: {checkpointId: string},
+	inventory: {[string]: number},
+	claimedRewards: {[string]: boolean},
+	simulator: {
+		bagOre: number,
+		capacity: number,
+		pickaxeLevel: number,
+		areaLevel: number,
+		rebirths: number,
+		oresMined: number,
+	},
+}
+
+local ProfileSchema = {}
+
+local function safeInteger(value: any, fallback: number, maximum: number): number
+	if typeof(value) ~= "number" or not math.isfinite(value) then
+		return fallback
+	end
+	return math.clamp(math.floor(value), 0, maximum)
+end
+
+local function baseFrom(raw: any): V2.Profile
+	if typeof(raw) == "table" and raw.schemaVersion == 3 then
+		return V2.migrate({
+			schemaVersion = 2,
+			currencies = raw.currencies,
+			progress = raw.progress,
+			inventory = raw.inventory,
+			claimedRewards = raw.claimedRewards,
+		})
+	end
+	return V2.migrate(raw)
+end
+
+function ProfileSchema.new(): Profile
+	return ProfileSchema.migrate(nil)
+end
+
+function ProfileSchema.migrate(raw: any): Profile
+	local base = baseFrom(raw)
+	local profile: Profile = {
+		schemaVersion = 3,
+		currencies = base.currencies,
+		progress = base.progress,
+		inventory = base.inventory,
+		claimedRewards = base.claimedRewards,
+		simulator = {
+			bagOre = 0,
+			capacity = 10,
+			pickaxeLevel = 1,
+			areaLevel = 1,
+			rebirths = 0,
+			oresMined = 0,
+		},
+	}
+	if typeof(raw) == "table" and raw.schemaVersion == 3
+		and typeof(raw.simulator) == "table" then
+		local simulator = raw.simulator
+		profile.simulator.bagOre = safeInteger(simulator.bagOre, 0, 100_000)
+		profile.simulator.capacity = math.max(10, safeInteger(simulator.capacity, 10, 100_000))
+		profile.simulator.pickaxeLevel = math.max(1, safeInteger(simulator.pickaxeLevel, 1, 100))
+		profile.simulator.areaLevel = math.max(1, safeInteger(simulator.areaLevel, 1, 20))
+		profile.simulator.rebirths = safeInteger(simulator.rebirths, 0, 1_000)
+		profile.simulator.oresMined = safeInteger(simulator.oresMined, 0, 1_000_000_000)
+		profile.simulator.bagOre = math.min(
+			profile.simulator.bagOre,
+			profile.simulator.capacity
+		)
+	end
+	return profile
+end
+
+return table.freeze(ProfileSchema)</code></pre></div>
+            <ol class="step-list" start="3"><li>Crie ModuleScript <code>RewardRules</code>. Ele recebe um perfil já controlado pelo servidor; não recebe moedas escolhidas pelo cliente.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>RewardRules.luau</strong><small>ModuleScript · ServerScriptService/Dados · servidor · chamado dentro da alteração de perfil</small></div><button class="copy-button" type="button" data-copy-target="codigo-704-reward" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-704-reward"><code>--!strict
+local ProfileSchema = require(script.Parent.ProfileSchema)
+
+export type Result = {ok: boolean, message: string}
+
+type QuestDefinition = {required: number, rewardCoins: number}
+
+local MAX_COINS = 1_000_000_000
+local QUESTS: {[string]: QuestDefinition} = {
+	primeiros_10_minerios = {required = 10, rewardCoins = 75},
+}
+local RewardRules = {}
+
+function RewardRules.tryClaim(
+	profile: ProfileSchema.Profile,
+	rewardId: string
+): Result
+	local quest = QUESTS[rewardId]
+	if not quest then
+		return {ok = false, message = "Missão desconhecida."}
+	end
+	if profile.claimedRewards[rewardId] then
+		return {ok = false, message = "Recompensa já concedida."}
+	end
+	if profile.simulator.oresMined < quest.required then
+		return {ok = false, message = "Objetivo ainda incompleto."}
+	end
+	if profile.currencies.coins > MAX_COINS - quest.rewardCoins then
+		return {ok = false, message = "Limite de moedas alcançado."}
+	end
+
+	-- Sem yield: marca e recompensa formam uma única alteração em memória.
+	profile.claimedRewards[rewardId] = true
+	profile.currencies.coins += quest.rewardCoins
+	return {ok = true, message = "Recompensa concedida uma vez."}
+end
+
+return table.freeze(RewardRules)</code></pre></div>
+            <ol class="step-list" start="4"><li>Crie Script <code>TestadorDeEconomia</code>, deixe ProfileBootstrap desabilitado durante este teste puro e use Run.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>TestadorDeEconomia.server.luau</strong><small>Script · ServerScriptService/Dados · servidor · somente desenvolvimento</small></div><button class="copy-button" type="button" data-copy-target="codigo-704-test" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-704-test"><code>--!strict
+local ProfileSchema = require(script.Parent.ProfileSchema)
+local RewardRules = require(script.Parent.RewardRules)
+
+local novice = ProfileSchema.new()
+novice.simulator.oresMined = 2
+
+local ready = ProfileSchema.new()
+ready.simulator.oresMined = 10
+
+local veteran = ProfileSchema.new()
+veteran.simulator.oresMined = 50
+veteran.claimedRewards.primeiros_10_minerios = true
+
+assert(not RewardRules.tryClaim(novice, "primeiros_10_minerios").ok)
+assert(RewardRules.tryClaim(ready, "primeiros_10_minerios").ok)
+assert(ready.currencies.coins == 75)
+assert(not RewardRules.tryClaim(ready, "primeiros_10_minerios").ok)
+assert(ready.currencies.coins == 75, "pedido repetido duplicou moedas")
+assert(not RewardRules.tryClaim(veteran, "primeiros_10_minerios").ok)
+
+print("[ECONOMIA] três perfis e repetição aprovados")</code></pre></div>
+            <ol class="step-list" start="5"><li>Use Run. Depois troque required/reward por valores hostis e confirme que os testes detectam a mudança.</li><li>Reative ProfileBootstrap. O próximo capítulo conectará essas regras ao estado de sessão e à vertical slice. Para desfazer, volte à versão v2 salva; não misture metade do schema novo com o store antigo.</li></ol><p><strong>Resultado esperado:</strong> v1/v2 viram v3, mochila nunca excede capacidade e a missão concede 75 moedas exatamente uma vez.</p>
+          </section>
+          <section><h3>Exercícios e incremento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Adicione uma missão de 50 minérios com outro ID e recompensa proporcional.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Modele uma compra de capacidade como sumidouro, recusando saldo insuficiente.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Calcule fontes e sumidouros para três perfis e identifique onde a economia infla.</p></article></div><p><strong>Projeto 9 iniciado:</strong> o perfil v3 contém mochila, upgrade, área, rebirth e progresso de missão; a recompensa é idempotente.</p><ul class="check-list"><li>Fonte e sumidouro têm IDs explicáveis.</li><li>Schema antigo migra antes de jogar.</li><li>Missão verifica objetivo no servidor.</li><li>Marcação e recompensa não contêm yield.</li><li>Repetição não duplica moedas.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> use ID estável como <code>minerador_50</code>; adicione configuração e teste antes/depois do requisito. Não use texto traduzido como ID.</p><p><strong>Intermediário:</strong> calcule custo no servidor, confirme inteiro finito, saldo ≥ custo e capacidade abaixo do teto; debite e aumente no mesmo bloco sem yield.</p><p><strong>Desafiador:</strong> some moedas criadas por venda/missão e removidas por upgrades. Se fontes crescem com pickaxe e preços ficam constantes, o saldo acelera; uma curva ou novos sumidouros são necessários.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Fontes, sumidouros e impacto</td><td><a href="https://create.roblox.com/docs/production/game-design/balance-virtual-economies" target="_blank" rel="noopener noreferrer">Balance virtual economies</a></td><td>Simulator — MonzterDEV não analisada integralmente</td><td>Atual e recomendada</td><td>Fluxos têm origem/destino e limites.</td></tr><tr><td>Objetivo, quantidade e recompensa</td><td><a href="https://create.roblox.com/docs/production/game-design/introduction-to-quest-design" target="_blank" rel="noopener noreferrer">Quest design</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Missão pequena ligada ao core loop.</td></tr><tr><td>Economy events</td><td><a href="https://create.roblox.com/docs/production/analytics/economy-events" target="_blank" rel="noopener noreferrer">Economy events</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Pontos de instrumentação preparados; implementação adiada ao Módulo 9.</td></tr><tr><td>PolicyService para economia</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/PolicyService" target="_blank" rel="noopener noreferrer">PolicyService API</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Não usado como substituto para validação econômica.</td></tr></tbody></table></div></section><div class="chapter-pager"><a class="button" href="#capitulo-03" data-previous-chapter>← 7.3</a><a class="button primary" href="#capitulo-05" data-next-chapter>7.5 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-05" aria-labelledby="titulo-05">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 7.5</p><h2 id="titulo-05">Protótipo de simulador bem arquitetado</h2><p>Integre um core loop pequeno sem criar um script monolítico.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-07-capitulo-05"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 4.3–4.6, 5.1–5.5, 6.1–6.3 e 7.1–7.4. Você conectará ferramenta, mineração, venda, upgrade, área, rebirth, HUD e persistência; validará remote, distância, estado, frequência, capacidade e falhas.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Core loop</dt><dd>Sequência mais repetida que sustenta a experiência.</dd></div><div class="glossary-item"><dt>Vertical slice</dt><dd>Fatia pequena, mas completa, do jogo do input ao salvamento.</dd></div><div class="glossary-item"><dt>Rebirth</dt><dd>Reinício voluntário de parte da progressão em troca de avanço persistente.</dd></div><div class="glossary-item"><dt>Configuração</dt><dd>Dados de design como valor, área e rendimento.</dd></div><div class="glossary-item"><dt>Estado autoritativo</dt><dd>Perfil em memória mantido pelo servidor.</dd></div><div class="glossary-item"><dt>Teste hostil</dt><dd>Tentativa deliberada de enviar entrada inválida ou repetida.</dd></div></dl></section>
+          <section><h3>Uma fatia completa, não um jogo infinito</h3><div class="flow-diagram" role="img" aria-label="Core loop do simulador: minerar, encher mochila, vender, melhorar, acessar área e repetir"><span>Minerar</span><span>→</span><span>Encher mochila</span><span>→</span><span>Vender</span><span>→</span><span>Melhorar</span><span>→</span><span>Nova área</span><span>→</span><span>Repetir</span></div><p>O cliente encontra o alvo e pede mineração. O servidor confirma Tool equipada, alvo permitido, área, distância, cooldown, capacidade e perfil carregado. Venda, upgrade, desbloqueio e rebirth partem de prompts, mas o servidor ainda verifica contexto.</p><div class="table-wrap"><table><thead><tr><th>Camada</th><th>Responsabilidade</th></tr></thead><tbody><tr><td>SimulatorConfig</td><td>IDs, rendimento, valor e área</td></tr><tr><td>ProfileState</td><td>perfil vivo e projeção em Attributes</td></tr><tr><td>SimulatorService</td><td>regras autoritativas sem conexões globais</td></tr><tr><td>SimulatorBootstrap</td><td>remotes, prompts e ciclo de início</td></tr><tr><td>HUD/Tool cliente</td><td>input, texto e feedback, nunca recompensa</td></tr></tbody></table></div></section>
+          <section class="practice-card"><p class="practice-label">Prática guiada · Projeto 9 concluído</p><h3>Monte a vertical slice de mineração</h3><dl class="practice-facts"><div><dt>Projeto</dt><dd>Laboratório de Dados com ProfileSchema v3</dd></div><div><dt>Mundo</dt><dd><code>Workspace → Simulator</code></dd></div><div><dt>Servidor</dt><dd><code>ServerScriptService → Simulator</code></dd></div><div><dt>Cliente</dt><dd>Tool e HUD já conhecidos do Módulo 4</dd></div></dl><h4>1. Crie o mundo e a interface de rede</h4><ol class="step-list"><li>Em Workspace, crie Folder <code>Simulator</code>. Dentro, crie Folder <code>Ores</code> e quatro Parts ancoradas: <code>Stone</code>, <code>Crystal</code>, <code>SellPoint</code>, <code>UpgradePoint</code>, <code>AreaPoint</code> e <code>RebirthPoint</code>.</li><li>Em Stone, crie Attribute string <code>OreId = stone</code>. Em Crystal, <code>OreId = crystal</code>. Coloque Crystal mais distante, representando área 2.</li><li>Em cada Point, crie ProximityPrompt com ActionText correspondente. Use MaxActivationDistance 10.</li><li>Em ReplicatedStorage, crie Folder <code>SimulatorRemotes</code> com RemoteEvents <code>MineOre</code> e <code>SimulatorResult</code>.</li><li>Em StarterPack, crie Tool <code>Picareta</code>, defina <code>RequiresHandle = false</code> e adicione LocalScript <code>MineClient</code>. Em StarterGui, crie ScreenGui <code>SimulatorHUD</code> com TextLabels <code>Stats</code> e <code>Status</code>, além de LocalScript <code>HUDClient</code>.</li></ol><h4>2. Exponha o perfil somente ao servidor</h4><ol class="step-list" start="6"><li>Em <code>ServerScriptService → Dados</code>, crie ModuleScript <code>ProfileState</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ProfileState.luau</strong><small>ModuleScript · ServerScriptService/Dados · servidor · estado vivo da sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-705-state" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-705-state"><code>--!strict
+local ProfileSchema = require(script.Parent.ProfileSchema)
+
+local profiles: {[Player]: ProfileSchema.Profile} = {}
+local ProfileState = {}
+
+local function sync(player: Player, profile: ProfileSchema.Profile)
+	player:SetAttribute("Coins", profile.currencies.coins)
+	player:SetAttribute("BagOre", profile.simulator.bagOre)
+	player:SetAttribute("Capacity", profile.simulator.capacity)
+	player:SetAttribute("PickaxeLevel", profile.simulator.pickaxeLevel)
+	player:SetAttribute("AreaLevel", profile.simulator.areaLevel)
+	player:SetAttribute("Rebirths", profile.simulator.rebirths)
+end
+
+function ProfileState.attach(player: Player, profile: ProfileSchema.Profile)
+	profiles[player] = profile
+	sync(player, profile)
+	player:SetAttribute("DataReady", true)
+end
+
+function ProfileState.get(player: Player): ProfileSchema.Profile?
+	return profiles[player]
+end
+
+function ProfileState.update(
+	player: Player,
+	mutator: (ProfileSchema.Profile) -> ()
+): boolean
+	local profile = profiles[player]
+	if not profile or player:GetAttribute("DataReady") ~= true then
+		return false
+	end
+	mutator(profile) -- sem pcall: erro de programação deve aparecer
+	sync(player, profile)
+	return true
+end
+
+function ProfileState.detach(player: Player)
+	profiles[player] = nil
+	player:SetAttribute("DataReady", false)
+end
+
+return table.freeze(ProfileState)</code></pre></div>
+            <p>No <code>ProfileBootstrap</code> de 7.3: adicione <code>local ProfileState = require(script.Parent.ProfileState)</code>; em <code>saveOne</code>, use <code>ProfileState.get(player)</code>; após load bem-sucedido, troque a atribuição em sessions por <code>ProfileState.attach(player, profile)</code>; após o save final, chame <code>ProfileState.detach(player)</code>. Remova a tabela local sessions. Essas quatro substituições mantêm o store isolado.</p><h4>3. Configure os minérios</h4><ol class="step-list" start="7"><li>Crie Folder <code>ServerScriptService → Simulator</code> e ModuleScript <code>SimulatorConfig</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>SimulatorConfig.luau</strong><small>ModuleScript · ServerScriptService/Simulator · servidor · configuração congelada</small></div><button class="copy-button" type="button" data-copy-target="codigo-705-config" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-705-config"><code>--!strict
+type OreDefinition = {area: number, baseYield: number, sellValue: number}
+
+local ores: {[string]: OreDefinition} = {
+		stone = table.freeze({area = 1, baseYield = 1, sellValue = 3}),
+		crystal = table.freeze({area = 2, baseYield = 2, sellValue = 8}),
+}
+
+local SimulatorConfig = {
+	Ores = table.freeze(ores),
+	MineDistance = 12,
+	MineCooldown = 0.45,
+	AreaTwoCost = 250,
+	RebirthCost = 1_000,
+	MaxCoins = 1_000_000_000,
+}
+
+return table.freeze(SimulatorConfig)</code></pre></div>
+            <h4>4. Implemente regras autoritativas</h4><ol class="step-list" start="8"><li>Crie ModuleScript <code>SimulatorService</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>SimulatorService.luau</strong><small>ModuleScript · ServerScriptService/Simulator · servidor · chamado pelo bootstrap</small></div><button class="copy-button" type="button" data-copy-target="codigo-705-service" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-705-service"><code>--!strict
+local ProfileState = require(script.Parent.Parent.Dados.ProfileState)
+local RewardRules = require(script.Parent.Parent.Dados.RewardRules)
+local Config = require(script.Parent.SimulatorConfig)
+
+local SimulatorService = {}
+local lastMineAt: {[Player]: number} = {}
+
+local function isNear(player: Player, part: BasePart, maximum: number): boolean
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	return root ~= nil and root:IsA("BasePart")
+		and humanoid ~= nil and humanoid.Health > 0
+		and (root.Position - part.Position).Magnitude <= maximum
+end
+
+function SimulatorService.mine(player: Player, target: any): string
+	if typeof(target) ~= "Instance" or not target:IsA("BasePart") then
+		return "Alvo inválido."
+	end
+	local ores = workspace.Simulator.Ores
+	if not target:IsDescendantOf(ores) or not isNear(player, target, Config.MineDistance) then
+		return "Minério fora do contexto permitido."
+	end
+	local character = player.Character
+	local tool = character and character:FindFirstChild("Picareta")
+	if not tool or not tool:IsA("Tool") then
+		return "Equipe a picareta."
+	end
+	local now = os.clock()
+	if now - (lastMineAt[player] or 0) < Config.MineCooldown then
+		return "Aguarde a picareta."
+	end
+	lastMineAt[player] = now
+
+	local oreId = target:GetAttribute("OreId")
+	if typeof(oreId) ~= "string" then
+		return "Minério sem ID válido."
+	end
+	local ore = Config.Ores[oreId]
+	if not ore then
+		return "Minério desconhecido."
+	end
+
+	local message = "Perfil indisponível."
+	ProfileState.update(player, function(profile)
+		if profile.simulator.areaLevel < ore.area then
+			message = "Área ainda bloqueada."
+			return
+		end
+		local space = profile.simulator.capacity - profile.simulator.bagOre
+		local amount = math.min(ore.baseYield + profile.simulator.pickaxeLevel - 1, space)
+		if amount <= 0 then
+			message = "Mochila cheia."
+			return
+		end
+		profile.simulator.bagOre += amount
+		profile.simulator.oresMined += amount
+		RewardRules.tryClaim(profile, "primeiros_10_minerios")
+		message = `+{amount} minério(s).`
+	end)
+	return message
+end
+
+function SimulatorService.sell(player: Player, point: BasePart): string
+	if not isNear(player, point, 12) then return "Venda fora de alcance." end
+	local message = "Perfil indisponível."
+	ProfileState.update(player, function(profile)
+		local amount = profile.simulator.bagOre
+		if amount <= 0 then message = "Mochila vazia." return end
+		local earned = amount * 3 -- preço-base conservador da vertical slice
+		if profile.currencies.coins > Config.MaxCoins - earned then
+			message = "Limite de moedas alcançado." return
+		end
+		profile.simulator.bagOre = 0
+		profile.currencies.coins += earned
+		message = `Venda concluída: +{earned} moedas.`
+	end)
+	return message
+end
+
+function SimulatorService.upgrade(player: Player, point: BasePart): string
+	if not isNear(player, point, 12) then return "Upgrade fora de alcance." end
+	local message = "Perfil indisponível."
+	ProfileState.update(player, function(profile)
+		local level = profile.simulator.pickaxeLevel
+		local cost = level * 100
+		if level >= 100 then message = "Nível máximo." return end
+		if profile.currencies.coins < cost then message = "Moedas insuficientes." return end
+		profile.currencies.coins -= cost
+		profile.simulator.pickaxeLevel += 1
+		message = `Picareta nível {level + 1}.`
+	end)
+	return message
+end
+
+function SimulatorService.unlockArea(player: Player, point: BasePart): string
+	if not isNear(player, point, 12) then return "Área fora de alcance." end
+	local message = "Perfil indisponível."
+	ProfileState.update(player, function(profile)
+		if profile.simulator.areaLevel >= 2 then message = "Área já liberada." return end
+		if profile.currencies.coins < Config.AreaTwoCost then message = "Moedas insuficientes." return end
+		profile.currencies.coins -= Config.AreaTwoCost
+		profile.simulator.areaLevel = 2
+		message = "Área de cristal liberada."
+	end)
+	return message
+end
+
+function SimulatorService.rebirth(player: Player, point: BasePart): string
+	if not isNear(player, point, 12) then return "Rebirth fora de alcance." end
+	local message = "Perfil indisponível."
+	ProfileState.update(player, function(profile)
+		if profile.currencies.coins < Config.RebirthCost then message = "Requisito incompleto." return end
+		profile.currencies.coins = 0
+		profile.simulator.bagOre = 0
+		profile.simulator.capacity = 10
+		profile.simulator.pickaxeLevel = 1
+		profile.simulator.areaLevel = 1
+		profile.simulator.rebirths += 1
+		message = "Rebirth concluído."
+	end)
+	return message
+end
+
+return table.freeze(SimulatorService)</code></pre></div>
+            <p>Não há yield dentro de <code>ProfileState.update</code>. Portanto, cada transação em memória termina antes de outra callback alterar o mesmo perfil. O autosave grava o snapshot depois.</p><h4>5. Conecte remotes e prompts</h4><ol class="step-list" start="9"><li>Crie Script <code>SimulatorBootstrap</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>SimulatorBootstrap.server.luau</strong><small>Script · ServerScriptService/Simulator · servidor · início da sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-705-bootstrap" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-705-bootstrap"><code>--!strict
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Service = require(script.Parent.SimulatorService)
+
+local remotes = ReplicatedStorage:WaitForChild("SimulatorRemotes")
+local mineOre = remotes:WaitForChild("MineOre") :: RemoteEvent
+local resultEvent = remotes:WaitForChild("SimulatorResult") :: RemoteEvent
+local world = workspace:WaitForChild("Simulator")
+
+local function point(name: string): BasePart
+	local found = world:WaitForChild(name)
+	assert(found:IsA("BasePart"), `{name} precisa ser BasePart`)
+	return found
+end
+
+local function connectPrompt(name: string, action: (Player, BasePart) -> string)
+	local part = point(name)
+	local prompt = part:FindFirstChildOfClass("ProximityPrompt")
+	assert(prompt, `ProximityPrompt ausente em {name}`)
+	prompt.Triggered:Connect(function(player)
+		resultEvent:FireClient(player, action(player, part))
+	end)
+end
+
+mineOre.OnServerEvent:Connect(function(player, target)
+	resultEvent:FireClient(player, Service.mine(player, target))
+end)
+connectPrompt("SellPoint", Service.sell)
+connectPrompt("UpgradePoint", Service.upgrade)
+connectPrompt("AreaPoint", Service.unlockArea)
+connectPrompt("RebirthPoint", Service.rebirth)</code></pre></div>
+            <h4>6. Faça input e HUD no cliente</h4><ol class="step-list" start="10"><li>No LocalScript da Tool, faça um raycast pelo centro da câmera. O servidor receberá apenas o alvo candidato.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>MineClient.client.luau</strong><small>LocalScript · StarterPack/Picareta · cliente · quando Tool é ativada</small></div><button class="copy-button" type="button" data-copy-target="codigo-705-client" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-705-client"><code>--!strict
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+local tool = script.Parent :: Tool
+local remotes = ReplicatedStorage:WaitForChild("SimulatorRemotes")
+local mineOre = remotes:WaitForChild("MineOre") :: RemoteEvent
+
+tool.Activated:Connect(function()
+	local camera = workspace.CurrentCamera
+	if not camera then return end
+	local center = camera.ViewportSize / 2
+	local ray = camera:ViewportPointToRay(center.X, center.Y)
+	local parameters = RaycastParams.new()
+	parameters.FilterType = Enum.RaycastFilterType.Exclude
+	parameters.FilterDescendantsInstances = if player.Character then {player.Character} else {}
+	local hit = workspace:Raycast(ray.Origin, ray.Direction * 30, parameters)
+	mineOre:FireServer(if hit then hit.Instance else nil)
+end)</code></pre></div>
+            <ol class="step-list" start="11"><li>No LocalScript do HUD, projete Attributes. Configure Stats e Status com tamanho responsivo e foco conforme 4.5–4.6.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>HUDClient.client.luau</strong><small>LocalScript · StarterGui/SimulatorHUD · cliente · quando GUI é clonada</small></div><button class="copy-button" type="button" data-copy-target="codigo-705-hud" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-705-hud"><code>--!strict
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+local stats = script.Parent.Stats :: TextLabel
+local status = script.Parent.Status :: TextLabel
+
+local function render()
+	stats.Text = string.format(
+		"Moedas %d · Mochila %d/%d · Picareta %d · Área %d · Rebirth %d",
+		player:GetAttribute("Coins") or 0,
+		player:GetAttribute("BagOre") or 0,
+		player:GetAttribute("Capacity") or 0,
+		player:GetAttribute("PickaxeLevel") or 1,
+		player:GetAttribute("AreaLevel") or 1,
+		player:GetAttribute("Rebirths") or 0
+	)
+end
+
+for _, name in {"Coins", "BagOre", "Capacity", "PickaxeLevel", "AreaLevel", "Rebirths"} do
+	player:GetAttributeChangedSignal(name):Connect(render)
+end
+local remotes = ReplicatedStorage:WaitForChild("SimulatorRemotes")
+local resultEvent = remotes:WaitForChild("SimulatorResult") :: RemoteEvent
+resultEvent.OnClientEvent:Connect(function(message)
+	status.Text = tostring(message)
+end)
+render()</code></pre></div>
+            <ol class="step-list" start="12"><li>Use Play: equipe a Tool, mire Stone, minere até encher, venda, compre upgrade, desbloqueie Crystal e teste rebirth. Pare e reabra para comprovar persistência.</li><li>Use Server &amp; Clients com dois jogadores. Depois tente enviar nil, uma Part fora de Ores, Crystal bloqueado e spam. Nenhum caso deve criar minério.</li><li>Use Device Emulator e Controller Emulator. Se um dispositivo não ativar Tool confortavelmente, reutilize o binding do Input Action System de 4.6 para chamar a mesma ativação cliente; nunca duplique a regra servidor.</li><li>Para reiniciar, restaure a versão do Laboratório de Dados ou use uma chave de usuário de teste. Não apague dados reais.</li></ol><p><strong>Resultado esperado:</strong> o ciclo minerar→vender→melhorar→desbloquear funciona, a missão concede uma vez, o rebirth reinicia campos definidos e tudo retorna na sessão seguinte. Se UI divergir, compare Attributes com ProfileState; a UI não corrige saldo.</p>
+          </section>
+          <section><h3>Testes de conclusão</h3><div class="table-wrap"><table><thead><tr><th>Cenário</th><th>Resultado obrigatório</th></tr></thead><tbody><tr><td>nil, Instance externa, ID desconhecido</td><td>recusa sem mutação</td></tr><tr><td>longe, morto, sem Tool, spam</td><td>recusa contextual</td></tr><tr><td>mochila cheia</td><td>nunca ultrapassa capacidade</td></tr><tr><td>Crystal na área 1</td><td>recusa</td></tr><tr><td>missão chamada duas vezes</td><td>uma recompensa</td></tr><tr><td>dois jogadores</td><td>perfis independentes</td></tr><tr><td>load falho/lock perdido</td><td>gameplay persistente e save bloqueados</td></tr><tr><td>Stop/entrada seguinte</td><td>estado íntegro e migrado</td></tr></tbody></table></div></section>
+          <section><h3>Exercícios e encerramento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Mostre no Status quanto falta para a missão sem deixar o cliente concedê-la.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Venda Stone e Crystal por valores separados sem confiar em valor enviado pelo cliente.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Crie testes automatizados puros para mochila, upgrade, área, rebirth e repetição de missão.</p></article></div><p><strong>Projeto 9 concluído:</strong> vertical slice persistente e autoritativa, com ferramenta, dois minérios, venda, upgrade, área, rebirth, HUD e testes hostis.</p><ul class="check-list"><li>Cliente envia intenção mínima.</li><li>Servidor valida tipo, alvo, distância, estado e frequência.</li><li>Toda mutação persistente passa por ProfileState.</li><li>Core loop possui fonte e sumidouro.</li><li>Falhas de dados desabilitam consequências persistentes.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> replique <code>OresMined</code> como Attribute e mostre <code>math.max(0, 10 - valor)</code>. RewardRules continua sendo a autoridade.</p><p><strong>Intermediário:</strong> armazene stacks por oreId no perfil; na venda, o servidor percorre IDs permitidos e consulta <code>SimulatorConfig.Ores[id].sellValue</code>. Nunca aceite preço no payload.</p><p><strong>Desafiador:</strong> extraia funções puras que recebem perfil/configuração e retornam Result. Cubra limites exatos, NaN, saldo insuficiente e duas chamadas consecutivas. Mais de uma arquitetura modular é válida.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>Core loop e progressão</td><td><a href="https://create.roblox.com/docs/production/game-design/core-loops" target="_blank" rel="noopener noreferrer">Core loops</a></td><td>Simulator — MonzterDEV não analisada integralmente</td><td>Atual e recomendada</td><td>Vertical slice limitada a um ciclo completo.</td></tr><tr><td>Raycast e RaycastParams</td><td><a href="https://create.roblox.com/docs/workspace/raycasting" target="_blank" rel="noopener noreferrer">Raycasting</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Cliente encontra candidato; servidor valida consequência.</td></tr><tr><td>RemoteEvent e segurança</td><td><a href="https://create.roblox.com/docs/scripting/security/server-side-detection" target="_blank" rel="noopener noreferrer">Server-side detection</a></td><td>Playlist não usada como autoridade</td><td>Insegura sem validação</td><td>Tipo, hierarquia, Tool, área, distância e cooldown verificados.</td></tr><tr><td>Economy events no Studio</td><td><a href="https://create.roblox.com/docs/production/analytics/economy-events" target="_blank" rel="noopener noreferrer">Economy events</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Eventos só serão enviados do servidor publicado no Módulo 9.</td></tr></tbody></table></div></section><div class="chapter-pager"><a class="button" href="#capitulo-04" data-previous-chapter>← 7.4</a><a class="button primary" href="#avaliacao" data-next-chapter>Avaliação →</a></div>
+        </div>
+      </article>
+
+      <section class="assessment-card" id="avaliacao" aria-labelledby="titulo-avaliacao"><p class="chapter-kicker">Avaliação de domínio · não contabilizada como capítulo</p><h2 id="titulo-avaliacao">Prove integridade antes de avançar</h2><p>Avance somente se conseguir explicar e demonstrar os oito itens sem consultar o gabarito.</p><ol><li>Migre um perfil v1 para v3 e mostre os valores padrão novos.</li><li>Explique por que leaderstats não é a fonte da verdade.</li><li>Mostre no Output que uma falha de load bloqueia o save.</li><li>Compare SetAsync, UpdateAsync e IncrementAsync com um cenário adequado para cada.</li><li>Faça três retries terminarem e identifique o backoff.</li><li>Mostre que outro servidor não carrega um lock ativo e que o antigo não salva após perder o lock.</li><li>Chame a missão duas vezes e prove que moedas não duplicam.</li><li>Execute a matriz hostil do simulador e reabra a sessão.</li></ol><details class="answer"><summary>Critério e encaminhamento</summary><div class="answer-body"><p><strong>Domínio:</strong> todas as evidências são reproduzíveis nos modos indicados, sem editar manualmente o dado para fabricar sucesso. Se load falho salvar, lock perdido gravar ou recompensa repetir, volte a 7.2–7.4 antes de seguir.</p><p><strong>Pronto para o Módulo 8:</strong> perfil íntegro nos cenários normal, concorrente e de falha; vertical slice funciona em teclado, gamepad e touch; nenhum resultado importante depende do cliente.</p></div></details></section>
+
+      <section class="module-reference" aria-labelledby="referencias-modulo"><h2 id="referencias-modulo">Glossário e referências do Módulo 7</h2><div class="glossary-grid"><article><h3>Backoff</h3><p>Espera crescente e limitada antes de tentar novamente.</p></article><article><h3>Budget</h3><p>Capacidade momentânea de solicitações DataStore.</p></article><article><h3>Idempotência</h3><p>Repetição sem duplicar a consequência.</p></article><article><h3>Schema</h3><p>Contrato versionado do dado persistente.</p></article><article><h3>Session lock</h3><p>Reserva atômica de um perfil para um servidor.</p></article><article><h3>Vertical slice</h3><p>Fatia pequena e completa da experiência.</p></article></div><p>Fontes centrais: <a href="https://create.roblox.com/docs/cloud-services/data-stores" target="_blank" rel="noopener noreferrer">Data stores</a>, <a href="https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits" target="_blank" rel="noopener noreferrer">erros e limites</a>, <a href="https://create.roblox.com/docs/cloud-services/data-stores/best-practices" target="_blank" rel="noopener noreferrer">boas práticas</a>, <a href="https://create.roblox.com/docs/cloud-services/data-stores/player-data-purchasing" target="_blank" rel="noopener noreferrer">player data sample</a>, <a href="https://create.roblox.com/docs/cloud-services/data-stores/observability" target="_blank" rel="noopener noreferrer">observabilidade</a>, <a href="https://create.roblox.com/docs/production/game-design/balance-virtual-economies" target="_blank" rel="noopener noreferrer">economias</a> e <a href="https://create.roblox.com/docs/production/game-design/core-loops" target="_blank" rel="noopener noreferrer">core loops</a>.</p><p class="callout info"><strong>Playlists:</strong> BrawlDev DataStore #17 e Simulator — MonzterDEV permanecem apoio complementar não analisado integralmente. Use somente depois dos respectivos capítulos, compare toda API e reconstrua com autoridade do servidor.</p></section>
+    </div>
+  </main>
+  <footer class="site-footer"><p>Módulo 7 completo · conteúdo técnico consultado em 26 de agosto de 2026.</p></footer>
+</body>
+</html>
+
+

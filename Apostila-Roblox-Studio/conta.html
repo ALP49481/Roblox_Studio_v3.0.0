@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Conta opcional para sincronizar o progresso da Apostila Roblox Studio.">
+  <title>Minha conta — Apostila Roblox Studio</title>
+  <link rel="stylesheet" href="assets/styles.css?v=20260826-11">
+  <script src="assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a>
+    <div class="header-actions"><a class="button" href="index.html#modulos">Módulos</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div>
+  </div></header>
+  <main id="conteudo" class="account-page" data-account-page data-server-available="false">
+    <section class="page-section compact-section" aria-labelledby="conta-titulo">
+      <div class="section-heading"><span class="eyebrow">Sincronização opcional</span><h1 id="conta-titulo">Leve seu progresso para outro dispositivo.</h1><p class="lead">A apostila funciona sem conta. Ao criar uma, as conclusões deste navegador são combinadas com as que já estiverem salvas no servidor.</p></div>
+      <div class="callout tip"><strong>O que a conta guarda</strong><p>Somente seu nome de usuário, a senha protegida e os capítulos marcados. Ela não se conecta à sua conta Roblox e não armazena dados de pagamento.</p></div>
+      <section data-account-offline aria-labelledby="offline-titulo">
+        <div class="card"><h2 id="offline-titulo">Modo offline ativo</h2><p>O servidor de contas não está disponível neste endereço. Continue estudando normalmente: o progresso fica salvo neste navegador. Depois de publicar o servidor no Render, abra esta página pelo endereço online para criar sua conta.</p><a class="button primary" href="index.html#modulos">Continuar estudando</a></div>
+      </section>
+      <section data-account-guest hidden aria-labelledby="acesso-titulo">
+        <h2 id="acesso-titulo">Criar conta ou entrar</h2>
+        <div class="account-grid">
+          <form class="card form-card" data-register-form>
+            <h3>Criar conta</h3><p>Escolha um nome simples e uma senha que você não usa em outro serviço.</p>
+            <label for="cadastro-usuario">Nome de usuário</label><input id="cadastro-usuario" name="username" autocomplete="username" minlength="3" maxlength="32" pattern="[a-z0-9._-]{3,32}" required aria-describedby="regra-usuario">
+            <small id="regra-usuario">3 a 32 caracteres: letras minúsculas, números, ponto, hífen ou _.</small>
+            <label for="cadastro-senha">Senha</label><input id="cadastro-senha" name="password" type="password" autocomplete="new-password" minlength="10" maxlength="128" required>
+            <p class="form-message" data-form-message role="alert"></p><button class="button primary" type="submit">Criar e sincronizar</button>
+          </form>
+          <form class="card form-card" data-login-form>
+            <h3>Já tenho conta</h3><p>Entre para unir o progresso salvo aqui com o progresso da nuvem.</p>
+            <label for="login-usuario">Nome de usuário</label><input id="login-usuario" name="username" autocomplete="username" required>
+            <label for="login-senha">Senha</label><input id="login-senha" name="password" type="password" autocomplete="current-password" required>
+            <p class="form-message" data-form-message role="alert"></p><button class="button primary" type="submit">Entrar e sincronizar</button>
+          </form>
+        </div>
+      </section>
+      <section data-account-signed hidden aria-labelledby="conectada-titulo">
+        <div class="card"><span class="status-pill available">Conta conectada</span><h2 id="conectada-titulo">Olá, <span data-username></span>.</h2><p>As novas marcações serão enviadas ao servidor. Se a conexão cair, o navegador mantém sua alteração e ela poderá ser combinada na próxima sincronização.</p><div class="button-row"><a class="button primary" href="index.html#modulos">Continuar estudando</a><button class="button" type="button" data-logout-button>Sair da conta</button></div></div>
+      </section>
+      <div class="callout attention"><strong>Guarde sua senha</strong><p>Esta versão simples ainda não possui recuperação por e-mail. Se perder a senha, não será possível recuperar a conta automaticamente.</p></div>
+    </section>
+  </main>
+  <footer class="site-footer"><p>Apostila Roblox Studio · progresso local com sincronização opcional.</p></footer>
+</body>
+</html>

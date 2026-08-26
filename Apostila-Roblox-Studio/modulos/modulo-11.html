@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Módulo 11 da Apostila Roblox Studio: projeto final Expedição de cristais, da arquitetura ao release privado.">
+  <title>Módulo 11 — Projeto final completo</title>
+  <link rel="stylesheet" href="../assets/styles.css?v=20260826-11">
+  <script src="../assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a><div class="header-actions"><a class="button" href="../index.html#modulos">Todos os módulos</a><a class="button" href="../conta.html" data-account-label>Conta</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div></div></header>
+  <main class="module-shell" id="conteudo">
+    <aside class="module-sidebar" data-module-sidebar data-collapsed="false">
+      <button class="button mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="true">Ocultar capítulos</button>
+      <nav aria-label="Capítulos do Módulo 11"><p class="eyebrow">Módulo 11</p><h2>Projeto final</h2><ol class="chapter-nav">
+        <li><a href="#capitulo-01" data-chapter-link><span>11.1</span> Escopo e arquitetura</a></li>
+        <li><a href="#capitulo-02" data-chapter-link><span>11.2</span> Vertical slice</a></li>
+        <li><a href="#capitulo-03" data-chapter-link><span>11.3</span> Release candidate</a></li>
+        <li><a href="#capitulo-04" data-chapter-link><span>11.4</span> Publicação e portfólio</a></li>
+      </ol></nav>
+      <section class="module-progress" aria-labelledby="progresso-modulo"><h3 id="progresso-modulo">Progresso do módulo</h3><div class="progress-track" role="progressbar" aria-label="Progresso do módulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" data-progress-fill data-progress-scope="11"></div></div><p class="progress-label" data-progress-label data-progress-scope="11">0 de 4 capítulos disponíveis concluídos · 0%</p><p><small>Alt + ← e Alt + → alternam capítulos.</small></p></section>
+      <a class="button" href="modulo-10.html">← Módulo 10</a>
+    </aside>
+
+    <section class="module-content">
+      <header class="module-hero"><p class="eyebrow">Dificuldade 5/5 · síntese e autonomia</p><h1>Módulo 11 — Projeto final completo</h1><p>Você transformará tudo que praticou numa experiência pequena, coerente e operável. O objetivo não é empilhar recursos: é provar um ciclo divertido, seguro, persistente, acessível, medido e reversível.</p><div class="concept-diagram" aria-label="Etapas do projeto final"><div class="concept-node"><strong>Planejar</strong><br>escopo e riscos</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Provar</strong><br>vertical slice</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Endurecer</strong><br>dados e acesso</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Operar</strong><br>medir e reverter</div></div><aside class="callout tip"><strong>Definição do projeto</strong><p><em>Expedição de cristais</em> é uma sessão cooperativa curta: entrar, coletar cristais, superar um obstáculo ou NPC, concluir a meta, receber recompensa e melhorar a ferramenta para a próxima expedição.</p></aside></header>
+
+      <article class="chapter" id="capitulo-01" aria-labelledby="titulo-01">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 11.1</p><h2 id="titulo-01">Escopo, documento de design e arquitetura</h2><p>Antes de programar, transforme uma ideia ampla numa promessa pequena que pode ser testada.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-11-capitulo-01"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos, pré-requisitos e vocabulário</h3><p><strong>Pré-requisitos:</strong> módulos 0–10. Você escreverá a promessa, o loop, a definição de pronto, o orçamento e as fronteiras de confiança; então montará a árvore mínima do projeto.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Game design document</dt><dd>Documento curto que registra a experiência pretendida e as decisões necessárias.</dd></div><div class="glossary-item"><dt>Core loop</dt><dd>Ciclo de ações repetidas que sustenta a experiência.</dd></div><div class="glossary-item"><dt>Vertical slice</dt><dd>Fatia pequena que atravessa gameplay, UI, áudio, rede e teste de ponta a ponta.</dd></div><div class="glossary-item"><dt>Critério de pronto</dt><dd>Evidência observável que permite encerrar uma entrega.</dd></div><div class="glossary-item"><dt>Orçamento</dt><dd>Limite consciente de conteúdo, desempenho, dados e complexidade.</dd></div></dl></section>
+
+          <section><h3>A promessa em uma frase</h3><p>Escreva: “Em sessões de 60–90 segundos, até quatro jogadores coletam cristais, evitam um guardião simples, entregam a meta e usam moedas para melhorar uma ferramenta.” Essa frase define público, duração, ação, risco, recompensa e progressão. Teleporte entre places, matchmaking customizado, monetização e Open Cloud são extensões; não bloqueiam a primeira versão.</p><div class="table-wrap"><table><thead><tr><th>Incluído no release candidate</th><th>Fora do primeiro release</th></tr></thead><tbody><tr><td>um lobby e uma área no mesmo place</td><td>mundo aberto e vários biomas</td></tr><tr><td>três IDs de cristal e uma meta</td><td>crafting e mercado entre jogadores</td></tr><tr><td>um obstáculo/guardião simples</td><td>árvore profunda de habilidades</td></tr><tr><td>moedas e dois níveis de ferramenta</td><td>monetização e trading</td></tr><tr><td>HUD, teclado, gamepad e toque</td><td>matchmaking customizado</td></tr><tr><td>perfil versionado e analytics mínimos</td><td>automação Open Cloud obrigatória</td></tr></tbody></table></div><p>O loop possui três camadas oficiais: interação minuto a minuto (mover e procurar), ação repetida (coletar e evitar perigo) e motor de progressão (melhorar ferramenta, facilitando a próxima expedição).</p></section>
+
+          <section><h3>Prática guiada — documento e árvore do projeto</h3><p><strong>Projeto aberto:</strong> nova experiência Baseplate privada, salva como <em>ExpedicaoDeCristais</em>. Publique numa cópia de staging antes de ativar serviços de API.</p><ol class="step-list"><li>No disco, crie um documento simples <code>DESIGN-EXPEDICAO.txt</code>. Registre promessa, público, dispositivos, loop, escopo, riscos, dados, remotes, orçamento e critérios abaixo. O arquivo é documentação do projeto, não conteúdo da apostila.</li><li>No Explorer, crie <code>ReplicatedStorage → FinalProject</code>. Dentro, Folders <code>Remotes</code> e <code>Shared</code>. Em Remotes, crie RemoteEvents <code>RequestStart</code>, <code>RequestCollect</code>, <code>RoundState</code> e <code>RequestSetting</code>.</li><li>Crie <code>ServerScriptService → FinalProject → Services</code>; <code>StarterGui → FinalHud</code>; e <code>Workspace → FinalMap</code> com Models <code>Lobby</code> e <code>ExpeditionZone</code>.</li><li>Em <code>Lobby</code>, crie Part ancorada <code>StartConsole</code> com ProximityPrompt <code>StartPrompt</code>. Em <code>ExpeditionZone</code>, crie Folder <code>Crystals</code> e pelo menos seis Parts ancoradas.</li><li>Adicione tag <code>Crystal</code> às Parts e o atributo string <code>CrystalId</code>, alternando <code>Blue</code>, <code>Green</code> e <code>Gold</code>. Não coloque valor monetário como verdade do cliente.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ProjectConfig.luau</strong><small>ModuleScript · game → ReplicatedStorage → FinalProject → Shared → ProjectConfig · compartilhado · carregado sob demanda</small></div><button class="copy-button" type="button" data-copy-target="codigo-1101-config" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-1101-config"><code>--!strict
+local ProjectConfig = {
+	ROUND_DURATION = 75,
+	GOAL_VALUE = 30,
+	COLLECTION_DISTANCE = 12,
+	REMOTE_COOLDOWN = 0.15,
+	CRYSTALS = {
+		Blue = {value = 2},
+		Green = {value = 5},
+		Gold = {value = 10},
+	},
+	UPGRADES = {
+		[1] = {nextCost = 50, collectionBonus = 0},
+		[2] = {nextCost = 150, collectionBonus = 1},
+		[3] = {nextCost = nil, collectionBonus = 2},
+	},
+}
+
+return table.freeze(ProjectConfig)</code></pre></div>
+            <p><strong>Significado:</strong> o ModuleScript reúne regras estáveis; a tabela é congelada para impedir alteração acidental. Valores continuam autoritativos porque o servidor consulta o módulo e valida o CrystalId. O cliente pode ler a meta para apresentação, mas não decide recompensa.</p>
+          </section>
+
+          <section><h3>Contrato, riscos e pronto</h3><div class="table-wrap"><table><thead><tr><th>Fluxo</th><th>Pedido</th><th>Validação/verdade</th><th>Falha segura</th></tr></thead><tbody><tr><td>iniciar rodada</td><td>cliente pede início</td><td>servidor: distância, estado, perfil</td><td>permanece no lobby</td></tr><tr><td>coletar</td><td>cliente aponta Instance</td><td>tag, ID, distância, rodada, repetição, frequência</td><td>nenhuma recompensa</td></tr><tr><td>upgrade</td><td>cliente aponta nível</td><td>catálogo, saldo e nível no servidor</td><td>sem débito</td></tr><tr><td>salvar</td><td>evento do servidor</td><td>perfil carregado, lock e schema</td><td>não sobrescreve com vazio</td></tr></tbody></table></div><p><strong>Critério de pronto:</strong> dois clientes completam o loop; pedido hostil não cria moeda; perfil antigo migra; load falho não salva; HUD funciona em 375/768/1440, gamepad e toque; baseline de performance existe; release privado tem analytics e rollback ensaiado.</p><p><strong>Orçamento inicial:</strong> um place, quatro jogadores, 12 cristais ativos, um NPC/obstáculo, quatro remotes estreitos, um perfil por jogador, até quatro eventos analytics por ciclo e nenhuma requisição HTTP no loop.</p></section>
+
+          <section><h3>Exercícios e início do Projeto 11</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Reescreva a promessa do jogo em uma frase, preservando duração, ação e progressão.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Para cada remote, registre tipo, frequência, validações e resposta de erro.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Remova três ideias do escopo e explique qual risco ou dependência cada corte elimina.</p></article></div><p><strong>Projeto progressivo 11 começa:</strong> entregue o documento, diagrama cliente→servidor→dados, árvore limpa e uma lista de dez testes. Ainda não há recompensa funcional.</p><ul class="check-list"><li>A promessa cabe numa sessão curta.</li><li>O loop tem interação, repetição e progressão.</li><li>“Fora do escopo” está escrito.</li><li>Servidor é fonte de verdade para valor.</li><li>Critério de pronto contém evidência, não sensação.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> uma boa frase permite imaginar o primeiro minuto e o motivo para repetir. Evite “um jogo com tudo”.</p><p><strong>Intermediário:</strong> <code>RequestCollect</code> aceita apenas uma Instance, no máximo algumas vezes por segundo, e verifica tag, ID, distância, rodada e repetição. Resposta inválida não muta estado.</p><p><strong>Desafiador:</strong> cortar vários places elimina teleporte e reconciliação; cortar trading elimina dupla concorrência; cortar monetização elimina recibos no primeiro release. Cortes conscientes aumentam a chance de concluir.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>core loop</td><td><a href="https://create.roblox.com/docs/production/game-design/core-loops" target="_blank" rel="noopener noreferrer">Core loops</a></td><td>Nenhuma playlist escolhida</td><td>Atual e recomendada</td><td>Três camadas aplicadas ao escopo.</td></tr><tr><td>prototipagem</td><td><a href="https://create.roblox.com/docs/production/game-design/prototyping" target="_blank" rel="noopener noreferrer">Prototyping</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Vertical slice precede conteúdo.</td></tr><tr><td>design para dispositivos</td><td><a href="https://create.roblox.com/docs/production/game-design/design-for-roblox" target="_blank" rel="noopener noreferrer">Design for Roblox</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Mobile e performance entram no escopo.</td></tr><tr><td><code>table.freeze</code></td><td><a href="https://create.roblox.com/docs/luau/tables" target="_blank" rel="noopener noreferrer">Luau tables</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Protege configuração contra mutação acidental.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="modulo-10.html">← Módulo 10</a><a class="button primary" href="#capitulo-02" data-next-chapter>11.2 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-02" aria-labelledby="titulo-02">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 11.2</p><h2 id="titulo-02">Vertical slice: loop principal seguro e testável</h2><p>Complete um ciclo ponta a ponta antes de aumentar mapa, conteúdo ou efeitos.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-11-capitulo-02"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e preparação</h3><p><strong>Pré-requisito:</strong> 11.1 e sistemas dos módulos 3–6. Você implementará início, coleta, meta, recompensa de sessão e HUD; depois atacará o fluxo com distância, spam, tipo errado e repetição.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Slice</dt><dd>Fatia completa que prova integração, não quantidade de conteúdo.</dd></div><div class="glossary-item"><dt>Estado de rodada</dt><dd>Conjunto de dados que define se o jogador está fora, ativo ou concluído.</dd></div><div class="glossary-item"><dt>Rate limit</dt><dd>Limite de pedidos aceitos num intervalo.</dd></div><div class="glossary-item"><dt>Teste adversarial</dt><dd>Entrada válida em formato, mas impossível, repetida ou maliciosa.</dd></div></dl></section>
+
+          <section><h3>Prática guiada — servidor autoritativo</h3><p><strong>Projeto aberto:</strong> <em>ExpedicaoDeCristais</em> de 11.1. Em <code>ServerScriptService → FinalProject</code>, crie Script <code>Main</code>. Os cristais permanecem visíveis para todos; a coleta é individual por rodada.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>Main.server.luau</strong><small>Script · game → ServerScriptService → FinalProject → Main · servidor · inicia com a sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-1102-main" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-1102-main"><code>--!strict
+local Players = game:GetService("Players")
+local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local rootFolder = ReplicatedStorage:WaitForChild("FinalProject")
+local remotes = rootFolder:WaitForChild("Remotes")
+local requestStart = remotes:WaitForChild("RequestStart") :: RemoteEvent
+local requestCollect = remotes:WaitForChild("RequestCollect") :: RemoteEvent
+local roundState = remotes:WaitForChild("RoundState") :: RemoteEvent
+local Config = require(rootFolder.Shared:WaitForChild("ProjectConfig"))
+local startConsole = workspace.FinalMap.Lobby:WaitForChild("StartConsole") :: BasePart
+
+type Round = {endsAt: number, value: number, collected: {[Instance]: boolean}}
+local rounds: {[Player]: Round} = {}
+local lastRequest: {[Player]: number} = {}
+
+local function rootPart(player: Player): BasePart?
+	local character = player.Character
+	return character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+end
+
+local function near(player: Player, part: BasePart, maximum: number): boolean
+	local root = rootPart(player)
+	return root ~= nil and (root.Position - part.Position).Magnitude &lt;= maximum
+end
+
+local function emit(player: Player, phase: string, value: number, message: string)
+	roundState:FireClient(player, {phase = phase, value = value, goal = Config.GOAL_VALUE, message = message})
+end
+
+local function finish(player: Player, success: boolean)
+	local round = rounds[player]
+	if not round then return end
+	rounds[player] = nil
+	if success then
+		local reward = round.value + 10
+		local current = player:GetAttribute("SessionCoins")
+		if typeof(current) ~= "number" then current = 0 end
+		player:SetAttribute("SessionCoins", current + reward)
+		emit(player, "Completed", round.value, "Expedição concluída: +" .. reward)
+	else
+		emit(player, "Failed", round.value, "Tempo encerrado; nenhuma moeda concedida")
+	end
+end
+
+requestStart.OnServerEvent:Connect(function(player: Player)
+	if rounds[player] or not near(player, startConsole, 12) then return end
+	local round: Round = {endsAt = workspace:GetServerTimeNow() + Config.ROUND_DURATION, value = 0, collected = {}}
+	rounds[player] = round
+	emit(player, "Active", 0, "Colete cristais")
+	task.delay(Config.ROUND_DURATION, function()
+		if rounds[player] == round then finish(player, false) end
+	end)
+end)
+
+requestCollect.OnServerEvent:Connect(function(player: Player, candidate: unknown)
+	local now = os.clock()
+	if now - (lastRequest[player] or 0) &lt; Config.REMOTE_COOLDOWN then return end
+	lastRequest[player] = now
+	if typeof(candidate) ~= "Instance" or not candidate:IsA("BasePart") then return end
+	if not CollectionService:HasTag(candidate, "Crystal") then return end
+	local round = rounds[player]
+	if not round or workspace:GetServerTimeNow() &gt;= round.endsAt then return end
+	if round.collected[candidate] or not near(player, candidate, Config.COLLECTION_DISTANCE) then return end
+	local crystalId = candidate:GetAttribute("CrystalId")
+	local definition = typeof(crystalId) == "string" and Config.CRYSTALS[crystalId] or nil
+	if not definition or typeof(definition.value) ~= "number" then return end
+	round.collected[candidate] = true
+	round.value += definition.value
+	emit(player, "Active", round.value, "+" .. definition.value .. " cristal")
+	if round.value &gt;= Config.GOAL_VALUE then finish(player, true) end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	rounds[player] = nil
+	lastRequest[player] = nil
+end)</code></pre></div>
+            <p><strong>Decisões:</strong> cliente envia intenção e Instance; servidor decide se o objeto é cristal, se a rodada existe, se a distância é possível, se já foi coletado e quanto vale. Só <code>finish</code> concede a recompensa. O atributo <code>SessionCoins</code> é temporário; persistência chega no próximo capítulo.</p>
+          </section>
+
+          <section><h3>Prática guiada — cliente e HUD</h3><ol class="step-list"><li>Em <code>StarterGui → FinalHud</code>, defina <code>ResetOnSpawn = false</code>. Crie TextLabels <code>Status</code> e <code>Progress</code>.</li><li>Dentro de <code>FinalHud</code>, crie LocalScript <code>FinalHudController</code>. Ele detecta prompts, mas não concede nada.</li><li>Selecione cada Part Crystal e insira ProximityPrompt <code>CollectPrompt</code>. No StartConsole já existe <code>StartPrompt</code>.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>FinalHudController.client.luau</strong><small>LocalScript · game → StarterGui → FinalHud → FinalHudController · cliente · após carregar a interface</small></div><button class="copy-button" type="button" data-copy-target="codigo-1102-client" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-1102-client"><code>--!strict
+local ProximityPromptService = game:GetService("ProximityPromptService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local gui = script.Parent :: ScreenGui
+local status = gui:WaitForChild("Status") :: TextLabel
+local progress = gui:WaitForChild("Progress") :: TextLabel
+local remotes = ReplicatedStorage:WaitForChild("FinalProject"):WaitForChild("Remotes")
+local requestStart = remotes:WaitForChild("RequestStart") :: RemoteEvent
+local requestCollect = remotes:WaitForChild("RequestCollect") :: RemoteEvent
+local roundState = remotes:WaitForChild("RoundState") :: RemoteEvent
+
+ProximityPromptService.PromptTriggered:Connect(function(prompt: ProximityPrompt)
+	if prompt.Name == "StartPrompt" then
+		requestStart:FireServer()
+	elseif prompt.Name == "CollectPrompt" then
+		requestCollect:FireServer(prompt.Parent)
+	end
+end)
+
+roundState.OnClientEvent:Connect(function(payload: unknown)
+	if typeof(payload) ~= "table" or typeof(payload.phase) ~= "string"
+		or typeof(payload.value) ~= "number" or typeof(payload.goal) ~= "number"
+		or typeof(payload.message) ~= "string" then return end
+	status.Text = payload.message
+	progress.Text = string.format("Cristais: %d / %d", payload.value, payload.goal)
+end)</code></pre></div>
+            <p><strong>Teste:</strong> Test → Start com dois clientes. Inicie e colete separadamente. Cada HUD deve ter progresso próprio. No servidor, chame o remote com uma Part sem tag, com string, de longe e várias vezes: nenhum caso cria moeda. Para simular tempo, reduza temporariamente <code>ROUND_DURATION</code> a 8; falha concede zero. Restaure 75. Para reiniciar, Stop/Start; para desfazer, remova Main, LocalScript e prompts sem apagar a árvore planejada.</p><p><strong>Erros comuns:</strong> todos progridem juntos indica estado global; recompensa dupla indica conclusão chamada sem remover a rodada; “Infinite yield” indica caminho/nome; coleta distante aceita indica validação no cliente; nenhum prompt no touch/gamepad pede revisar propriedades e emulação.</p>
+          </section>
+
+          <section><h3>Exercícios e vertical slice</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Adicione mensagem “meta atingida” sem alterar a recompensa.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Inclua o nível temporário de ferramenta no servidor e some bônus definido em Config.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Crie dez testes hostis automatizáveis para tipo, distância, frequência, estado, repetição, respawn e dois jogadores.</p></article></div><p><strong>Projeto 11 — vertical slice:</strong> inclua um obstáculo simples ou o NPC do Módulo 8, som e feedback reduzíveis. Não acrescente bioma, loja grande ou place extra. Grave uma execução completa e uma tentativa hostil.</p><ul class="check-list"><li>Loop termina em 60–90 segundos.</li><li>Dois jogadores têm estados independentes.</li><li>Servidor calcula valor e recompensa.</li><li>Falha/timeout concede zero.</li><li>HUD comunica início, progresso e final.</li><li>Teste hostil não gera erro nem mutação.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> envie a mensagem em <code>finish</code>; a UI só apresenta. Evite outro remote de recompensa.</p><p><strong>Intermediário:</strong> servidor lê nível validado, encontra <code>Config.UPGRADES[level]</code> e soma <code>collectionBonus</code>. Nível declarado pelo cliente é ignorado.</p><p><strong>Desafiador:</strong> cubra string/Part falsa, cristal sem ID, ID desconhecido, distância, spam, coleta repetida, sem rodada, rodada expirada, respawn e dois jogadores no mesmo cristal. Resultado esperado: apenas pedidos válidos alteram a rodada correta.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>fronteira cliente-servidor</td><td><a href="https://create.roblox.com/docs/scripting/security/client-server-boundary" target="_blank" rel="noopener noreferrer">Client-server boundary</a></td><td>Nenhuma; playlists não especificam o projeto</td><td>Atual e recomendada</td><td>Tipo, contexto, distância e frequência.</td></tr><tr><td><code>RemoteEvent</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/RemoteEvent" target="_blank" rel="noopener noreferrer">RemoteEvent API</a></td><td>Não utilizada</td><td>Insegura sem validação</td><td>Remotes estreitos; servidor autoritativo.</td></tr><tr><td><code>CollectionService</code>/atributos</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/CollectionService" target="_blank" rel="noopener noreferrer">CollectionService API</a>; <a href="https://create.roblox.com/docs/studio/properties#instance-attributes" target="_blank" rel="noopener noreferrer">Attributes</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>ID separa conteúdo de regra.</td></tr><tr><td><code>ProximityPromptService</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/ProximityPromptService" target="_blank" rel="noopener noreferrer">ProximityPromptService API</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Input unificado; servidor ainda valida.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-01">← 11.1</a><a class="button primary" href="#capitulo-03" data-next-chapter>11.3 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-03" aria-labelledby="titulo-03">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 11.3</p><h2 id="titulo-03">Progressão persistente, acessibilidade e endurecimento</h2><p>Troque o protótipo por um release candidate que sobrevive a falhas, reconexões, dispositivos e abuso.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-11-capitulo-03"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 11.2, módulos 7 e 9. Você integrará perfil versionado, migração, lock de sessão, settings persistentes, UI adaptativa, localização, teste de falha e baseline.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Release candidate</dt><dd>Versão candidata a lançamento, sem erro relevante conhecido no fluxo principal.</dd></div><div class="glossary-item"><dt>Schema</dt><dd>Formato e significado dos campos persistidos.</dd></div><div class="glossary-item"><dt>Migração</dt><dd>Conversão explícita de formato antigo para novo.</dd></div><div class="glossary-item"><dt>Lock de sessão</dt><dd>Marca temporária que impede dois servidores de editar o mesmo perfil.</dd></div><div class="glossary-item"><dt>Reduced motion</dt><dd>Preferência para reduzir movimentos não essenciais.</dd></div></dl></section>
+
+          <section><h3>Prática guiada — perfil final</h3><p><strong>Projeto aberto:</strong> cópia de staging. Reutilize o ProfileStore testado no Módulo 7. Em vez de reescrever concorrência, substitua apenas schema e migração pelos blocos abaixo; preserve <code>UpdateAsync</code>, lock, autosave, <code>BindToClose</code>, retry limitado e regra “load falhou → não salvar”.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>FinalProfileSchema.luau</strong><small>ModuleScript · game → ServerScriptService → FinalProject → Services → FinalProfileSchema · servidor · usado no load/migração</small></div><button class="copy-button" type="button" data-copy-target="codigo-1103-schema" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-1103-schema"><code>--!strict
+export type Profile = {
+	schemaVersion: number,
+	coins: number,
+	toolLevel: number,
+	completedExpeditions: number,
+	settings: {reduceMotion: boolean},
+}
+
+local Schema = {}
+local CURRENT_VERSION = 2
+
+function Schema.default(): Profile
+	return {schemaVersion = CURRENT_VERSION, coins = 0, toolLevel = 1,
+		completedExpeditions = 0, settings = {reduceMotion = false}}
+end
+
+function Schema.migrate(raw: any): Profile
+	local profile = Schema.default()
+	if typeof(raw) ~= "table" then return profile end
+	if typeof(raw.coins) == "number" and math.isfinite(raw.coins) then
+		profile.coins = math.clamp(math.floor(raw.coins), 0, 1_000_000_000)
+	end
+	if typeof(raw.toolLevel) == "number" and math.isfinite(raw.toolLevel) then
+		profile.toolLevel = math.clamp(math.floor(raw.toolLevel), 1, 3)
+	end
+	if typeof(raw.completedExpeditions) == "number" and math.isfinite(raw.completedExpeditions) then
+		profile.completedExpeditions = math.clamp(math.floor(raw.completedExpeditions), 0, 1_000_000)
+	end
+	if typeof(raw.settings) == "table" and typeof(raw.settings.reduceMotion) == "boolean" then
+		profile.settings.reduceMotion = raw.settings.reduceMotion
+	end
+	return profile
+end
+
+return table.freeze(Schema)</code></pre></div>
+            <ol class="step-list"><li>No ProfileStore do Módulo 7, chame <code>Schema.migrate(raw)</code> dentro do claim de <code>UpdateAsync</code>. O dado retornado já é versão 2.</li><li>Depois do load seguro, publique atributos <code>ProfileLoaded</code>, <code>Coins</code>, <code>ToolLevel</code> e <code>ReduceMotion</code>. Se load falhar/lock existir, mantenha o jogador em tela neutra e não inicie rodada.</li><li>No <code>Main</code>, exija <code>ProfileLoaded == true</code> no início. Troque <code>SessionCoins</code> por método <code>ProfileStore.AddRoundReward(player, reward)</code>, que altera a cópia do servidor e atributos; o autosave persiste.</li><li>Crie loja de dois upgrades com catálogo do servidor. Use uma única operação: confirme nível/custo, subtraia moedas e aumente nível na mesma função; pedido repetido após subir encontra custo/estado novo e não compra duas vezes.</li></ol><aside class="callout security"><strong>Não una perfis “no escuro”</strong><p>Se load falhar, salvar o default apaga progresso. Se outro servidor possui lock válido, espere/recuse a sessão. Teste essas falhas antes de publicar.</p></aside>
+          </section>
+
+          <section><h3>Acessibilidade, localização e setting seguro</h3><p>Em <code>FinalHud</code>, use Scale, constraints, safe insets, texto legível e foco de gamepad. Não comunique estado só por cor; combine cor, ícone e texto. Adicione TextButton <code>ReduceMotion</code> e envie apenas booleano pelo <code>RequestSetting</code>. O servidor valida nome permitido e tipo, atualiza o perfil e atributo.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>AccessibilityController.client.luau</strong><small>LocalScript · game → StarterGui → FinalHud → AccessibilityController · cliente · aplica preferência visual</small></div><button class="copy-button" type="button" data-copy-target="codigo-1103-access" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-1103-access"><code>--!strict
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local gui = script.Parent :: ScreenGui
+local button = gui:WaitForChild("ReduceMotion") :: TextButton
+local requestSetting = ReplicatedStorage.FinalProject.Remotes.RequestSetting :: RemoteEvent
+
+local function render()
+	local reduced = player:GetAttribute("ReduceMotion") == true
+	button.Text = if reduced then "Movimento reduzido: ligado" else "Movimento reduzido: desligado"
+	button:SetAttribute("ReducedMotion", reduced)
+	-- Controladores de Tween/partículas consultam este atributo e evitam efeitos não essenciais.
+end
+
+button.Activated:Connect(function()
+	requestSetting:FireServer("reduceMotion", player:GetAttribute("ReduceMotion") ~= true)
+end)
+
+player:GetAttributeChangedSignal("ReduceMotion"):Connect(render)
+render()</code></pre></div>
+            <p>No servidor, aceite somente <code>settingName == "reduceMotion"</code> e <code>typeof(value) == "boolean"</code>, com cooldown. Nunca aceite nome arbitrário que permita sobrescrever campos do perfil.</p><p>No Creator Dashboard → Localization, defina português como fonte e adicione entradas estáveis para <code>Final/Start</code>, <code>Final/Collect</code>, <code>Final/Completed</code> e <code>Final/Failed</code>. Não concatene frases complexas; use placeholders contextuais quando necessário. Desative <code>AutoLocalize</code> apenas em nomes próprios que não devem ser traduzidos.</p>
+          </section>
+
+          <section><h3>Matriz de endurecimento</h3><div class="table-wrap"><table><thead><tr><th>Ensaio</th><th>Como executar</th><th>Evidência de aprovação</th></tr></thead><tbody><tr><td>load falho</td><td><code>SIMULATE_LOAD_FAILURE</code> em staging</td><td>não inicia nem salva default</td></tr><tr><td>save falho</td><td>falha simulada antes da chamada</td><td>dirty permanece; retry limitado</td></tr><tr><td>concorrência</td><td>reconectar antes do lock expirar</td><td>apenas uma sessão edita</td></tr><tr><td>dois clientes</td><td>Server &amp; Clients</td><td>estado/recompensa separados</td></tr><tr><td>respawn/reconexão</td><td>Reset e sair/entrar</td><td>HUD volta; perfil não duplica</td></tr><tr><td>mobile/gamepad</td><td>Device Emulator + controle</td><td>ações acessíveis e foco visível</td></tr><tr><td>localização</td><td>emular idioma</td><td>sem corte/concatenação ruim</td></tr><tr><td>performance</td><td>baseline no dispositivo-alvo</td><td>sem crescimento contínuo/pico crítico</td></tr></tbody></table></div><p>Use MicroProfiler/Developer Console na mesma cena, com número de jogadores e qualidade registrados. Verifique conexões ao respawn, loops, memória, rede e streaming. Otimize apenas o custo medido.</p>
+          </section>
+
+          <section><h3>Exercícios e release candidate</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Crie um perfil versão 1 sem settings e prove a migração para versão 2.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Implemente RequestSetting no servidor com allowlist, booleano e cooldown.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Execute a matriz inteira e abra issues para toda falha; nenhuma issue relevante do fluxo principal pode ficar conhecida.</p></article></div><p><strong>Projeto 11 — release candidate privado:</strong> perfil, dois upgrades, HUD responsivo/localizável, preferência de movimento, obstáculo/NPC, testes hostis e baseline. Monetização e múltiplos places continuam opcionais.</p><ul class="check-list"><li>Schema versionado migra dados antigos.</li><li>Load falho nunca salva default.</li><li>Lock impede edição concorrente.</li><li>Compra é atômica no servidor.</li><li>HUD funciona em três tamanhos e métodos de entrada.</li><li>Motion reduzido e localização foram testados.</li><li>Baseline e regressões estão registrados.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> <code>{schemaVersion=1, coins=40, toolLevel=2}</code> vira versão 2, preserva 40/2 e recebe <code>completedExpeditions=0</code> e <code>reduceMotion=false</code>.</p><p><strong>Intermediário:</strong> rejeite nome diferente, tipo diferente e rajada. Atualize a cópia do servidor, o atributo e marque perfil dirty; cliente não escolhe outro campo.</p><p><strong>Desafiador:</strong> falha de dados, duplicação, botão inacessível, texto cortado, conexão acumulada ou pico reproduzível bloqueiam o release candidate. “Raro” não é correção.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>DataStore e falhas</td><td><a href="https://create.roblox.com/docs/cloud-services/data-stores" target="_blank" rel="noopener noreferrer">Data stores</a>; <a href="https://create.roblox.com/docs/cloud-services/data-stores/best-practices" target="_blank" rel="noopener noreferrer">Best practices</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Reuso do ProfileStore testado e separado de produção.</td></tr><tr><td>UI adaptativa/acessível</td><td><a href="https://create.roblox.com/docs/ui/positioning-and-sizing-uiobjects" target="_blank" rel="noopener noreferrer">Positioning and sizing</a>; <a href="https://create.roblox.com/docs/ui/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Três telas, foco e motion reduzido.</td></tr><tr><td>localização</td><td><a href="https://create.roblox.com/docs/production/localization" target="_blank" rel="noopener noreferrer">Localization</a>; <a href="https://create.roblox.com/docs/production/localization/manual-translations" target="_blank" rel="noopener noreferrer">Manual translations</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Chaves/contexto e teste de corte.</td></tr><tr><td>profiling</td><td><a href="https://create.roblox.com/docs/studio/microprofiler" target="_blank" rel="noopener noreferrer">MicroProfiler</a>; <a href="https://create.roblox.com/docs/performance-optimization/design" target="_blank" rel="noopener noreferrer">Design for performance</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Baseline reproduzível antes da otimização.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-02">← 11.2</a><a class="button primary" href="#capitulo-04" data-next-chapter>11.4 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-04" aria-labelledby="titulo-04">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 11.4</p><h2 id="titulo-04">Publicação privada, analytics, manutenção e portfólio</h2><p>Conclua o Projeto 11 com evidência de operação, reversão e comunicação técnica.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-11-capitulo-04"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisito:</strong> 11.3 e módulos 9–10 conforme o escopo. Você congelará o release candidate, instrumentará fatos, publicará privadamente, ensaiará rollback e montará portfólio verificável.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Changelog</dt><dd>Lista objetiva do que mudou numa versão.</dd></div><div class="glossary-item"><dt>Runbook</dt><dd>Passos operacionais para publicar, investigar ou recuperar.</dd></div><div class="glossary-item"><dt>Rollback</dt><dd>Retorno planejado a uma versão compatível.</dd></div><div class="glossary-item"><dt>Incidente</dt><dd>Evento que prejudica disponibilidade, dados, segurança ou jogadores.</dd></div><div class="glossary-item"><dt>Portfólio técnico</dt><dd>Apresentação do problema, decisões, evidências e aprendizados.</dd></div></dl></section>
+
+          <section><h3>Prática guiada — analytics mínimo</h3><p><strong>Projeto aberto:</strong> release candidate de staging. Em <code>ServerScriptService → FinalProject → Services</code>, crie ModuleScript <code>FinalAnalytics</code>. Chame os eventos apenas depois do fato autoritativo.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>FinalAnalytics.luau</strong><small>ModuleScript · game → ServerScriptService → FinalProject → Services → FinalAnalytics · servidor · chamado pelo fluxo confirmado</small></div><button class="copy-button" type="button" data-copy-target="codigo-1104-analytics" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-1104-analytics"><code>--!strict
+local AnalyticsService = game:GetService("AnalyticsService")
+
+local FinalAnalytics = {}
+local steps: {[Player]: {[number]: boolean}} = {}
+
+function FinalAnalytics.step(player: Player, number: number, name: string)
+	steps[player] = steps[player] or {}
+	if steps[player][number] then return end
+	steps[player][number] = true
+	local ok, message = pcall(function()
+		AnalyticsService:LogOnboardingFunnelStepEvent(player, number, name)
+	end)
+	if not ok then warn("[Analytics] funnel:", message) end
+end
+
+function FinalAnalytics.reward(player: Player, amount: number, balance: number)
+	if amount &lt;= 0 or balance &lt; 0 or not math.isfinite(amount) or not math.isfinite(balance) then return end
+	local ok, message = pcall(function()
+		AnalyticsService:LogEconomyEvent(player,
+			Enum.AnalyticsEconomyFlowType.Source, "Coins", amount, balance,
+			Enum.AnalyticsEconomyTransactionType.Gameplay.Name, "ExpeditionComplete")
+	end)
+	if not ok then warn("[Analytics] economy:", message) end
+end
+
+function FinalAnalytics.cleanup(player: Player)
+	steps[player] = nil
+end
+
+return table.freeze(FinalAnalytics)</code></pre></div>
+            <ol class="step-list"><li>Após perfil carregado, registre passo 1 <code>ProfileReady</code>; após iniciar, passo 2 <code>StartedExpedition</code>; após primeira coleta válida, passo 3 <code>CollectedCrystal</code>; após conclusão, passo 4 <code>CompletedExpedition</code>.</li><li>Depois de <code>AddRoundReward</code> confirmar saldo em memória do servidor, registre economy source com quantidade e saldo final. Rejeição não gera evento.</li><li>Em staging publicado, abra Creator Dashboard → Analytics → View Events. Confirme nomes/ordem; painéis agregados podem demorar.</li><li>Não registre texto livre, segredo ou IDs desnecessários. Limpe a tabela ao sair.</li></ol>
+          </section>
+
+          <section><h3>Publicação privada e rollback ensaiado</h3><ol class="step-list"><li><strong>Congelar:</strong> nomeie a versão <code>RC-1</code>, registre hash/commit quando houver Git, schema 2, responsáveis e issues conhecidas (devem ser não críticas).</li><li><strong>Backup:</strong> salve cópia local e confirme Version History. Exporte o documento de design, matriz de testes e changelog.</li><li><strong>Publicar:</strong> mantenha acesso privado e adicione somente playtesters. Publique todos os places usados; neste escopo mínimo há um.</li><li><strong>Smoke test:</strong> conta nova e antiga; dois clientes; teclado, gamepad e mobile; load/save/reconexão; rodada completa e timeout; Output sem erro relevante.</li><li><strong>Observar:</strong> View Events, falhas de DataStore, memória, heartbeat, rejeições e feedback. Logs não incluem perfil completo ou segredo.</li><li><strong>Rollback:</strong> publique de volta a versão anterior compatível e repita smoke test. Não reverta código que não entende o schema mais novo sem estratégia de compatibilidade.</li></ol><aside class="callout warning"><strong>Rollback de código não apaga dados novos</strong><p>Version History restaura place, não o banco. Leitores devem tolerar campos desconhecidos; migrações devem ser aditivas ou possuir plano de volta.</p></aside>
+          </section>
+
+          <section><h3>Runbook e incidente</h3><div class="table-wrap"><table><thead><tr><th>Sinal</th><th>Ação imediata</th><th>Decisão</th></tr></thead><tbody><tr><td>load/save falha acima do normal</td><td>bloquear mutação dependente; preservar dirty</td><td>pausar rollout/rollback compatível</td></tr><tr><td>moedas sobem sem conclusão</td><td>desativar concessão/feature flag segura</td><td>investigar idempotência e logs</td></tr><tr><td>queda no passo 2→3</td><td>reproduzir onboarding em dispositivos</td><td>corrigir orientação, não inventar causa</td></tr><tr><td>memória cresce</td><td>perfil, conexões e respawn</td><td>reverter se regressão confirmada</td></tr><tr><td>asset moderado</td><td>usar substituto do manifesto</td><td>republicar e verificar permissões</td></tr></tbody></table></div><p>Após o incidente, escreva linha do tempo, impacto, causa técnica e organizacional, correção, prevenção e proprietário. Evite culpar pessoas. Atualize testes/runbook para que a mesma classe de erro seja detectada antes.</p>
+          </section>
+
+          <section><h3>Portfólio técnico e conclusão</h3><p>O portfólio deve mostrar decisões, não apenas screenshots. Inclua: vídeo de 60–90 segundos; diagrama de arquitetura; ameaça e validações; schema/migração; testes hostis; comparação de performance; matriz de dispositivos; eventos analytics; release/rollback; três problemas reais e como foram resolvidos. Remova IDs privados, credenciais e dados de jogadores.</p><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Escreva changelog RC-1 em cinco itens verificáveis.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Execute rollback ensaiado e registre o que Version History recupera e o que não recupera.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Entregue runbook, post-mortem simulado e portfólio técnico para outra pessoa reproduzir.</p></article></div><p><strong>Projeto progressivo 11 concluído:</strong> <em>Expedição de cristais</em> é um release candidate privado, testado em múltiplos clientes/dispositivos, com servidor autoritativo, perfil versionado, acessibilidade, analytics, observação e rollback.</p><ul class="check-list"><li>RC e changelog estão identificados.</li><li>Smoke test cobre conta nova/antiga e dois clientes.</li><li>Analytics registra fatos após sucesso.</li><li>Rollback foi realmente ensaiado.</li><li>Runbook define sinal, ação e responsável.</li><li>Portfólio não expõe segredo/dado privado.</li><li>A próxima mudança será pequena, medida e reversível.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> “adicionado loop de 75 s”, “três IDs validados no servidor”, “schema 2 com reduceMotion”, “HUD testado em três larguras”, “funnel de quatro passos” são verificáveis.</p><p><strong>Intermediário:</strong> Version History recupera scripts, objetos e configuração do place; não desfaz automaticamente DataStore. O smoke test pós-rollback deve ler schema 2 sem perda.</p><p><strong>Desafiador:</strong> outra pessoa deve conseguir publicar, observar e reverter usando seus documentos. Se depende de memória do autor, o runbook está incompleto.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>publicação e Version History</td><td><a href="https://create.roblox.com/docs/production/publishing/publish-experiences-and-places" target="_blank" rel="noopener noreferrer">Publish experiences and places</a>; <a href="https://create.roblox.com/docs/production/publishing/versioning" target="_blank" rel="noopener noreferrer">Versioning</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Release privado e rollback ensaiado.</td></tr><tr><td>analytics de funnel/economia</td><td><a href="https://create.roblox.com/docs/production/analytics/event-types" target="_blank" rel="noopener noreferrer">Event types</a>; <a href="https://create.roblox.com/docs/reference/engine/classes/AnalyticsService" target="_blank" rel="noopener noreferrer">AnalyticsService API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Somente fatos autoritativos.</td></tr><tr><td>dashboard/monitoramento</td><td><a href="https://create.roblox.com/docs/production/analytics" target="_blank" rel="noopener noreferrer">Analytics</a>; <a href="https://create.roblox.com/docs/production/analytics/analytics-dashboard" target="_blank" rel="noopener noreferrer">Analytics dashboard</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>View Events antes de agregados.</td></tr><tr><td>manutenção e LiveOps</td><td><a href="https://create.roblox.com/docs/production/game-design/liveops-essentials" target="_blank" rel="noopener noreferrer">LiveOps essentials</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Cadência subordinada à capacidade.</td></tr><tr><td>Open Cloud opcional</td><td><a href="https://create.roblox.com/docs/cloud" target="_blank" rel="noopener noreferrer">Open Cloud</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Não bloqueia o release mínimo.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-03">← 11.3</a><a class="button primary" href="../index.html#modulos">Formação concluída</a></div>
+        </div>
+      </article>
+
+      <section class="page-section" id="glossario" aria-labelledby="glossario-titulo"><h2 id="glossario-titulo">Glossário do módulo</h2><dl class="glossary-grid"><div class="glossary-item"><dt>Core loop</dt><dd>Ciclo central repetido pelo jogador.</dd></div><div class="glossary-item"><dt>Guardrail</dt><dd>Métrica/limite que impede uma mudança de causar dano.</dd></div><div class="glossary-item"><dt>Release candidate</dt><dd>Versão pronta para validação final.</dd></div><div class="glossary-item"><dt>Runbook</dt><dd>Procedimento operacional reproduzível.</dd></div><div class="glossary-item"><dt>Smoke test</dt><dd>Verificação curta dos fluxos críticos após publicar.</dd></div><div class="glossary-item"><dt>Vertical slice</dt><dd>Fatia pequena, completa e integrada.</dd></div></dl></section>
+      <section class="page-section" id="fontes" aria-labelledby="fontes-titulo"><h2 id="fontes-titulo">Fontes oficiais do módulo</h2><p>As tabelas registram as páginas específicas e a data. O projeto também reutiliza referências validadas dos módulos anteriores: <a href="https://create.roblox.com/docs/production/game-design" target="_blank" rel="noopener noreferrer">Game design</a>, <a href="https://create.roblox.com/docs/scripting/security" target="_blank" rel="noopener noreferrer">Security</a>, <a href="https://create.roblox.com/docs/cloud-services/data-stores" target="_blank" rel="noopener noreferrer">Data stores</a>, <a href="https://create.roblox.com/docs/performance-optimization" target="_blank" rel="noopener noreferrer">Performance</a>, <a href="https://create.roblox.com/docs/production/publishing" target="_blank" rel="noopener noreferrer">Publishing</a> e <a href="https://create.roblox.com/docs/production/analytics" target="_blank" rel="noopener noreferrer">Analytics</a>.</p></section>
+    </section>
+  </main>
+  <footer class="site-footer"><p>Apostila Roblox Studio · Módulo 11 completo · formação com 57 capítulos.</p></footer>
+</body>
+</html>

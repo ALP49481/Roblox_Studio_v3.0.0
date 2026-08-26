@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Módulo 9 da Apostila Roblox Studio: segurança, desempenho, assets, publicação, monetização, Analytics e manutenção.">
+  <title>Módulo 9 — Qualidade, segurança e produção</title>
+  <link rel="stylesheet" href="../assets/styles.css?v=20260826-11">
+  <script src="../assets/app.js?v=20260826-11" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">R+</span><span>Apostila Roblox Studio</span></a><div class="header-actions"><a class="button" href="../index.html#modulos">Todos os módulos</a><a class="button" href="../conta.html" data-account-label>Conta</a><button class="icon-button" type="button" data-theme-toggle aria-pressed="false">☾ Modo escuro</button></div></div></header>
+
+  <main class="module-shell" id="conteudo">
+    <aside class="module-sidebar" data-module-sidebar data-collapsed="false">
+      <button class="button mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="true">Ocultar capítulos</button>
+      <nav aria-label="Capítulos do Módulo 9"><p class="eyebrow">Módulo 9</p><h2>Qualidade, segurança e produção</h2><ol class="chapter-nav">
+        <li><a href="#capitulo-01" data-chapter-link><span>9.1</span> Ameaças e políticas</a></li>
+        <li><a href="#capitulo-02" data-chapter-link><span>9.2</span> Performance e profiling</a></li>
+        <li><a href="#capitulo-03" data-chapter-link><span>9.3</span> Assets e avatares</a></li>
+        <li><a href="#capitulo-04" data-chapter-link><span>9.4</span> Publicação e rollback</a></li>
+        <li><a href="#capitulo-05" data-chapter-link><span>9.5</span> Monetização responsável</a></li>
+        <li><a href="#capitulo-06" data-chapter-link><span>9.6</span> Analytics e manutenção</a></li>
+        <li><a href="#avaliacao"><span>✓</span> Avaliação de domínio</a></li>
+      </ol></nav>
+      <section class="module-progress" aria-labelledby="progresso-modulo"><h3 id="progresso-modulo">Progresso do módulo</h3><div class="progress-track" role="progressbar" aria-label="Progresso do módulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" data-progress-fill data-progress-scope="9"></div></div><p class="progress-label" data-progress-label data-progress-scope="9">0 de 6 capítulos disponíveis concluídos · 0%</p><p><small>Alt + ← e Alt + → alternam capítulos.</small></p></section>
+      <a class="button" href="modulo-08.html">← Módulo 8</a>
+    </aside>
+
+    <section class="module-content">
+      <header class="module-hero"><p class="eyebrow">Dificuldade 4/5 · avançada</p><h1>Módulo 9 — Qualidade, segurança e produção</h1><p>Um sistema pronto no Studio ainda não é um produto pronto. Aqui você transforma o simulador e a arena em uma experiência auditável, reversível, honesta e observável.</p><div class="concept-diagram" aria-label="Ciclo de produção"><div class="concept-node"><strong>Prevenir</strong><br>ameaças, políticas e propriedade</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Medir</strong><br>performance e comportamento</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Lançar</strong><br>gradualmente, com rollback</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Manter</strong><br>hipótese, evidência e decisão</div></div><aside class="callout security"><strong>Regra central</strong><p>Publicar não encerra o desenvolvimento. Toda mudança importante precisa de responsável, evidência de teste, forma de detectar dano e caminho de reversão.</p></aside></header>
+
+      <article class="chapter" id="capitulo-01" aria-labelledby="titulo-01">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 9.1</p><h2 id="titulo-01">Threat modeling, texto, políticas e moderação</h2><p>Pense como um defensor: o que pode ser controlado, abusado ou exibido indevidamente?</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-09-capitulo-01"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos, pré-requisitos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 5.1–5.5, 7.4 e 8.5. Você criará um modelo de ameaças, filtrará texto fora do chat, adotará falha segura e distinguirá prevenção, detecção e resposta.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Threat model</dt><dd>Mapa do que protegemos, de quem, por quais caminhos e com qual impacto.</dd></div><div class="glossary-item"><dt>UGC</dt><dd>Conteúdo criado ou fornecido pelo usuário, como texto, desenho ou áudio.</dd></div><div class="glossary-item"><dt>Falha segura</dt><dd>Quando uma dependência falha, o sistema escolhe o estado menos arriscado.</dd></div><div class="glossary-item"><dt>Política</dt><dd>Regra da plataforma ou condição de elegibilidade que o sistema deve respeitar.</dd></div><div class="glossary-item"><dt>Moderação</dt><dd>Processo de prevenir, revisar e responder a conteúdo ou comportamento impróprio.</dd></div></dl></section>
+          <section><h3>Do ativo valioso ao teste hostil</h3><p>O explorador determinado controla seu cliente: memória local, scripts replicados, chamadas de remotes e parte da simulação física. Ele pode trocar parâmetros, repetir uma ação mil vezes, omitir campos e combinar estados improváveis. Portanto, modele cada fluxo em cinco perguntas: <em>o que vale proteger, quem decide, qual entrada cruza a fronteira, qual pior caso e qual evidência denuncia abuso?</em></p><div class="table-wrap"><table><thead><tr><th>Fluxo</th><th>Ativo</th><th>Abuso plausível</th><th>Controle</th><th>Evidência</th></tr></thead><tbody><tr><td>Loja</td><td>moedas e itens</td><td>preço negativo/repetição</td><td>catálogo e saldo no servidor, idempotência</td><td>produto, jogador, resultado; sem segredo</td></tr><tr><td>Combate</td><td>vida e partida</td><td>alvo distante, NaN, spam</td><td>tipo, finitude, cadência, estado, raycast</td><td>motivo agregado de rejeição</td></tr><tr><td>Placa de texto</td><td>segurança social</td><td>texto impróprio ou filtro indisponível</td><td>limite, filtro oficial, fallback neutro</td><td>falha e contagem; nunca texto bruto</td></tr><tr><td>DataStore</td><td>progresso</td><td>duplicação e gravação inconclusiva</td><td>UpdateAsync, marcador, retry limitado</td><td>ID de operação e estado, sem dados pessoais</td></tr></tbody></table></div><aside class="callout warning"><strong>Log também é dado</strong><p>Não grave texto bruto, tokens, chaves, mensagens privadas ou perfil completo. Prefira códigos de motivo e contagens. Logs devem ajudar a investigar sem criar outro vazamento.</p></aside></section>
+          <section><h3>Prática guiada — placa com texto filtrado</h3><p><strong>Projeto aberto:</strong> cópia de <em>SimuladorEnxuto</em> chamada <em>AuditoriaProducao</em>. <strong>Objetivo:</strong> enviar texto no cliente, validar e filtrar no servidor, e nunca exibir o original se a API falhar.</p><ol class="step-list"><li>Em <code>ReplicatedStorage</code>, crie Folder <code>SafetyRemotes</code> e dentro um <code>RemoteEvent</code> chamado <code>SubmitSignText</code>.</li><li>Em <code>Workspace</code>, crie Model <code>SafetyLab</code>, Part <code>Sign</code>, <code>SurfaceGui</code> na face frontal e <code>TextLabel</code> chamado <code>Message</code>. Defina o texto inicial como “Aguardando mensagem”.</li><li>Em <code>StarterGui</code>, crie <code>ScreenGui</code> <code>SafetyGui</code>; dentro, <code>TextBox</code> <code>Input</code>, <code>TextButton</code> <code>Submit</code> e <code>TextLabel</code> <code>Status</code>. Ajuste tamanho/posição usando o que aprendeu no Módulo 4.</li><li>Dentro de <code>SafetyGui</code>, crie <code>LocalScript</code> <code>SubmitSignText</code>. Em <code>ServerScriptService</code>, crie Script de mesmo nome.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>SubmitSignText.client.luau</strong><small>LocalScript · StarterGui/SafetyGui · cliente · após carregar a interface</small></div><button class="copy-button" type="button" data-copy-target="codigo-901-cliente" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-901-cliente"><code>--!strict
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local gui = script.Parent :: ScreenGui
+local input = gui:WaitForChild("Input") :: TextBox
+local submit = gui:WaitForChild("Submit") :: TextButton
+local status = gui:WaitForChild("Status") :: TextLabel
+local remote = ReplicatedStorage:WaitForChild("SafetyRemotes"):WaitForChild("SubmitSignText") :: RemoteEvent
+
+submit.Activated:Connect(function()
+	status.Text = "Enviando para revisão…"
+	remote:FireServer(input.Text) -- pedido, não decisão
+end)
+
+remote.OnClientEvent:Connect(function(ok: boolean, message: string)
+	status.Text = message
+	if ok then input.Text = "" end
+end)</code></pre></div>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>SubmitSignText.server.luau</strong><small>Script · ServerScriptService · servidor · inicia com a sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-901-servidor" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-901-servidor"><code>--!strict
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextService = game:GetService("TextService")
+
+local remote = ReplicatedStorage:WaitForChild("SafetyRemotes"):WaitForChild("SubmitSignText") :: RemoteEvent
+local label = workspace:WaitForChild("SafetyLab"):WaitForChild("Sign"):WaitForChild("SurfaceGui"):WaitForChild("Message") :: TextLabel
+local lastRequest: {[Player]: number} = {}
+local COOLDOWN = 3
+local MAX_BYTES = 200
+
+remote.OnServerEvent:Connect(function(player: Player, raw: unknown)
+	if typeof(raw) ~= "string" or #raw == 0 or #raw &gt; MAX_BYTES then
+		remote:FireClient(player, false, "Use entre 1 e 200 bytes.")
+		return
+	end
+	local now = os.clock()
+	if now - (lastRequest[player] or 0) &lt; COOLDOWN then
+		remote:FireClient(player, false, "Espere alguns segundos.")
+		return
+	end
+	lastRequest[player] = now
+
+	local success, filtered = pcall(function()
+		local result = TextService:FilterStringAsync(raw, player.UserId)
+		return result:GetNonChatStringForBroadcastAsync()
+	end)
+	if not success then
+		warn("[Safety] filtro indisponível; texto bruto descartado")
+		label.Text = "Mensagem indisponível"
+		remote:FireClient(player, false, "Não foi possível revisar o texto. Tente depois.")
+		return
+	end
+
+	label.Text = filtered
+	remote:FireClient(player, true, "Mensagem publicada com filtro.")
+end)</code></pre></div>
+            <p><strong>Teste:</strong> use Test → Start com dois clientes. Envie texto e confira que ambos veem a versão filtrada. Troque temporariamente a função dentro do <code>pcall</code> por <code>error("falha simulada")</code>: deve aparecer apenas “Mensagem indisponível”, nunca o texto original. Restaure a função antes de salvar. Para reiniciar, Stop; para desfazer, apague apenas os objetos <code>SafetyLab</code>, <code>SafetyGui</code>, <code>SafetyRemotes</code> e os dois scripts.</p><p><strong>Diagnóstico:</strong> <code>Infinite yield</code> indica nome/caminho incorreto; nenhum clique indica LocalScript fora de StarterGui; texto bruto após falha significa violação crítica. Filtre depois do envio, não a cada tecla.</p></section>
+          <section><h3>Chat, PolicyService e resposta proporcional</h3><p><code>TextChatService</code> oferece filtragem e moderação para o chat moderno, mas você continua responsável por todo texto fora dele. Antes de recursos dependentes de região, idade ou plataforma, consulte <code>PolicyService:GetPolicyInfoForPlayerAsync()</code> no servidor, dentro de <code>pcall</code>; se falhar, use o estado restritivo. Para reincidência, documente evidência e use o sistema de bans do Creator Dashboard/Ban API; <code>Player:Kick()</code> encerra apenas a sessão atual.</p><p>Conteúdo público também exige questionário de Maturidade e Conformidade correto e atualizado. Moderar não é “punir todo erro”: rejeite pedidos inválidos, limite frequência, registre sinais agregados e escale somente quando houver evidência.</p></section>
+          <section><h3>Exercícios e incremento</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Acrescente ao threat model quem é o dono da verdade em cada um dos quatro fluxos.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Adapte a placa para texto por jogador com <code>GetNonChatStringForUserAsync</code> e explique por que o resultado pode variar.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Monte cinco testes hostis para loja e combate, incluindo NaN, spam e estado impossível, sem executar exploit externo.</p></article></div><p><strong>Incremento do Projeto 9 e 10:</strong> crie uma matriz de ameaças e políticas para simulador e arena, com ativo, limite de confiança, prevenção, detecção, resposta e responsável.</p><ul class="check-list"><li>Sei listar capacidades do cliente hostil.</li><li>Filtro todo texto exibido a outros usuários.</li><li>Falha do filtro nunca libera texto bruto.</li><li>Uso políticas e maturidade como requisitos de produto.</li><li>Logs não contêm segredos ou conteúdo sensível.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> moedas, itens, dano e progresso pertencem ao servidor; o cliente é dono apenas de intenção e feedback local. Texto passa pelo servidor e serviço de filtragem.</p><p><strong>Intermediário:</strong> gere o <code>TextFilterResult</code> uma vez e obtenha a representação destinada a cada usuário. Não reutilize texto bruto como fallback.</p><p><strong>Desafiador:</strong> uma boa bateria inclui tipo errado, infinito/NaN, quantidade extrema, pedido fora de alcance e rajada. O esperado é rejeição sem mutação nem erro não tratado. Há outras soluções válidas.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>capacidades do explorador</td><td><a href="https://create.roblox.com/docs/scripting/security/security-tactics" target="_blank" rel="noopener noreferrer">Security tactics</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Threat model precede controles.</td></tr><tr><td><code>FilterStringAsync</code></td><td><a href="https://create.roblox.com/docs/ui/text-filtering" target="_blank" rel="noopener noreferrer">Text filtering</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Falha segura, sem texto bruto.</td></tr><tr><td><code>TextChatService</code></td><td><a href="https://create.roblox.com/docs/chat/in-experience-text-chat" target="_blank" rel="noopener noreferrer">In-experience text chat</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Separado do texto customizado.</td></tr><tr><td><code>PolicyService</code>, bans e maturidade</td><td><a href="https://create.roblox.com/docs/reference/engine/classes/PolicyService" target="_blank" rel="noopener noreferrer">PolicyService API</a>; <a href="https://create.roblox.com/docs/production/bans" target="_blank" rel="noopener noreferrer">Bans</a>; <a href="https://create.roblox.com/docs/production/promotion/content-maturity" target="_blank" rel="noopener noreferrer">Content maturity</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Falha de política assume restrição.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="modulo-08.html">← Módulo 8</a><a class="button primary" href="#capitulo-02" data-next-chapter>9.2 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-02" aria-labelledby="titulo-02">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 9.2</p><h2 id="titulo-02">Performance, memória, rede e profiling</h2><p>Otimize a causa medida, no dispositivo relevante, e preserve uma comparação reproduzível.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-09-capitulo-02"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 6.3, 8.1 e projetos integrados. Você estabelecerá baseline, reproduzirá custo controlado, localizará um escopo no MicroProfiler e comprovará a correção.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Baseline</dt><dd>Medição inicial, feita sob condições registradas.</dd></div><div class="glossary-item"><dt>Budget</dt><dd>Limite planejado de tempo, memória ou tráfego.</dd></div><div class="glossary-item"><dt>Profiler</dt><dd>Ferramenta que mostra onde recursos são gastos.</dd></div><div class="glossary-item"><dt>Leak</dt><dd>Memória ou conexão que permanece sem necessidade.</dd></div><div class="glossary-item"><dt>Regressão</dt><dd>Problema que reaparece após uma mudança.</dd></div></dl></section>
+          <section><h3>Medir antes de mexer</h3><p>Performance tem pelo menos quatro lados: CPU, GPU, memória e rede; carregamento é outro resultado importante. Um PC rápido pode esconder o custo que derruba um celular. Registre dispositivo/emulação, número de jogadores, qualidade gráfica, cenário e duração. Depois compare a mesma cena.</p><div class="table-wrap"><table><thead><tr><th>Sintoma</th><th>Ferramenta inicial</th><th>Próxima pergunta</th></tr></thead><tbody><tr><td>FPS baixo ou picos</td><td>Performance Summary + MicroProfiler</td><td>CPU, GPU ou tarefa específica?</td></tr><tr><td>memória cresce continuamente</td><td>Developer Console → Memory</td><td>instâncias, conexões ou assets?</td></tr><tr><td>servidor lento/ping alto</td><td>Server Jobs/Stats</td><td>heartbeat abaixo do esperado?</td></tr><tr><td>script caro</td><td>Script Performance/Profiler</td><td>qual função e frequência?</td></tr><tr><td>rede alta</td><td>Developer Console → Network</td><td>estado repetido ou árvore grande?</td></tr></tbody></table></div></section>
+          <section><h3>Prática guiada — gargalo controlado e correção</h3><p><strong>Projeto aberto:</strong> <em>AuditoriaProducao</em>. Em <code>ServerScriptService</code>, crie Script <code>PerformanceLab</code>. O modo inicial é seguro; o modo ruim existe só para um teste curto no Studio.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>PerformanceLab.server.luau</strong><small>Script · ServerScriptService · servidor · inicia com a sessão</small></div><button class="copy-button" type="button" data-copy-target="codigo-902-perf" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-902-perf"><code>--!strict
+local RunService = game:GetService("RunService")
+
+local MODE = "FIXED" -- altere temporariamente para "BAD"
+local SAMPLE_COUNT = 250
+local accumulator = 0
+
+local function measuredWork()
+	debug.profilebegin("PerformanceLabWork")
+	local total = 0
+	for index = 1, SAMPLE_COUNT do
+		total += math.sqrt(index)
+	end
+	debug.profileend()
+	return total
+end
+
+local connection: RBXScriptConnection
+connection = RunService.Heartbeat:Connect(function(deltaTime: number)
+	if MODE == "BAD" then
+		-- Intencionalmente ruim: trabalho desnecessário em todo frame.
+		measuredWork()
+		return
+	end
+
+	-- Versão corrigida: o relatório só precisa de 5 atualizações por segundo.
+	accumulator += deltaTime
+	if accumulator &lt; 0.2 then return end
+	accumulator %= 0.2
+	measuredWork()
+end)
+
+script.Destroying:Connect(function()
+	connection:Disconnect()
+end)</code></pre></div>
+            <ol class="step-list"><li>Use Play e espere 30 segundos com <code>MODE = "FIXED"</code>. Abra View → Performance e Developer Console (F9); registre FPS, memória e atividade do script.</li><li>Abra o MicroProfiler com Ctrl+Alt+F6, pause com Ctrl+P e procure <code>PerformanceLabWork</code>.</li><li>Stop, mude para <code>MODE = "BAD"</code>, repita a mesma cena por 30 segundos e compare frequência/tempo do escopo.</li><li>Volte obrigatoriamente para <code>FIXED</code>, rode de novo e salve a tabela antes/depois. Nunca publique a versão ruim.</li></ol><p><strong>Resultado:</strong> o marcador ocorre aproximadamente cinco vezes por segundo no modo corrigido e uma vez por frame no ruim. O tamanho do custo depende do dispositivo; a evidência principal é frequência e tempo, não uma promessa de FPS.</p><p><strong>Erros:</strong> marcador ausente indica nome alterado ou script não executado; resultado igual pode significar trabalho pequeno demais para o dispositivo — aumente apenas <code>SAMPLE_COUNT</code> com cuidado e reverta; memória crescente não é causada por este cálculo puro, então procure instâncias ou conexões. Para desfazer, apague <code>PerformanceLab</code>.</p></section>
+          <section><h3>Correções que preservam o design</h3><p>Prefira evento a polling; reduza frequência; envie mudança em vez de estado repetido; produza efeitos visuais no cliente quando o servidor só precisa validar o resultado; destrua instâncias e desconecte conexões; use pooling apenas quando a medição mostrar que criar/destruir repetidamente é caro. Pooling tem custo de memória e complexidade, portanto não é “sempre mais rápido”.</p><aside class="callout tip"><strong>Regression test</strong><p>Guarde cenário, números, captura do perfil e limite aceitável. Depois de cada atualização grande, repita o mesmo teste no dispositivo mais fraco que você pretende suportar.</p></aside></section>
+          <section><h3>Exercícios e relatório principal</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Troque o intervalo corrigido para 0,5 s e calcule quantas chamadas espera em 30 s.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Encontre uma conexão que possa sobreviver ao objeto e implemente desligamento explícito.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Faça um teste com dois e seis clientes e compare servidor, cliente e rede sem mudar a cena.</p></article></div><p><strong>Projeto principal:</strong> entregue um relatório do simulador ou arena com hipótese, ambiente, baseline, perfil, uma mudança, resultado, trade-off e limite de regressão.</p><ul class="check-list"><li>Separo CPU, GPU, memória, rede e carregamento.</li><li>Registro condições do teste.</li><li>Uso profiler para localizar causa.</li><li>Comparo antes/depois na mesma cena.</li><li>Não publico o gargalo didático.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> 30 ÷ 0,5 = cerca de 60 chamadas; pequenas diferenças decorrem do início/fim do teste.</p><p><strong>Intermediário:</strong> guarde o <code>RBXScriptConnection</code> e chame <code>Disconnect()</code> ao destruir/desativar o dono. Evite criar outra conexão a cada respawn sem limpar a anterior.</p><p><strong>Desafiador:</strong> mantenha duração, posição e ações equivalentes. A conclusão deve apontar a métrica que mudou e não confundir correlação com causa.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>ciclo de otimização</td><td><a href="https://create.roblox.com/docs/performance-optimization" target="_blank" rel="noopener noreferrer">Performance optimization</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Medir → melhorar → monitorar.</td></tr><tr><td>ferramentas e métricas</td><td><a href="https://create.roblox.com/docs/performance-optimization/identify" target="_blank" rel="noopener noreferrer">Identify issues</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Teste também fora do Studio.</td></tr><tr><td>MicroProfiler e marcadores</td><td><a href="https://create.roblox.com/docs/performance-optimization/microprofiler/use-microprofiler" target="_blank" rel="noopener noreferrer">MicroProfiler walkthrough</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td><code>debug.profilebegin/end</code> delimita o laboratório.</td></tr><tr><td>pooling e redução de replicação</td><td><a href="https://create.roblox.com/docs/performance-optimization/improve" target="_blank" rel="noopener noreferrer">Improve performance</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Só após evidência.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-01">← 9.1</a><a class="button primary" href="#capitulo-03" data-next-chapter>9.3 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-03" aria-labelledby="titulo-03">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 9.3</p><h2 id="titulo-03">Assets, avatares, propriedade, permissões e propriedade intelectual</h2><p>Um ID que funciona hoje não basta: você precisa saber de quem é, onde pode ser usado e como substituí-lo.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-09-capitulo-03"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 1.4, 4.1, 6.4 e 8.3. Você fará inventário de assets, verificará permissões/moderação, distinguirá R6 de R15 e criará um plano de migração de proprietário.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Asset ID</dt><dd>Identificador de um recurso armazenado na nuvem Roblox.</dd></div><div class="glossary-item"><dt>Owner</dt><dd>Conta ou grupo que detém o asset.</dd></div><div class="glossary-item"><dt>Licença</dt><dd>Permissão legal de uso, que não nasce só porque o arquivo está acessível.</dd></div><div class="glossary-item"><dt>Package</dt><dd>Conjunto reutilizável de instâncias com versões e permissões.</dd></div><div class="glossary-item"><dt>Rig</dt><dd>Estrutura de partes/juntas que permite mover um personagem.</dd></div></dl></section>
+          <section><h3>O inventário de dependências visuais</h3><p>Imagens, meshes, áudio, animações e packages são assets na nuvem. Privacidade determina quem pode usar; moderação determina se pode aparecer; propriedade determina quem consegue manter. Um asset privado da conta pessoal pode quebrar quando a experiência pertence ao grupo. Conteúdo da Toolbox também exige revisão de scripts, licença e procedência.</p><div class="table-wrap"><table><thead><tr><th>Campo do inventário</th><th>Por que existe</th></tr></thead><tbody><tr><td>ID, tipo e caminho</td><td>localizar cada dependência</td></tr><tr><td>owner esperado</td><td>evitar dependência pessoal em projeto de grupo</td></tr><tr><td>fonte/licença</td><td>provar direito de uso</td></tr><tr><td>privacidade/permissão</td><td>confirmar acesso na experiência</td></tr><tr><td>status de moderação</td><td>não lançar conteúdo pendente/rejeitado</td></tr><tr><td>substituto e responsável</td><td>recuperar se o asset sair do ar</td></tr></tbody></table></div></section>
+          <section><h3>Prática guiada — manifesto auditável</h3><p><strong>Projeto aberto:</strong> <em>AuditoriaProducao</em>. Em <code>ReplicatedStorage</code>, crie Folder <code>Shared</code> se não existir e dentro um <code>ModuleScript</code> <code>AssetManifest</code>. Em <code>ServerScriptService</code>, crie Script <code>AuditAssets</code>. Substitua os IDs de exemplo pelos seus antes de considerar a auditoria aprovada.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>AssetManifest.luau</strong><small>ModuleScript · ReplicatedStorage/Shared · carregado por quem chamar <code>require</code></small></div><button class="copy-button" type="button" data-copy-target="codigo-903-manifesto" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-903-manifesto"><code>--!strict
+export type AssetRecord = {
+	name: string,
+	id: number,
+	kind: string,
+	expectedOwner: string,
+	licenseEvidence: string,
+	status: string,
+}
+
+local assets: {AssetRecord} = {
+	{name = "ArenaMusic", id = 0, kind = "Audio", expectedOwner = "SEU_GRUPO", licenseEvidence = "Creator Dashboard", status = "REPLACE_ID"},
+	{name = "AttackAnimation", id = 0, kind = "Animation", expectedOwner = "SEU_GRUPO", licenseEvidence = "arquivo-fonte", status = "REPLACE_ID"},
+}
+
+return table.freeze(assets)</code></pre></div>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>AuditAssets.server.luau</strong><small>Script · ServerScriptService · servidor · inicia com a sessão de teste</small></div><button class="copy-button" type="button" data-copy-target="codigo-903-auditoria" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-903-auditoria"><code>--!strict
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local assets = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("AssetManifest"))
+
+local seen: {[number]: string} = {}
+local failures = 0
+for _, asset in assets do
+	if asset.id &lt;= 0 or asset.status ~= "APPROVED" then
+		failures += 1
+		warn("[AssetAudit] pendente:", asset.name, asset.status)
+	end
+	if asset.licenseEvidence == "" or asset.expectedOwner == "" then
+		failures += 1
+		warn("[AssetAudit] falta evidência:", asset.name)
+	end
+	if seen[asset.id] then
+		warn("[AssetAudit] ID repetido:", asset.name, "e", seen[asset.id])
+	else
+		seen[asset.id] = asset.name
+	end
+end
+
+print(string.format("[AssetAudit] %d assets; %d pendências", #assets, failures))</code></pre></div>
+            <ol class="step-list"><li>Abra View → Asset Manager e Creator Dashboard. Para cada ID, confira owner, permissão, moderação e local de uso; o script não descobre licença sozinho.</li><li>Pesquise no Explorer por <code>rbxassetid://</code>, <code>AnimationId</code>, <code>SoundId</code>, <code>Texture</code>, <code>MeshId</code> e referências de package. Adicione ao manifesto.</li><li>Marque <code>APPROVED</code> apenas com evidência. Use Play e exija “0 pendências”.</li><li>Para reiniciar, Stop e corrija o manifesto. Para desfazer, remova somente os dois scripts.</li></ol><p><strong>Diagnóstico:</strong> asset invisível pode estar moderando, sem permissão, arquivado ou com ID/tipo errado. Não “conserte” copiando material sem licença.</p></section>
+          <section><h3>R6, R15, customização e migração</h3><p>R6 é o rig legado com seis partes; R15 possui quinze partes e suporte mais amplo a movimento/acessórios em camadas. Não suponha nomes de membros sem testar o modo configurado. Para trocar owner, publique os assets no grupo, conceda permissões, substitua IDs numa branch/cópia privada, teste animação/áudio/mesh, publique gradualmente e mantenha o mapa antigo→novo para rollback. Packages ajudam consistência, mas <em>auto-update</em> deve ser consciente: uma atualização não testada pode afetar todas as cópias.</p></section>
+          <section><h3>Exercícios e auditoria principal</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Adicione três assets reais e suas localizações no Explorer.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Teste a arena em R6 e R15 e registre qualquer suposição quebrada.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Escreva uma migração de conta pessoal para grupo com validação e rollback.</p></article></div><p><strong>Projeto principal:</strong> inventário completo de IDs, owner, licença, privacidade, moderação e substituto do simulador/arena.</p><ul class="check-list"><li>Sei localizar e documentar cada asset.</li><li>Acesso não equivale a licença.</li><li>Owner combina com a experiência.</li><li>Testo o rig realmente suportado.</li><li>Migração preserva mapa antigo→novo.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> um registro válido contém ID positivo, tipo correto, caminho, owner confirmado e evidência.</p><p><strong>Intermediário:</strong> procure nomes rígidos como <code>Torso</code>, proporções, acessórios e animações. Prefira abstrações como <code>HumanoidRootPart</code> e teste ambos quando ambos forem anunciados.</p><p><strong>Desafiador:</strong> publicar cópias no grupo, registrar novos IDs, trocar numa versão privada, testar, liberar, observar e manter reversão. Não arquive o original antes da estabilidade.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>IDs, privacidade e moderação</td><td><a href="https://create.roblox.com/docs/projects/assets" target="_blank" rel="noopener noreferrer">Assets</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Inventário inclui owner e evidência.</td></tr><tr><td>packages</td><td><a href="https://create.roblox.com/docs/projects/assets/packages" target="_blank" rel="noopener noreferrer">Packages</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Auto-update exige teste.</td></tr><tr><td>R6/R15</td><td><a href="https://create.roblox.com/docs/studio/rig-builder" target="_blank" rel="noopener noreferrer">Rig Generator</a>; <a href="https://create.roblox.com/docs/avatar" target="_blank" rel="noopener noreferrer">Avatars</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Compatibilidade é testada.</td></tr><tr><td>conteúdo e propriedade intelectual</td><td><a href="https://create.roblox.com/docs/production/publishing" target="_blank" rel="noopener noreferrer">Publishing</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Licença permanece requisito externo ao ID.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-02">← 9.2</a><a class="button primary" href="#capitulo-04" data-next-chapter>9.4 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-04" aria-labelledby="titulo-04">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 9.4</p><h2 id="titulo-04">Publicação, configuração, lançamento e rollback</h2><p>Publicar uma versão privada é o começo de uma liberação controlada, não um salto direto ao público.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-09-capitulo-04"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 6.3–6.4, 7.3 e 9.1–9.3. Você publicará um teste privado, fará checklist de release e planejará rollback compatível com o schema de dados.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Staging</dt><dd>Ambiente/experiência separada para validar uma versão antes do público.</dd></div><div class="glossary-item"><dt>Rollout</dt><dd>Liberação gradual para limitar impacto.</dd></div><div class="glossary-item"><dt>Rollback</dt><dd>Retorno planejado a uma versão segura.</dd></div><div class="glossary-item"><dt>Metadata</dt><dd>Nome, descrição, ícone, miniaturas e informações de descoberta.</dd></div><div class="glossary-item"><dt>Schema</dt><dd>Formato persistido dos dados do jogador.</dd></div></dl></section>
+          <section><h3>Três coisas diferentes</h3><p><strong>Salvar localmente</strong> cria arquivo no computador. <strong>Publicar no Roblox</strong> envia uma versão do place à nuvem. <strong>Tornar público</strong> altera quem pode entrar. Novas experiências começam privadas; preserve isso durante os testes.</p><div class="concept-diagram"><div class="concept-node"><strong>Cópia local</strong><br>recuperação do autor</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Staging privado</strong><br>teste multi-cliente/dispositivo</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Produção privada</strong><br>smoke test</div><span class="concept-arrow">→</span><div class="concept-node"><strong>Público</strong><br>monitorado e reversível</div></div></section>
+          <section><h3>Prática guiada — release privada reproduzível</h3><p><strong>Projeto aberto:</strong> <em>AuditoriaProducao</em> com zero pendências críticas conhecidas. Use uma experiência de teste, não a experiência pública.</p><ol class="step-list"><li>Stop qualquer playtest. Use File → Save to File e crie uma cópia datada.</li><li>Use File → Publish to Roblox As…, escolha/crie a experiência de staging sob o owner correto. Confirme nome, descrição honesta, creator e dispositivos realmente testados. Mantenha-a privada.</li><li>No Creator Dashboard, abra a experiência → Configure. Revise Places, Permissions, Devices, Maturity &amp; Compliance e acesso de colaboradores pelo menor privilégio.</li><li>Adicione ícone quadrado de pelo menos 512×512 e miniatura 16:9 idealmente 1920×1080, ambos representando gameplay real e aguardando moderação.</li><li>Em Studio, execute teste de servidor com dois clientes; no app Roblox, faça smoke test do link privado com uma conta autorizada.</li><li>Registre número/horário da versão, checksum/tag do código, schema de dados, responsável e resultado. Abra Version History e confirme onde reverteria, sem efetuar rollback desnecessário.</li></ol>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ReleaseGuard.server.luau</strong><small>Script · ServerScriptService · servidor · verifica contrato ao iniciar</small></div><button class="copy-button" type="button" data-copy-target="codigo-904-release" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-904-release"><code>--!strict
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local RELEASE_ID = "staging-2026-08-26-01"
+local DATA_SCHEMA_VERSION = 3
+local requiredPaths = {
+	{"Remotes"},
+	{"Shared", "AssetManifest"},
+}
+
+local failures = 0
+for _, pathParts in requiredPaths do
+	local current: Instance? = ReplicatedStorage
+	for _, name in pathParts do
+		current = current and current:FindFirstChild(name)
+	end
+	if not current then
+		failures += 1
+		warn("[ReleaseGuard] ausente:", table.concat(pathParts, "/"))
+	end
+end
+
+if failures &gt; 0 then
+	error(string.format("Release %s bloqueada no teste: %d requisito(s) ausente(s)", RELEASE_ID, failures))
+end
+print("[ReleaseGuard] aprovado", RELEASE_ID, "schema", DATA_SCHEMA_VERSION)</code></pre></div>
+            <p><strong>Resultado:</strong> a experiência continua privada, acessível só a autorizados; Output mostra “aprovado”; a ficha de release aponta versão e rollback. Se o guard falhar, corrija o caminho ou o requisito — não remova a verificação para “ficar verde”. Para reiniciar, Stop/Play; para desfazer, remova o script apenas após incorporar a verificação à suíte real.</p></section>
+          <section><h3>Rollback que não apaga progresso</h3><p>Version History pode restaurar o place, mas não volta automaticamente os DataStores. Uma versão antiga pode não compreender dados novos. Migrações devem ser compatíveis: adicione campos com padrão, preserve campos desconhecidos quando possível e só remova depois de janela segura. Se o schema novo é incompatível, o rollback precisa incluir código capaz de ler ambos ou uma correção à frente.</p><aside class="callout warning"><strong>Servidor antigo continua vivo</strong><p>Publicar não troca instantaneamente todos os servidores existentes. Planeje coexistência de versões, contratos de remote e dados compatíveis; reiniciar servidores é uma decisão operacional com impacto nos jogadores.</p></aside></section>
+          <section><h3>Exercícios e release principal</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Escreva cinco itens de smoke test para a primeira sessão.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Crie um campo novo opcional no perfil e prove que a versão anterior não destrói os demais campos.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Simule uma versão ruim em staging, execute rollback e documente a decisão sem tocar na produção.</p></article></div><p><strong>Projeto principal:</strong> pacote de release privada com checklist de segurança, performance, assets, dados, dispositivos, metadata, responsáveis, observação e rollback.</p><ul class="check-list"><li>Distingo salvar, publicar e tornar público.</li><li>Staging usa owner e configurações corretos.</li><li>Metadata descreve gameplay real.</li><li>Rollback considera place e dados.</li><li>Versões coexistentes mantêm contratos compatíveis.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> entrar, carregar perfil, completar ciclo principal, desconectar/reentrar e testar fluxo crítico em outro dispositivo são um núcleo válido.</p><p><strong>Intermediário:</strong> leitura usa padrão quando o campo falta; gravação copia/preserva campos que não conhece. Teste fixture antigo e novo.</p><p><strong>Desafiador:</strong> registre sintoma, limiar, versão alvo, ação, verificação posterior e responsável. Rollback é ensaiado antes da emergência.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>publicar experiência/place</td><td><a href="https://create.roblox.com/docs/production/publishing/publish-experiences-and-places" target="_blank" rel="noopener noreferrer">Publish experiences and places</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Primeiro lançamento permanece privado.</td></tr><tr><td>configuração e Version History</td><td><a href="https://create.roblox.com/docs/projects/configure-games" target="_blank" rel="noopener noreferrer">Configure games and places</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Rollback inclui compatibilidade de dados.</td></tr><tr><td>ícone e miniaturas</td><td><a href="https://create.roblox.com/docs/production/publishing/experience-icons" target="_blank" rel="noopener noreferrer">Experience icons</a>; <a href="https://create.roblox.com/docs/production/publishing/thumbnails" target="_blank" rel="noopener noreferrer">Thumbnails</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Representação autêntica e acessível.</td></tr><tr><td>publicação automatizada</td><td><a href="https://create.roblox.com/docs/cloud/guides/usage-place-publishing" target="_blank" rel="noopener noreferrer">Place Publishing API</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Apenas prévia; Open Cloud fica no Módulo 10.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-03">← 9.3</a><a class="button primary" href="#capitulo-05" data-next-chapter>9.5 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-05" aria-labelledby="titulo-05">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 9.5</p><h2 id="titulo-05">Monetização responsável, produtos e recibos idempotentes</h2><p>Uma janela de compra solicita; somente um recibo concedido e persistido encerra a transação.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-09-capitulo-05"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 5.5, 7.3–7.4, 9.1 e 9.4. Você distinguirá passes, produtos e assinaturas; comparará os dois processadores atuais; implementará concessão persistente e idempotente; tratará repetição, ausência e falha inconclusiva.</p><dl class="glossary-grid"><div class="glossary-item"><dt>Pass</dt><dd>Benefício comprado uma vez e associado à propriedade.</dd></div><div class="glossary-item"><dt>Developer product</dt><dd>Produto que pode ser comprado repetidamente.</dd></div><div class="glossary-item"><dt>Receipt</dt><dd>Registro entregue pelo Roblox para o servidor processar a compra.</dd></div><div class="glossary-item"><dt>Idempotência</dt><dd>Processar o mesmo identificador novamente sem duplicar o benefício.</dd></div><div class="glossary-item"><dt>Inconclusivo</dt><dd>Não sabemos se a gravação terminou; devemos aceitar replay com segurança.</dd></div></dl></section>
+          <section><h3>Escolha de produto e UX honesta</h3><div class="table-wrap"><table><thead><tr><th>Oferta</th><th>Use quando</th><th>Confirmação</th></tr></thead><tbody><tr><td>Pass</td><td>benefício permanente, compra única</td><td>verificação de propriedade</td></tr><tr><td>Developer product</td><td>moeda/consumível repetível</td><td>recibo no servidor</td></tr><tr><td>Subscription</td><td>benefício recorrente descrito com clareza</td><td>status atual e ciclo da assinatura</td></tr></tbody></table></div><p>Preço, item e duração devem ser claros; fechamento do prompt não é compra confirmada. Evite urgência falsa, descontos permanentes e padrões que pressionem menores. Para itens aleatórios pagos, consulte <code>PolicyService</code> e revele probabilidades conforme as políticas aplicáveis.</p></section>
+          <section><h3>Revalidação de 26/08/2026: dois caminhos documentados</h3><div class="table-wrap"><table><thead><tr><th>API</th><th>Contrato</th><th>Uso no curso</th></tr></thead><tbody><tr><td><code>BindReceiptHandler(Enum.ReceiptType.DeveloperProduct, handler, filter?)</code></td><td>método atual; retorna conexão; handler devolve <code>Enum.ReceiptDecision</code>; filtro pode limitar IDs</td><td>exemplo novo desta aula</td></tr><tr><td><code>MarketplaceService.ProcessReceipt = callback</code></td><td>callback atual; só pode ser definido uma vez; devolve <code>Enum.ProductPurchaseDecision</code></td><td>compatibilidade e projetos existentes</td></tr></tbody></table></div><p>A Engine Reference atual documenta ambos e não marca <code>ProcessReceipt</code> como depreciado. O guia narrativo de Developer Products ainda o enfatiza. Por isso, centralize a concessão em uma única função idempotente e conecte somente um estilo por experiência. Não registre ambos para o mesmo produto.</p><aside class="callout error"><strong>API depreciada</strong><p><code>MarketplaceService:GetProductInfo()</code> está marcado como <strong>Deprecated</strong>. Código novo usa <code>GetProductInfoAsync()</code> dentro de <code>pcall</code>.</p></aside></section>
+          <section><h3>Prática guiada — concessão persistente exatamente uma vez</h3><p><strong>Projeto aberto:</strong> uma cópia privada publicada de <em>AuditoriaProducao</em>, com Studio Access to API Services habilitado apenas para teste consciente. Crie um Developer Product barato de teste no Creator Dashboard e copie seu ID. Em <code>ServerScriptService</code>, crie Script <code>ReceiptService</code>. Esta prática usa DataStore isolado; em projeto real, integre recibo e moeda à mesma fila/perfil do Módulo 7.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ReceiptService.server.luau</strong><small>Script · ServerScriptService · servidor · um único registrador de recibos</small></div><button class="copy-button" type="button" data-copy-target="codigo-905-receipt" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-905-receipt"><code>--!strict
+local DataStoreService = game:GetService("DataStoreService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+
+local PRODUCT_ID = 123456789 -- substitua pelo ID do seu produto
+local COINS_GRANTED = 100
+local store = DataStoreService:GetDataStore("PurchaseLabV1")
+
+local function grantOnce(player: Player, purchaseId: string): boolean
+	local success, profile = pcall(function()
+		return store:UpdateAsync("player_" .. player.UserId, function(old)
+			local data = old or {coins = 0, processedReceipts = {}}
+			data.processedReceipts = data.processedReceipts or {}
+			if data.processedReceipts[purchaseId] then
+				return data -- repetição: já concedido, sem somar
+			end
+			data.coins = math.max(0, tonumber(data.coins) or 0) + COINS_GRANTED
+			data.processedReceipts[purchaseId] = true
+			return data
+		end)
+	end)
+	if not success or typeof(profile) ~= "table" then
+		warn("[Receipt] gravação inconclusiva; aguardando nova entrega")
+		return false
+	end
+	player:SetAttribute("PurchaseLabCoins", profile.coins)
+	return profile.processedReceipts[purchaseId] == true
+end
+
+local function handleReceipt(receiptInfo)
+	if receiptInfo.ProductId ~= PRODUCT_ID then
+		warn("[Receipt] produto sem handler:", receiptInfo.ProductId)
+		return Enum.ReceiptDecision.NotProcessedYet
+	end
+	local player = Players:GetPlayerByUserId(receiptInfo.PlayerId)
+	if not player then
+		return Enum.ReceiptDecision.NotProcessedYet
+	end
+	local granted = grantOnce(player, tostring(receiptInfo.PurchaseId))
+	return if granted then Enum.ReceiptDecision.Processed else Enum.ReceiptDecision.NotProcessedYet
+end
+
+MarketplaceService:BindReceiptHandler(
+	Enum.ReceiptType.DeveloperProduct,
+	handleReceipt,
+	{PRODUCT_ID}
+)</code></pre></div>
+            <p><strong>Leitura:</strong> moeda e marcador do <code>PurchaseId</code> são alterados no mesmo <code>UpdateAsync</code>. Se a resposta se perde depois de gravar, o Roblox pode reenviar; o marcador impede soma dupla. Jogador ausente, produto desconhecido ou falha retorna <code>NotProcessedYet</code>. Só retorne <code>Processed</code> após confirmação persistente.</p><ol class="step-list"><li>Substitua o ID. Use o fluxo oficial de teste; compras de teste podem custar Robux real, então mantenha preço baixo e confirme antes.</li><li>Observe <code>PurchaseLabCoins</code> em Player → Attributes. Registre o <code>PurchaseId</code> apenas em ambiente de teste sem expor dados desnecessários.</li><li>Para provar idempotência sem nova cobrança, extraia <code>grantOnce</code> para ModuleScript e crie teste que chama duas vezes com o mesmo ID fictício em um DataStore de teste; saldo deve subir uma vez.</li><li>Simule falha antes do <code>UpdateAsync</code>; espere <code>NotProcessedYet</code>. Restaure antes de publicar.</li></ol><p><strong>Diagnóstico:</strong> concessão no evento <code>PromptProductPurchaseFinished</code> é insegura; duas concessões indicam marcador fora da mesma atualização; recibo preso indica produto sem handler, jogador ausente ou falha — investigue, não force <code>Processed</code>. Para desfazer, remova o produto de teste da interface e o script; não reutilize o DataStore de laboratório em produção.</p></section>
+          <section><h3>Informação de produto e preço personalizado</h3><p>Para mostrar nome e preço, um <code>LocalScript</code> de loja chama <code>MarketplaceService:GetProductInfoAsync(PRODUCT_ID, Enum.InfoType.Product)</code> dentro de <code>pcall</code>. Isso importa quando preços gerenciados/personalizados podem variar por usuário. Falha da API oculta/desabilita a compra; não invente preço nem confie em preço vindo do cliente para conceder algo.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ProductCard.client.luau</strong><small>LocalScript · StarterGui/ShopGui/ProductCard · cliente · carrega a apresentação, não concede</small></div><button class="copy-button" type="button" data-copy-target="codigo-905-info" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-905-info"><code>--!strict
+local MarketplaceService = game:GetService("MarketplaceService")
+local PRODUCT_ID = 123456789
+local card = script.Parent
+local success, info = pcall(function()
+	return MarketplaceService:GetProductInfoAsync(PRODUCT_ID, Enum.InfoType.Product)
+end)
+if success then
+	card.Text = string.format("%s · %s Robux", info.Name, tostring(info.PriceInRobux))
+	card.Active = true
+else
+	card.Text = "Produto indisponível"
+	card.Active = false
+end</code></pre></div></section>
+          <section><h3>Exercícios e auditoria de compra</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Explique por que fechar o prompt ou receber um evento de término não prova concessão.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Adicione um segundo produto com filtro/handler e catálogo no servidor.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Teste recibo repetido, ausência, falha antes/depois da confirmação, produto desconhecido e desconexão.</p></article></div><p><strong>Projeto principal:</strong> loja privada e responsável com catálogo no servidor, preço atual no cliente, recibo idempotente, logs mínimos, recuperação e checklist de cancelamento.</p><ul class="check-list"><li>Prompt não concede benefício.</li><li>Servidor processa recibos.</li><li>Marcador e valor são persistidos atomicamente.</li><li>Falha inconclusiva aceita replay seguro.</li><li>Uso <code>GetProductInfoAsync</code>, não a versão depreciada.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> o usuário pode cancelar e o evento de prompt não é o recibo autoritativo. Apenas o handler no servidor, após persistir o benefício, resolve a compra.</p><p><strong>Intermediário:</strong> mapeie ID→quantidade no servidor, valide produto antes do UpdateAsync e inclua ambos no filtro. Nunca aceite quantidade do cliente.</p><p><strong>Desafiador:</strong> em todo replay, o saldo final deve ser o mesmo; jogador ausente/falha retorna <code>NotProcessedYet</code>; produto desconhecido não concede; sucesso persistido retorna <code>Processed</code>.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta imediata: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td><code>BindReceiptHandler</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/MarketplaceService#BindReceiptHandler" target="_blank" rel="noopener noreferrer">MarketplaceService API</a></td><td>BrawlDev Advanced, Developer Products #22 — não assistido/revalidado integralmente</td><td>Atual e recomendada</td><td>Usado no código novo com filtro.</td></tr><tr><td><code>ProcessReceipt</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/MarketplaceService#ProcessReceipt" target="_blank" rel="noopener noreferrer">MarketplaceService API</a>; <a href="https://create.roblox.com/docs/production/monetization/developer-products" target="_blank" rel="noopener noreferrer">Developer Products</a></td><td>Mesma playlist, apenas referência temática</td><td>Atual, mas depende do contexto</td><td>Não é declarado como única abordagem.</td></tr><tr><td><code>GetProductInfoAsync</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/MarketplaceService#GetProductInfoAsync" target="_blank" rel="noopener noreferrer">Engine API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Chamado com <code>pcall</code>.</td></tr><tr><td><code>GetProductInfo</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/MarketplaceService#GetProductInfo" target="_blank" rel="noopener noreferrer">Engine API</a></td><td>Guia narrativo ainda contém exemplo antigo</td><td>Antiga ou obsoleta</td><td>Classificado como depreciado e substituído.</td></tr><tr><td>UX/persistência de monetização</td><td><a href="https://create.roblox.com/docs/production/monetization" target="_blank" rel="noopener noreferrer">Monetization</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Sem urgência falsa; concessão durável.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-04">← 9.4</a><a class="button primary" href="#capitulo-06" data-next-chapter>9.6 →</a></div>
+        </div>
+      </article>
+
+      <article class="chapter" id="capitulo-06" aria-labelledby="titulo-06">
+        <header class="chapter-header"><div><p class="chapter-kicker">Capítulo 9.6</p><h2 id="titulo-06">Analytics, experimentos, LiveOps e manutenção</h2><p>Comece por uma pergunta; registre o evento depois do fato; mude com hipótese e guardrail.</p></div><label class="completion-control"><input type="checkbox" data-progress-id="modulo-09-capitulo-06"> Concluído</label></header>
+        <div class="reading-flow">
+          <section><h3>Objetivos e vocabulário</h3><p><strong>Pré-requisitos:</strong> 7.4, 9.2, 9.4 e 9.5. Você desenhará funil de onboarding, registrará economia após sucesso, formulará experimento com proteção e criará rotina de manutenção.</p><dl class="glossary-grid"><div class="glossary-item"><dt>KPI</dt><dd>Métrica-chave ligada a um objetivo.</dd></div><div class="glossary-item"><dt>Funil</dt><dd>Sequência de etapas usada para localizar abandono.</dd></div><div class="glossary-item"><dt>Hipótese</dt><dd>Previsão testável de causa e efeito.</dd></div><div class="glossary-item"><dt>Guardrail</dt><dd>Métrica-limite que impede ganho aparente às custas de dano.</dd></div><div class="glossary-item"><dt>LiveOps</dt><dd>Operação contínua após o lançamento: conteúdo, correções e acompanhamento.</dd></div></dl></section>
+          <section><h3>Pergunta → evento → decisão</h3><p>“Colete tudo” produz ruído e risco. Pergunte: <em>em qual etapa iniciantes abandonam a primeira missão?</em> Então registre poucas etapas estáveis. Economia registra <em>depois</em> da fonte ou gasto confirmado; evento customizado registra comportamento específico. Gráficos podem levar cerca de 24 horas, mas View Events oferece inspeção quase em tempo real.</p><div class="table-wrap"><table><thead><tr><th>Pergunta</th><th>Evento</th><th>Decisão possível</th></tr></thead><tbody><tr><td>onde o onboarding perde pessoas?</td><td>funil: entrou, coletou, comprou, concluiu</td><td>simplificar a etapa com maior queda</td></tr><tr><td>moeda cresce sem gasto?</td><td>economy source/sink após transação</td><td>ajustar fonte ou sink</td></tr><tr><td>habilidade nova é usada?</td><td>custom event após ativação válida</td><td>melhorar descoberta ou remover</td></tr></tbody></table></div><aside class="callout security"><strong>Analytics não substitui segurança</strong><p>O servidor registra fatos autoritativos. Não envie texto livre, segredo ou identificador desnecessário; respeite limites e use nomes de evento com cardinalidade controlada.</p></aside></section>
+          <section><h3>Prática guiada — funil mínimo no servidor</h3><p><strong>Projeto aberto:</strong> staging privado de <em>AuditoriaProducao</em>. Em <code>ServerScriptService</code>, crie ModuleScript <code>ProductionAnalytics</code>. Os sistemas autoritativos chamam as funções somente depois de cada marco confirmado.</p>
+            <div class="copy-panel"><div class="copy-panel-header"><div><strong>ProductionAnalytics.luau</strong><small>ModuleScript · ServerScriptService · servidor · chamado após fatos confirmados</small></div><button class="copy-button" type="button" data-copy-target="codigo-906-analytics" data-copy-label="Copiar código">Copiar código</button></div><pre id="codigo-906-analytics"><code>--!strict
+local AnalyticsService = game:GetService("AnalyticsService")
+
+local ProductionAnalytics = {}
+local loggedSteps: {[Player]: {[number]: boolean}} = {}
+
+function ProductionAnalytics.logOnboardingStep(player: Player, step: number, stepName: string)
+	loggedSteps[player] = loggedSteps[player] or {}
+	if loggedSteps[player][step] then return end
+	loggedSteps[player][step] = true
+	local success, message = pcall(function()
+		AnalyticsService:LogOnboardingFunnelStepEvent(player, step, stepName)
+	end)
+	if not success then warn("[Analytics] onboarding falhou:", message) end
+end
+
+function ProductionAnalytics.logCoinSource(player: Player, amount: number, endingBalance: number, sku: string)
+	assert(amount &gt; 0 and math.isfinite(amount), "amount inválido")
+	assert(endingBalance &gt;= 0 and math.isfinite(endingBalance), "saldo inválido")
+	local success, message = pcall(function()
+		AnalyticsService:LogEconomyEvent(
+			player,
+			Enum.AnalyticsEconomyFlowType.Source,
+			"Coins",
+			amount,
+			endingBalance,
+			Enum.AnalyticsEconomyTransactionType.Gameplay.Name,
+			sku
+		)
+	end)
+	if not success then warn("[Analytics] economia falhou:", message) end
+end
+
+function ProductionAnalytics.cleanup(player: Player)
+	loggedSteps[player] = nil
+end
+
+return table.freeze(ProductionAnalytics)</code></pre></div>
+            <ol class="step-list"><li>No script que carrega o perfil, chame passo 1 “Joined”; depois da primeira coleta confirmada, passo 2 “Collected First Coin”; depois da compra segura, passo 3 “Bought First Upgrade”; após a primeira volta, passo 4 “Completed First Loop”.</li><li>Após somar moeda no servidor, chame <code>logCoinSource</code> com quantidade e saldo final reais. Não chame quando o cliente apenas toca numa moeda antes da validação.</li><li>Em <code>Players.PlayerRemoving</code>, chame <code>cleanup</code>. Teste em staging; no Creator Dashboard → Analytics → Funnels/Economy → View Events, confirme eventos.</li><li>Force uma tentativa rejeitada e confirme que nenhum evento de sucesso é gerado. Para reiniciar, use outro jogador/teste; etapas repetidas do mesmo onboarding são ignoradas. Para desfazer, remova chamadas e módulo.</li></ol><p><strong>Diagnóstico:</strong> evento demais indica chamada antes de sucesso ou repetição; painel vazio pode refletir experiência não publicada, atraso ou assinatura errada; nomes variados por jogador causam cardinalidade inútil. Gráficos agregados não aparecem instantaneamente.</p></section>
+          <section><h3>Experimento e LiveOps com guardrails</h3><p>Um experimento precisa de hipótese, variante, métrica principal, guardrails e decisão antecipada. Exemplo: “reduzir texto do tutorial aumenta conclusão do onboarding”; métrica principal: passo 4; guardrails: retenção D1, denúncias e erro do servidor não pioram. Experimentos no Creator Dashboard usam configs e audiência; não faça seu próprio sorteio sem necessidade.</p><p>LiveOps mistura correções, qualidade de vida, conteúdo e eventos. Cada atualização deve ter owner, changelog, staging, release, monitoramento e rollback. Alertas devem apontar ação: erro crítico, aumento de falha de DataStore, queda de conclusão ou heartbeat degradado.</p></section>
+          <section><h3>Exercícios e plano de manutenção</h3><div class="exercise-grid"><article class="card"><span class="difficulty">Fácil</span><p>Transforme “quero mais jogadores” numa pergunta mensurável e uma decisão.</p></article><article class="card"><span class="difficulty">Intermediário</span><p>Adicione um sink de 50 moedas após compra validada e confira saldo final.</p></article><article class="card"><span class="difficulty">Desafiador</span><p>Planeje experimento de onboarding com hipótese, público, métrica, dois guardrails, duração configurada na plataforma e regra de parada.</p></article></div><p><strong>Projeto principal:</strong> dashboard mínimo e plano de atualização com pergunta, eventos, baseline, hipótese, guardrails, rollout, rollback, responsável e decisão.</p><ul class="check-list"><li>Cada evento responde a uma pergunta.</li><li>Registro sucesso depois da mutação autoritativa.</li><li>Não envio dados sensíveis ou cardinalidade livre.</li><li>Experimento possui guardrails e critério de decisão.</li><li>LiveOps inclui manutenção e rollback.</li></ul></section>
+          <details class="answer"><summary>Gabarito comentado</summary><div class="answer-body"><p><strong>Fácil:</strong> “qual porcentagem de novos jogadores conclui o primeiro ciclo?”; se a maior queda é antes da coleta, revisar orientação dessa etapa.</p><p><strong>Intermediário:</strong> use <code>Enum.AnalyticsEconomyFlowType.Sink</code>, quantidade positiva 50, saldo final após débito e SKU estável como <code>FirstUpgrade</code>.</p><p><strong>Desafiador:</strong> não escolha vencedor só por uma oscilação. Defina antes quando parar, qual dano bloqueia rollout e como voltar ao controle.</p></div></details>
+          <section><h3>Validação técnica</h3><p>Consulta: <time datetime="2026-08-26">26 de agosto de 2026</time>.</p><div class="table-wrap"><table><thead><tr><th>Informação ou API</th><th>Fonte oficial</th><th>Fonte complementar</th><th>Situação</th><th>Ajustes realizados</th></tr></thead><tbody><tr><td>eventos de economy/funnel/custom</td><td><a href="https://create.roblox.com/docs/production/analytics/event-types" target="_blank" rel="noopener noreferrer">Event types</a></td><td>MonzterDEV — apenas fonte de perguntas, não validada aula a aula</td><td>Atual e recomendada</td><td>Evento somente após sucesso.</td></tr><tr><td><code>AnalyticsService</code></td><td><a href="https://create.roblox.com/docs/reference/engine/classes/AnalyticsService" target="_blank" rel="noopener noreferrer">AnalyticsService API</a></td><td>Não utilizada</td><td>Atual e recomendada</td><td>Assinaturas conferidas na Engine API.</td></tr><tr><td>experimentos</td><td><a href="https://create.roblox.com/docs/production/experiments" target="_blank" rel="noopener noreferrer">Experiments</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Hipótese e guardrails definidos antes.</td></tr><tr><td>LiveOps</td><td><a href="https://create.roblox.com/docs/production/game-design/liveops-essentials" target="_blank" rel="noopener noreferrer">LiveOps essentials</a></td><td>Não utilizada</td><td>Atual, mas depende do contexto</td><td>Cadência subordinada à capacidade de manter.</td></tr></tbody></table></div></section>
+          <div class="chapter-pager"><a class="button" href="#capitulo-05">← 9.5</a><a class="button primary" href="#avaliacao" data-next-chapter>Avaliação →</a></div>
+        </div>
+      </article>
+
+      <section class="chapter assessment" id="avaliacao" aria-labelledby="titulo-avaliacao">
+        <header class="chapter-header"><div><p class="chapter-kicker">Avaliação de domínio · não contabilizada como capítulo</p><h2 id="titulo-avaliacao">Gate de produção do Módulo 9</h2><p>Avance somente quando seus fluxos críticos forem seguros, medidos e reversíveis.</p></div></header>
+        <div class="reading-flow"><section><h3>Evidências obrigatórias</h3><ol class="step-list"><li><strong>Ameaças:</strong> apresente a matriz de loja, coleta, combate e texto, com teste hostil e falha segura.</li><li><strong>Performance:</strong> mostre baseline, perfil, mudança e repetição equivalente no dispositivo-alvo.</li><li><strong>Assets:</strong> prove owner, licença, permissão, moderação e substituto dos IDs críticos.</li><li><strong>Release:</strong> execute publicação privada e ensaio de rollback compatível com schema.</li><li><strong>Dinheiro:</strong> processe o mesmo PurchaseId duas vezes e prove uma única concessão persistente; ausência/falha permanecem pendentes.</li><li><strong>Analytics:</strong> relacione pergunta, evento, hipótese, métrica principal, guardrail e decisão.</li></ol></section><section><h3>Critérios de aprovação</h3><ul class="check-list"><li>Nenhum fluxo crítico conhecido concede valor pelo cliente.</li><li>Toda concessão tem fonte de verdade, registro persistente e recuperação.</li><li>Nenhuma falha de filtro mostra texto bruto.</li><li>Release possui responsável, observação e rollback ensaiado.</li><li>Otimização e decisão de produto usam evidência reproduzível.</li><li>Não há segredo, asset sem procedência ou API depreciada em código novo.</li></ul><aside class="callout warning"><strong>Se algum item falhar</strong><p>Volte ao capítulo correspondente e corrija a evidência. “Funcionou uma vez” não é critério de produção.</p></aside></section>
+          <details class="answer"><summary>Rubrica e gabarito da avaliação</summary><div class="answer-body"><p><strong>Aprovado:</strong> as seis evidências são reproduzíveis por outra pessoa, o recibo repetido não duplica valor, a falha de dependência preserva estado seguro e o rollback não perde dados compatíveis.</p><p><strong>Revisão necessária:</strong> qualquer concessão sem marcador persistente, texto bruto em fallback, asset de owner incerto, otimização sem baseline ou release sem rollback bloqueia o avanço.</p><p><strong>Excelente:</strong> além de aprovado, cada risco tem responsável, limiar de alerta e teste de regressão.</p></div></details>
+          <div class="chapter-pager"><a class="button" href="#capitulo-06">← 9.6</a><a class="button primary" href="../index.html#modulo-10">Voltar ao plano da formação</a></div>
+        </div>
+      </section>
+
+      <section class="page-section" id="glossario" aria-labelledby="glossario-titulo"><h2 id="glossario-titulo">Glossário do módulo</h2><dl class="glossary-grid"><div class="glossary-item"><dt>Autoridade</dt><dd>Lado que decide o estado verdadeiro.</dd></div><div class="glossary-item"><dt>Cardinalidade</dt><dd>Quantidade de valores diferentes numa dimensão de dados.</dd></div><div class="glossary-item"><dt>Idempotência</dt><dd>Repetição segura do mesmo identificador.</dd></div><div class="glossary-item"><dt>Observabilidade</dt><dd>Sinais que permitem entender o sistema em execução.</dd></div><div class="glossary-item"><dt>Rollout</dt><dd>Liberação controlada de uma mudança.</dd></div><div class="glossary-item"><dt>Source of truth</dt><dd>Fonte oficial usada para decidir um valor.</dd></div></dl></section>
+      <section class="page-section" id="fontes" aria-labelledby="fontes-titulo"><h2 id="fontes-titulo">Fontes oficiais do módulo</h2><p>As tabelas de cada capítulo registram a validação específica e a data. Portais gerais: <a href="https://create.roblox.com/docs/safety" target="_blank" rel="noopener noreferrer">Safety</a>, <a href="https://create.roblox.com/docs/performance-optimization" target="_blank" rel="noopener noreferrer">Performance</a>, <a href="https://create.roblox.com/docs/projects/assets" target="_blank" rel="noopener noreferrer">Assets</a>, <a href="https://create.roblox.com/docs/production/publishing" target="_blank" rel="noopener noreferrer">Publishing</a>, <a href="https://create.roblox.com/docs/production/monetization" target="_blank" rel="noopener noreferrer">Monetization</a> e <a href="https://create.roblox.com/docs/production/analytics" target="_blank" rel="noopener noreferrer">Analytics</a>.</p></section>
+    </section>
+  </main>
+  <footer class="site-footer"><p>Apostila Roblox Studio · Módulo 9 completo · progresso local com sincronização opcional.</p></footer>
+</body>
+</html>
+
+
