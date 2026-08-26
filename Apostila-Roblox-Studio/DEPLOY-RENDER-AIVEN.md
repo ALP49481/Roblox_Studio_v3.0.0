@@ -63,11 +63,13 @@ O arquivo `render.yaml`, na raiz do repositório, define:
 `npm start` executa `server/start.js`. A inicialização:
 
 1. tenta conectar à Aiven com TLS;
-2. obtém um bloqueio transacional do PostgreSQL;
-3. aplica `server/schema.sql`, composto por operações `IF NOT EXISTS`;
-4. repete a tentativa com espera crescente em até quatro tentativas se houver falha temporária;
-5. inicia o Express em `0.0.0.0` e na porta fornecida pelo Render;
-6. encerra com erro se o banco não puder ser preparado, evitando disponibilizar uma aplicação parcialmente funcional.
+2. remove da URI parâmetros como `sslmode` que fariam o `node-postgres` substituir a CA configurada pela aplicação;
+3. verifica o certificado e o hostname com a CA da Aiven e `rejectUnauthorized: true`;
+4. obtém um bloqueio transacional do PostgreSQL;
+5. aplica `server/schema.sql`, composto por operações `IF NOT EXISTS`;
+6. repete a tentativa com espera crescente em até quatro tentativas se houver falha temporária;
+7. inicia o Express em `0.0.0.0` e na porta fornecida pelo Render;
+8. encerra com erro se o banco não puder ser preparado, evitando disponibilizar uma aplicação parcialmente funcional.
 
 Essa verificação também ocorre depois de um cold start do Render. Ela é pequena e segura para repetição. Migrações futuras devem continuar aditivas e compatíveis; não coloque remoções destrutivas automáticas nesse arquivo.
 
@@ -222,6 +224,7 @@ O Render gratuito mantém opções limitadas de rollback. Um rollback de código
 | configuração pede Pre-Deploy pago | campo antigo ainda preenchido | apague o Pre-Deploy Command; a migração ocorre em `npm start` |
 | `DATABASE_URL não foi definida` | segredo ausente | Environment do Web Service, sem espaços ou aspas extras |
 | `AIVEN_CA_CERT é obrigatória` | CA ausente ou nome incorreto | variável com PEM completo e quebras de linha |
+| aviso sobre `sslmode=require` | versão anterior do código deixou a URI substituir a configuração TLS | publique esta versão; não remova a CA nem desative a verificação |
 | erro de certificado | CA incompleta ou URI do serviço errado | baixe novamente a CA do mesmo serviço Aiven |
 | timeout/`ECONNREFUSED` no start | Aiven desligada, URI incorreta ou filtro de IP | estado do serviço, host/porta e todos os CIDRs Render |
 | aplicação reinicia sem ficar saudável | migração falhou quatro vezes | primeira mensagem de erro no log e estado da Aiven |
@@ -277,5 +280,6 @@ Alterar segredos reinicia o serviço e pode interromper sessões brevemente.
 - [Aiven — Create a PostgreSQL service](https://aiven.io/docs/products/postgresql/get-started)
 - [Aiven — PostgreSQL connection limits](https://aiven.io/docs/products/postgresql/reference/pg-connection-limits)
 - [Aiven — Connect Node.js to PostgreSQL](https://aiven.io/docs/products/postgresql/howto/connect-node)
+- [node-postgres — SSL com connection string](https://node-postgres.com/features/ssl)
 - [Aiven — Restrict access with IP filters](https://aiven.io/docs/platform/howto/restrict-access)
 - [Aiven — Power cycle a PostgreSQL service](https://aiven.io/docs/products/postgresql/howto/power-cycle-service)

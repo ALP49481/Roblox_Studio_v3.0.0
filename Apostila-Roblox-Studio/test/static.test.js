@@ -293,6 +293,8 @@ test("deploy Render e Aiven possui configuração reproduzível e sem segredos",
   assert.match(start, /MAX_ATTEMPTS = 4/);
   assert.match(migrate, /pg_advisory_xact_lock/);
   assert.match(database, /DATABASE_POOL_MAX \|\| "3"/);
+  assert.match(database, /connectionUrl\.searchParams\.delete\(parameter\)/);
+  assert.match(database, /rejectUnauthorized: true/);
   assert.match(guide, /Criar o PostgreSQL gratuito na Aiven/);
   assert.match(guide, /Web Service gratuito já existente no Render/);
   assert.match(guide, /Criar do zero com o Blueprint gratuito/);
