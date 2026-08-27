@@ -300,8 +300,14 @@ test("os 11 kits práticos estão completos e os arquivos rbxlx são estruturado
   assert.match(lantern, /<Item class="Tool">[\s\S]*<string name="Name">Lanterna<\/string>[\s\S]*<Item class="PointLight">[\s\S]*<Item class="LocalScript">/);
   const checkpoint = resolved("projeto-05-percurso-checkpoint-interface");
   assert.match(checkpoint, /<Item class="ScreenGui">[\s\S]*<string name="Name">CheckpointGui<\/string>[\s\S]*<Item class="TextLabel">[\s\S]*<Item class="LocalScript">/);
-  assert.match(resolved("projeto-09-simulador-enxuto"), /<Item class="Tool">[\s\S]*<string name="Name">Picareta<\/string>/);
+  const collection = resolved("projeto-06-coleta-moedas-seguras");
+  assert.match(collection, /<Item class="ProximityPrompt">[\s\S]*<Item class="StarterPlayerScripts">[\s\S]*<Item class="LocalScript">/);
+  assert.match(resolved("projeto-07-loja-segura"), /<string name="Name">Loja<\/string>[\s\S]*<Item class="ProximityPrompt">[\s\S]*<Item class="LocalScript">/);
+  assert.match(resolved("projeto-09-simulador-enxuto"), /<Item class="Tool">[\s\S]*<string name="Name">Picareta<\/string>[\s\S]*<Item class="LocalScript">/);
   assert.match(resolved("projeto-10-estudo-combate"), /<Item class="Tool">[\s\S]*<string name="Name">Blaster<\/string>[\s\S]*<Item class="LocalScript">/);
+  assert.match(resolved("projeto-11-projeto-final"), /<string name="Name">Crystals<\/string>[\s\S]*<Item class="ProximityPrompt">[\s\S]*<Item class="LocalScript">/);
+  assert.match(collection, /\[Kit 6\] servidor carregado/);
+  assert.match(collection, /\[Kit 6\] cliente carregado/);
   assert.doesNotMatch(lantern, /<Item class="Folder"><Properties><string name="Name">StarterPlayerScripts<\/string>/);
 });
 

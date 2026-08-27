@@ -180,6 +180,22 @@ end)
 
 Players.PlayerRemoving:Connect(function(player) lastRequest[player] = nil end)
 `,
+    client: `--!strict
+local remote = game:GetService("ReplicatedStorage").Remotes.RequestCollect
+local collectibles = workspace.Laboratorio.Coletaveis
+
+local function connectCollectible(collectible: Instance)
+ if not collectible:IsA("BasePart") then return end
+ local prompt = collectible:FindFirstChildOfClass("ProximityPrompt")
+ if not prompt then return end
+ prompt.Triggered:Connect(function()
+  remote:FireServer(collectible)
+ end)
+end
+
+for _, collectible in collectibles:GetChildren() do connectCollectible(collectible) end
+collectibles.ChildAdded:Connect(connectCollectible)
+`,
     error: `-- ERROS INTENCIONAIS
 game.ReplicatedStorage.Remotes.RequestCollect.OnServerEvent:Connect(function(player, item, valor)
  player:SetAttribute("Coins", player:GetAttribute("Coins") + valor) -- confia no valor do cliente
@@ -217,6 +233,15 @@ end)
 
 Players.PlayerRemoving:Connect(function(player: Player)
  processed[player] = nil
+end)
+`,
+    client: `--!strict
+local HttpService = game:GetService("HttpService")
+local remote = game:GetService("ReplicatedStorage").Remotes.RequestPurchase
+local prompt = workspace.Laboratorio.Loja:WaitForChild("ProximityPrompt") :: ProximityPrompt
+
+prompt.Triggered:Connect(function()
+ remote:FireServer("lanterna_dourada", HttpService:GenerateGUID(false))
 end)
 `,
     module: `--!strict
@@ -296,6 +321,25 @@ remote.OnServerEvent:Connect(function(player: Player, ore: unknown)
  player:SetAttribute("Bag", math.min(bag + 1, capacity))
 end)
 `,
+    client: `--!strict
+local Players = game:GetService("Players")
+local remote = game:GetService("ReplicatedStorage").Remotes.MineOre
+local tool = script.Parent
+
+tool.Activated:Connect(function()
+ local root = Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+ if not root then return end
+ local nearest: BasePart? = nil
+ local distance = math.huge
+ for _, ore in workspace.Laboratorio.Ores:GetChildren() do
+  if ore:IsA("BasePart") then
+   local current = (root.Position - ore.Position).Magnitude
+   if current < distance then nearest, distance = ore, current end
+  end
+ end
+ if nearest then remote:FireServer(nearest) end
+end)
+`,
     module: `--!strict
 return table.freeze({stone = {yield = 1, area = 1}, crystal = {yield = 2, area = 2}})
 `,
@@ -361,6 +405,22 @@ request.OnServerEvent:Connect(function(player: Player, crystal: unknown)
  crystal.Transparency = 1; crystal.CanTouch = false
 end)
 `,
+    client: `--!strict
+local remote = game:GetService("ReplicatedStorage").Remotes.RequestCollectCrystal
+local crystals = workspace.Laboratorio.Crystals
+
+local function connectCrystal(crystal: Instance)
+ if not crystal:IsA("BasePart") then return end
+ local prompt = crystal:FindFirstChildOfClass("ProximityPrompt")
+ if not prompt then return end
+ prompt.Triggered:Connect(function()
+  remote:FireServer(crystal)
+ end)
+end
+
+for _, crystal in crystals:GetChildren() do connectCrystal(crystal) end
+crystals.ChildAdded:Connect(connectCrystal)
+`,
     module: `--!strict
 return table.freeze({roundSeconds = 180, extractionRequirement = 5, collectionDistance = 12})
 `,
@@ -394,8 +454,8 @@ function instance(className, name, children = "", extra = "") {
   return `<Item class="${className}">${properties(name, extra)}${children}</Item>`;
 }
 
-function part(name, x, y, z, sx, sy, sz) {
-  return `<Item class="Part">${properties(name, `<bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>${x}</X><Y>${y}</Y><Z>${z}</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>${sx}</X><Y>${sy}</Y><Z>${sz}</Z></Vector3>`)}</Item>`;
+function part(name, x, y, z, sx, sy, sz, children = "") {
+  return `<Item class="Part">${properties(name, `<bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>${x}</X><Y>${y}</Y><Z>${z}</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>${sx}</X><Y>${sy}</Y><Z>${sz}</Z></Vector3>`)}${children}</Item>`;
 }
 
 function scriptItem(className, name, source) {
@@ -403,6 +463,7 @@ function scriptItem(className, name, source) {
 }
 
 function placeXml(project, solved) {
+  const prompt = (action, object) => instance("ProximityPrompt", "ProximityPrompt", "", `<string name="ActionText">${escapeXml(action)}</string><string name="ObjectText">${escapeXml(object)}</string><float name="MaxActivationDistance">10</float><float name="HoldDuration">0</float>`);
   const room = [
     part("Base", 0, 0, 0, 60, 1, 60),
     part("Entrada", 0, 3, 24, 10, 1, 6),
@@ -411,15 +472,17 @@ function placeXml(project, solved) {
     project.number >= 2 ? part("Porta", 0, 5, -10, 8, 10, 1) : "",
     project.number >= 3 ? part("Perigo", 8, 1, 2, 10, 1, 10) : "",
     project.number === 5 ? folder("Checkpoints", part("Checkpoint1", 0, 1, 18, 8, 1, 8) + part("Checkpoint2", 0, 1, -14, 8, 1, 8)) : "",
-    project.number === 6 ? folder("Coletaveis", part("Item1", -10, 2, -4, 2, 2, 2) + part("Item2", 10, 2, -4, 2, 2, 2)) : "",
+    project.number === 6 ? folder("Coletaveis", part("Item1", -10, 2, -4, 2, 2, 2, prompt("Coletar", "Moeda")) + part("Item2", 10, 2, -4, 2, 2, 2, prompt("Coletar", "Moeda"))) : "",
+    project.number === 7 ? part("Loja", 0, 3, -4, 8, 6, 4, prompt("Comprar", "Lanterna dourada · 25 moedas")) : "",
     project.number === 9 ? folder("Ores", part("Item1", -10, 2, -4, 2, 2, 2) + part("Item2", 10, 2, -4, 2, 2, 2)) : "",
-    project.number === 11 ? folder("Crystals", part("Crystal1", -12, 2, -12, 2, 3, 2) + part("Crystal2", 12, 2, -12, 2, 3, 2)) : ""
+    project.number === 11 ? folder("Crystals", part("Crystal1", -12, 2, -12, 2, 3, 2, prompt("Coletar", "Cristal")) + part("Crystal2", 12, 2, -12, 2, 3, 2, prompt("Coletar", "Cristal"))) : ""
   ].join("");
-  const serverScripts = solved && project.server ? scriptItem("Script", `Projeto${project.number}Server`, project.server) : "";
-  const clientScripts = solved && project.client ? scriptItem("LocalScript", `Projeto${project.number}Client`, project.client) : "";
+  const serverScripts = solved && project.server ? scriptItem("Script", `Projeto${project.number}Server`, `print("[Kit ${project.number}] servidor carregado")\n${project.server}`) : "";
+  const clientScripts = solved && project.client ? scriptItem("LocalScript", `Projeto${project.number}Client`, `print("[Kit ${project.number}] cliente carregado")\n${project.client}`) : "";
   const moduleScripts = solved && project.module ? scriptItem("ModuleScript", `Projeto${project.number}Config`, project.module) : "";
   const remotes = project.number >= 6 ? folder("Remotes", `<Item class="RemoteEvent">${properties(project.number === 6 ? "RequestCollect" : project.number === 7 ? "RequestPurchase" : project.number === 9 ? "MineOre" : project.number === 10 ? "RequestFire" : "RequestCollectCrystal")}</Item>`) : "";
-  const starterPlayerScripts = instance("StarterPlayerScripts", "StarterPlayerScripts");
+  const clientUsesDedicatedContainer = [4, 5, 9, 10].includes(project.number);
+  const starterPlayerScripts = instance("StarterPlayerScripts", "StarterPlayerScripts", solved && project.client && !clientUsesDedicatedContainer ? clientScripts : "");
   let starterGuiContent = "";
   let starterPackContent = "";
 
@@ -431,7 +494,7 @@ function placeXml(project, solved) {
     const label = instance("TextLabel", "CheckpointAtual", "", '<string name="Text">Checkpoint: —</string>');
     starterGuiContent = instance("ScreenGui", "CheckpointGui", label + clientScripts, '<bool name="ResetOnSpawn">false</bool>');
   } else if (solved && project.number === 9) {
-    starterPackContent = instance("Tool", "Picareta", "", '<bool name="RequiresHandle">false</bool>');
+    starterPackContent = instance("Tool", "Picareta", clientScripts, '<bool name="RequiresHandle">false</bool>');
   } else if (solved && project.number === 10) {
     starterPackContent = instance("Tool", "Blaster", clientScripts, '<bool name="RequiresHandle">false</bool>');
   }

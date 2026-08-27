@@ -3,7 +3,8 @@
   <External>null</External><External>nil</External>
   <Item class="Workspace"><Properties><string name="Name">Workspace</string></Properties><Item class="Folder"><Properties><string name="Name">Laboratorio</string></Properties><Item class="Part"><Properties><string name="Name">Base</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>0</X><Y>0</Y><Z>0</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>60</X><Y>1</Y><Z>60</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Entrada</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>0</X><Y>3</Y><Z>24</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>10</X><Y>1</Y><Z>6</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Objetivo</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>0</X><Y>2</Y><Z>-20</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>8</X><Y>2</Y><Z>8</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Painel</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>-8</X><Y>3</Y><Z>0</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>6</X><Y>6</Y><Z>6</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Porta</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>0</X><Y>5</Y><Z>-10</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>8</X><Y>10</Y><Z>1</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Perigo</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>8</X><Y>1</Y><Z>2</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>10</X><Y>1</Y><Z>10</Z></Vector3></Properties></Item><Item class="Folder"><Properties><string name="Name">Ores</string></Properties><Item class="Part"><Properties><string name="Name">Item1</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>-10</X><Y>2</Y><Z>-4</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>2</X><Y>2</Y><Z>2</Z></Vector3></Properties></Item><Item class="Part"><Properties><string name="Name">Item2</string><bool name="Anchored">true</bool><CoordinateFrame name="CFrame"><X>10</X><Y>2</Y><Z>-4</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>2</X><Y>2</Y><Z>2</Z></Vector3></Properties></Item></Item></Item></Item>
   <Item class="ReplicatedStorage"><Properties><string name="Name">ReplicatedStorage</string></Properties><Item class="Folder"><Properties><string name="Name">Remotes</string></Properties><Item class="RemoteEvent"><Properties><string name="Name">MineOre</string></Properties></Item></Item></Item>
-  <Item class="ServerScriptService"><Properties><string name="Name">ServerScriptService</string></Properties><Item class="Script"><Properties><string name="Name">Projeto9Server</string><ProtectedString name="Source"><![CDATA[--!strict
+  <Item class="ServerScriptService"><Properties><string name="Name">ServerScriptService</string></Properties><Item class="Script"><Properties><string name="Name">Projeto9Server</string><ProtectedString name="Source"><![CDATA[print("[Kit 9] servidor carregado")
+--!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local remote = ReplicatedStorage.Remotes.MineOre
 local lastMine: {[Player]: number} = {}
@@ -23,6 +24,25 @@ return table.freeze({stone = {yield = 1, area = 1}, crystal = {yield = 2, area =
 ]]></ProtectedString></Properties></Item></Item>
   <Item class="StarterPlayer"><Properties><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts"><Properties><string name="Name">StarterPlayerScripts</string></Properties></Item></Item>
   <Item class="StarterGui"><Properties><string name="Name">StarterGui</string></Properties></Item>
-  <Item class="StarterPack"><Properties><string name="Name">StarterPack</string></Properties><Item class="Tool"><Properties><string name="Name">Picareta</string><bool name="RequiresHandle">false</bool></Properties></Item></Item>
+  <Item class="StarterPack"><Properties><string name="Name">StarterPack</string></Properties><Item class="Tool"><Properties><string name="Name">Picareta</string><bool name="RequiresHandle">false</bool></Properties><Item class="LocalScript"><Properties><string name="Name">Projeto9Client</string><ProtectedString name="Source"><![CDATA[print("[Kit 9] cliente carregado")
+--!strict
+local Players = game:GetService("Players")
+local remote = game:GetService("ReplicatedStorage").Remotes.MineOre
+local tool = script.Parent
+
+tool.Activated:Connect(function()
+ local root = Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+ if not root then return end
+ local nearest: BasePart? = nil
+ local distance = math.huge
+ for _, ore in workspace.Laboratorio.Ores:GetChildren() do
+  if ore:IsA("BasePart") then
+   local current = (root.Position - ore.Position).Magnitude
+   if current < distance then nearest, distance = ore, current end
+  end
+ end
+ if nearest then remote:FireServer(nearest) end
+end)
+]]></ProtectedString></Properties></Item></Item></Item>
   <Item class="Lighting"><Properties><string name="Name">Lighting</string></Properties></Item>
 </roblox>
